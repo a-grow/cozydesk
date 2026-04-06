@@ -1,0 +1,45 @@
+<!-- ⚠️ DO NOT MODIFY FONTS - Protected file -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme colour (browser chrome / status bar) -->
+    <meta name="theme-color" content="#e6cba8" />
+
+    <!-- Standard meta -->
+    <meta name="description" content="Your cozy productivity workspace — sticky notes, stickers, timers and more." />
+    <meta name="application-name" content="CozyDesk" />
+
+    <!-- Apple PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CozyDesk" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cinzel+Decorative&family=Comic+Neue:wght@400;700&family=Fredoka:wght@400&family=Nunito:wght@400;700;800&family=Patrick+Hand&family=Permanent+Marker&family=Poppins:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+
+    <title>CozyDesk</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <!-- Register service worker for PWA offline support -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

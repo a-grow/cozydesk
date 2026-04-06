@@ -1,0 +1,1905 @@
+/* ⚠️ DO NOT MODIFY FONTS - Protected file */
+/* ════════════════════════════════════════════════
+   Sidebar.css — CozyDesk Sidebar Styles
+   ════════════════════════════════════════════════ */
+
+/* ── Theme Variables (Cozy Kawaii — default) ── */
+.cozy-sidebar,
+.cozy-sidebar[data-theme="cozykawaii"] {
+  --sb-bg: #fff8f0;
+  --sb-text: #4b3b2a;
+  --sb-accent: #f5a8b8;
+  --sb-accent-secondary: #c8dfa8;
+  --sb-accent-light: #ffdca8;
+  --sb-border: #ecddd0;
+  --sb-card: #fffdf8;
+  --sb-heading: #6b4b3a;
+  --sb-subtext: #a07850;
+  --sb-input-bg: #fffdf8;
+  --sb-input-border: #e0d4c8;
+  --sb-btn-primary: #f5a8b8;
+  --sb-btn-primary-hover: #e07890;
+  --sb-btn-secondary: #c8dfa8;
+  --sb-btn-secondary-text: #3a5a20;
+  --sb-shadow: rgba(0,0,0,0.08);
+  --sb-clock-text: #6b4b3a;
+  --sb-pomo-circle: #ffe0e0;
+  --sb-pomo-work: #ff8a8a;
+  --sb-pomo-break: #a8dbb8;
+  /* To add a new theme, define --btn-bg, --btn-text, --btn-font */
+  --btn-bg: #F5E6D3;
+  --btn-text: #5C3D2E;
+  --btn-font: 'Nunito', sans-serif;
+}
+
+.cozy-sidebar[data-theme="lofi"] {
+  --sb-bg: #1a1a2e;
+  --sb-text: #c8c4d8;
+  --sb-accent: #7c73c0;
+  --sb-accent-secondary: #5a7070;
+  --sb-accent-light: #3a3468;
+  --sb-border: #3a3a5c;
+  --sb-card: #252540;
+  --sb-heading: #e0dce8;
+  --sb-subtext: #8888a8;
+  --sb-input-bg: #252540;
+  --sb-input-border: #3a3a5c;
+  --sb-btn-primary: #7c73c0;
+  --sb-btn-primary-hover: #6b64a8;
+  --sb-btn-secondary: #5a7070;
+  --sb-btn-secondary-text: #c8e0d8;
+  --sb-shadow: rgba(0,0,0,0.25);
+  --sb-clock-text: #e0dce8;
+  --sb-pomo-circle: #2a2040;
+  --sb-pomo-work: #a06060;
+  --sb-pomo-break: #608878;
+  /* To add a new theme, define --btn-bg, --btn-text, --btn-font */
+  --btn-bg: #2D2B55;
+  --btn-text: #C9C0FF;
+  --btn-font: 'Nunito', sans-serif;
+}
+
+.cozy-sidebar[data-theme="steampunk"] {
+  --sb-bg: #2a2018;
+  --sb-text: #e8d4b0;
+  --sb-accent: #b87333;
+  --sb-accent-secondary: #8a6a40;
+  --sb-accent-light: #6a5030;
+  --sb-border: #5a4a3a;
+  --sb-card: #3a2e22;
+  --sb-heading: #f0deb8;
+  --sb-subtext: #b8a080;
+  --sb-input-bg: #3a2e22;
+  --sb-input-border: #5a4a3a;
+  --sb-btn-primary: #b87333;
+  --sb-btn-primary-hover: #a06828;
+  --sb-btn-secondary: #8a6a40;
+  --sb-btn-secondary-text: #f0deb8;
+  --sb-shadow: rgba(0,0,0,0.3);
+  --sb-clock-text: #f0deb8;
+  --sb-pomo-circle: #4a3020;
+  --sb-pomo-work: #c07838;
+  --sb-pomo-break: #6b8a5a;
+  /* To add a new theme, define --btn-bg, --btn-text, --btn-font */
+  --btn-bg: #6B3F1E;
+  --btn-text: #D4A853;
+  --btn-font: 'Cinzel Decorative', cursive;
+}
+
+/* ── Sidebar Container ── */
+.cozy-sidebar {
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-border) transparent;
+  box-shadow: 2px 0 12px var(--sb-shadow);
+  border-radius: 0 16px 16px 0;
+}
+.cozy-sidebar::-webkit-scrollbar { width: 5px; }
+.cozy-sidebar::-webkit-scrollbar-track { background: transparent; }
+.cozy-sidebar::-webkit-scrollbar-thumb {
+  background: var(--sb-border);
+  border-radius: 10px;
+}
+
+/* ── Logo ── */
+.sb-logo { text-align: center; margin-bottom: 4px; }
+.sb-logo-title {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--sb-heading);
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  text-shadow: 0 1px 0 rgba(255,240,220,0.5), 0 2px 4px var(--sb-shadow);
+}
+.sb-logo-subtitle {
+  margin: 3px 0 0;
+  font-size: 0.75rem;
+  color: var(--sb-subtext);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.sb-divider {
+  border: none;
+  border-top: 1px solid var(--sb-border);
+  margin: 8px 0 10px;
+}
+
+/* ── Action Buttons ── */
+.sb-action-btn {
+  width: 100%;
+  margin: 4px 0;
+  padding: 10px;
+  border: none !important;
+  border-radius: 12px;
+  background-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  font-family: var(--btn-font) !important;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, filter 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.sb-action-btn:hover { transform: scale(1.02); filter: brightness(0.92); }
+.sb-action-note {
+  background: var(--sb-btn-primary);
+  color: #fff;
+}
+.sb-action-note:hover { background: var(--sb-btn-primary-hover); filter: none; }
+.sb-action-todo {
+  background: var(--sb-btn-secondary);
+  color: var(--sb-btn-secondary-text);
+}
+.sb-action-todo:hover { opacity: 0.85; filter: none; }
+.sb-action-settings {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-family: var(--btn-font);
+  font-weight: 600;
+}
+.sb-action-settings:hover { filter: brightness(0.92); }
+
+/* ── Section ── */
+.sb-section {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--sb-border);
+}
+.sb-section-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--sb-heading);
+  margin: 0 0 8px;
+  letter-spacing: 0.03em;
+}
+.sb-spacer { flex: 1; min-height: 10px; }
+
+/* ── Productivity Icons Row ── */
+.sb-productivity-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sb-todo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 10px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+}
+
+.sb-todo-container:hover {
+  background: var(--sb-accent-light); /* Matching the warm yellow/brown from the theme */
+  border-color: rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(180, 140, 100, 0.12);
+  transform: translateY(-2px);
+}
+
+.sb-todo-container:hover .sb-todo-icon-btn {
+  transform: scale(1.02);
+}
+
+/* ── To-Do Icon Button (image only) ── */
+.sb-todo-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: transparent !important;
+  cursor: pointer;
+  transition: transform 0.25s;
+}
+.sb-todo-icon-btn-active {
+  /* No special button-level highlight anymore, container handles it */
+}
+.sb-todo-icon-img {
+  width: 100%;
+  max-width: 140px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.15));
+}
+.sb-icon-label {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.65rem;
+  color: var(--sb-subtext);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* ── Shared Undo / Redo Buttons ── */
+.sb-undo-btn, .sb-redo-btn {
+  flex: 1;
+  padding: 10px;
+  border: none !important;
+  border-radius: 12px;
+  background-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  font-family: var(--btn-font) !important;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, filter 0.2s, transform 0.15s, opacity 0.2s;
+}
+.sb-undo-btn:hover:not(:disabled),
+.sb-redo-btn:hover:not(:disabled) {
+  filter: brightness(0.92);
+  transform: scale(1.02);
+}
+.sb-undo-btn:disabled,
+.sb-redo-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+
+/* ════════════════════════════════════════════════
+   Clock Widget
+   ════════════════════════════════════════════════ */
+.clock-widget {
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.clock-time {
+  font-family: 'Fredoka', cursive;
+  font-size: 1.5rem;
+  color: var(--sb-clock-text);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+.clock-date {
+  font-size: 0.8rem;
+  color: var(--sb-subtext);
+  margin-top: 2px;
+}
+
+
+/* ════════════════════════════════════════════════
+   Reminders Widget
+   ════════════════════════════════════════════════ */
+.reminders-widget {
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+/* Mode toggle */
+.reminders-mode-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.reminders-mode-btn {
+  flex: 1;
+  padding: 5px 4px;
+  border: 1.5px solid var(--sb-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sb-text);
+  font-family: 'Fredoka', cursive;
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reminders-mode-btn.active {
+  background: var(--sb-accent);
+  color: #fff;
+  border-color: var(--sb-accent);
+}
+.reminders-mode-btn:hover:not(.active) {
+  background: var(--sb-accent-light);
+}
+
+/* Undo/Redo row */
+.reminders-undo-redo {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+/* Whiteboard mode overrides */
+.reminders-whiteboard {
+  background: var(--sb-card);
+  border-style: dashed;
+  border-width: 2px;
+}
+.reminders-whiteboard .reminders-text-input,
+.reminders-whiteboard .reminders-item-text {
+  font-family: 'Permanent Marker', cursive;
+}
+.reminders-whiteboard .reminders-item {
+  border-style: dashed;
+}
+
+/* Input area */
+.reminders-input-area { margin-bottom: 6px; }
+.reminders-input-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.reminders-emoji-btn {
+  background: var(--sb-card);
+  border: 1.5px solid var(--sb-input-border);
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.2s;
+}
+.reminders-emoji-btn:hover { background: var(--sb-accent-light); }
+.reminders-text-input {
+  flex: 1;
+  border: 1.5px solid var(--sb-input-border);
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--sb-text);
+  background: var(--sb-input-bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.reminders-text-input:focus { border-color: var(--sb-accent); }
+
+/* Emoji grid */
+.reminders-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+  padding: 6px;
+  margin-top: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+.reminders-emoji-option {
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.reminders-emoji-option:hover { background: var(--sb-accent-light); }
+
+/* Date / Time / Alarm */
+.reminders-input-extras {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  align-items: center;
+}
+.reminders-date-input,
+.reminders-time-input {
+  flex: 1;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 6px;
+  padding: 3px 4px;
+  font-size: 0.7rem;
+  font-family: inherit;
+  background: var(--sb-input-bg);
+  color: var(--sb-text);
+  outline: none;
+}
+.reminders-date-input:focus,
+.reminders-time-input:focus { border-color: var(--sb-accent); }
+.reminders-alarm-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.reminders-alarm-toggle input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--sb-accent);
+}
+
+/* Add button */
+.reminders-add-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px;
+  border: none;
+  border-radius: 8px;
+  background: var(--sb-accent-light);
+  color: var(--sb-heading);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.reminders-add-btn:hover {
+  background: var(--sb-accent);
+  color: #fff;
+  transform: scale(1.02);
+}
+
+/* Reminder list */
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-top: 6px;
+}
+.reminders-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border-radius: 8px;
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  transition: background 0.2s;
+  position: relative;
+  font-size: 0.85rem;
+}
+.reminders-item:hover { background: var(--sb-input-bg); }
+.reminders-item-done { opacity: 0.55; }
+
+/* Checkbox */
+.reminders-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid var(--sb-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--sb-heading);
+  transition: background 0.25s;
+}
+.reminders-checkbox-checked {
+  background: var(--sb-accent-light);
+  animation: cozy-pop 0.35s ease-out;
+}
+
+/* Item text */
+.reminders-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+.reminders-item-emoji { margin-right: 3px; }
+
+/* Strike-through marker animation */
+.reminders-strikethrough {
+  color: var(--sb-subtext);
+  opacity: 0.5;
+}
+.reminders-strikethrough::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--sb-accent);
+  animation: strike-line 0.3s ease-out forwards;
+}
+/* Thicker marker line in whiteboard mode */
+.reminders-whiteboard .reminders-strikethrough::after {
+  height: 3px;
+  background: #cc3333;
+  border-radius: 2px;
+}
+
+@keyframes strike-line {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* Date badge */
+.reminders-item-date {
+  font-size: 0.6rem;
+  color: var(--sb-subtext);
+  white-space: nowrap;
+}
+/* Alarm icon (non-active) */
+.alarm-icon {
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+/* Pin button */
+.reminders-pin-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.reminders-pin-btn:hover { background: var(--sb-accent-light); }
+
+/* ── Flashing Alarm Light ── */
+.alarm-light {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3333;
+  flex-shrink: 0;
+  animation: alarm-flash 0.6s ease-in-out infinite;
+}
+@keyframes alarm-flash {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff3333; }
+  50%      { opacity: 0.2; box-shadow: 0 0 2px #ff3333; }
+}
+
+
+/* ════════════════════════════════════════════════
+   Pomodoro Timer
+   ════════════════════════════════════════════════ */
+.pomo-widget {
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 8px;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pomo-widget:hover {
+  background: var(--sb-accent-light);
+  border-color: rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(180, 140, 100, 0.12);
+  transform: translateY(-2px);
+}
+.pomo-circle {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: var(--sb-pomo-circle);
+  border: 3px solid var(--sb-pomo-work);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+.pomo-break-mode {
+  border-color: var(--sb-pomo-break);
+}
+.pomo-emoji { font-size: 20px; line-height: 1; }
+.pomo-timer {
+  font-family: 'Fredoka', cursive;
+  font-size: 1.1rem;
+  color: var(--sb-heading);
+  letter-spacing: 0.05em;
+}
+.pomo-label {
+  font-size: 0.6rem;
+  color: var(--sb-subtext);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Controls */
+.pomo-btns {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+.pomo-btn {
+  padding: 5px 10px;
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  background: var(--sb-card);
+  color: var(--sb-text);
+}
+.pomo-btn:hover { transform: scale(1.05); }
+.pomo-main-btn {
+  background: var(--sb-card);  /* Matching the other buttons */
+  color: var(--sb-text);       /* Dark, readable text */
+  border-color: var(--sb-border);
+  font-weight: bold;
+}
+.pomo-main-btn:hover { background: var(--sb-accent-light); }
+
+/* Settings panel */
+.pomo-settings {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--sb-input-bg);
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+}
+.pomo-setting {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--sb-text);
+}
+.pomo-num {
+  width: 38px;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 4px;
+  padding: 2px 3px;
+  font-size: 0.75rem;
+  background: var(--sb-input-bg);
+  color: var(--sb-text);
+  text-align: center;
+}
+.pomo-num:focus { border-color: var(--sb-accent); outline: none; }
+
+/* ── Tomato Wiggle (when timer finishes) ── */
+.pomo-wiggle {
+  animation: wiggle 0.5s ease-in-out infinite;
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-6deg); }
+  75%      { transform: rotate(6deg); }
+}
+
+/* ── Tomato Glow (when complete) ── */
+.pomo-glow {
+  box-shadow: 0 0 14px var(--sb-pomo-work), 0 0 28px var(--sb-pomo-work);
+}
+.pomo-complete .pomo-circle {
+  border-color: var(--sb-pomo-work);
+}
+
+/* ── Subtle pulse while running ── */
+.pomo-pulse {
+  animation: pomo-breathe 2s ease-in-out infinite;
+}
+@keyframes pomo-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+
+/* ════════════════════════════════════════════════
+   Mini Calendar
+   ════════════════════════════════════════════════ */
+.cal-widget {
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.cal-nav {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--sb-text);
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.cal-nav:hover { background: var(--sb-accent-light); }
+.cal-month-label {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.78rem;
+  color: var(--sb-heading);
+}
+
+/* Day grid */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal-day-label {
+  font-size: 0.55rem;
+  text-align: center;
+  color: var(--sb-subtext);
+  font-weight: bold;
+  padding: 2px 0;
+}
+.cal-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.65rem;
+  position: relative;
+  border: 1.5px solid transparent;
+}
+.cal-cell:hover:not(.cal-empty) { background: var(--sb-accent-light); }
+.cal-empty { cursor: default; }
+.cal-today {
+  background: var(--sb-accent);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 6px;
+}
+.cal-selected {
+  border-color: var(--sb-accent);
+  background: var(--sb-accent-light);
+}
+.cal-day-num { line-height: 1; }
+.cal-event-dots {
+  display: flex;
+  gap: 1px;
+  position: absolute;
+  bottom: 1px;
+}
+.cal-event-dot { font-size: 0.35rem; line-height: 1; }
+
+/* Popup */
+.cal-popup {
+  margin-top: 6px;
+  background: var(--sb-input-bg);
+  border: 1px solid var(--sb-border);
+  border-radius: 8px;
+  padding: 8px;
+}
+.cal-popup-title {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.75rem;
+  color: var(--sb-heading);
+  margin-bottom: 4px;
+}
+.cal-popup-event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  padding: 3px 4px;
+  border-bottom: 1px dashed var(--sb-border);
+}
+.cal-popup-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #cc3333;
+  font-size: 0.7rem;
+  padding: 1px 3px;
+}
+.cal-popup-add {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+.cal-popup-icon-row {
+  display: flex;
+  gap: 4px;
+}
+.cal-icon-option {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  transition: background 0.15s;
+}
+.cal-icon-option:hover,
+.cal-icon-active { background: var(--sb-accent-light); }
+.cal-popup-input-row {
+  display: flex;
+  gap: 4px;
+}
+.cal-popup-input {
+  flex: 1;
+  border: 1px solid var(--sb-input-border);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  font-family: inherit;
+  background: var(--sb-input-bg);
+  color: var(--sb-text);
+  outline: none;
+}
+.cal-popup-input:focus { border-color: var(--sb-accent); }
+.cal-popup-add-btn {
+  background: var(--sb-accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.cal-popup-add-btn:hover { background: var(--sb-btn-primary-hover); }
+
+
+/* ════════════════════════════════════════════════
+   Stickers Section
+   ════════════════════════════════════════════════ */
+.stickers-undo-redo {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.stickers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px;
+}
+.sticker-thumb-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+  padding: 3px;
+}
+.sticker-thumb-cell:hover {
+  border-color: var(--sb-border);
+  background: var(--sb-card);
+}
+.sticker-thumb-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  cursor: grab;
+  border-radius: 4px;
+  transition: transform 0.2s;
+  display: block;
+}
+.sticker-thumb-img:active { cursor: grabbing; }
+.sticker-thumb-img:hover { transform: scale(1.12); }
+
+
+/* ════════════════════════════════════════════════
+   Themes Section
+   ════════════════════════════════════════════════ */
+.themes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.theme-dropdown {
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid var(--sb-border);
+  border-radius: 12px;
+  background: var(--sb-card);
+  color: var(--sb-text);
+  font-family: 'Fredoka', cursive;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  appearance: auto;
+}
+
+
+/* ════════════════════════════════════════════════
+   Shared Animations
+   ════════════════════════════════════════════════ */
+@keyframes cozy-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45); }
+  70%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+/* Quick Add button */
+.sb-quick-add-btn {
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s, background 0.2s;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f5a8b8; /* Soft pink accent */
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+.sb-stickynote-container:hover .sb-quick-add-btn,
+.sb-todo-container:hover .sb-quick-add-btn {
+  opacity: 1;
+}
+.sb-quick-add-btn:hover {
+  transform: scale(1.18);
+  background: #f0899d;
+}
+
+
+/* ════════════════════════════════════════════════
+   Kawaii Clock Icon — live time overlay
+   Positions text over the black screen area of
+   the cozyclock.png image (946×496, screen ~55%v)
+   ════════════════════════════════════════════════ */
+.sb-clock-overlay {
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 70%;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.sb-clock-overlay-time {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.88rem;
+  color: #ffb3c6;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  text-shadow:
+    0 0 6px rgba(255, 100, 140, 0.7),
+    0 0 14px rgba(255, 100, 140, 0.35);
+}
+.sb-clock-overlay-ampm {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.42rem;
+  color: rgba(255, 180, 200, 0.85);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+/* ════════════════════════════════════════════════
+   Lo-Fi Sidebar
+   All rules here are additive — nothing above is
+   changed. Activated via data-theme="lofi".
+   ════════════════════════════════════════════════ */
+
+/* Container: deep navy/purple gradient + left neon edge */
+.cozy-sidebar[data-theme="lofi"] {
+  background: linear-gradient(180deg, #2D1B69 0%, #16103a 55%, #0A0815 100%);
+  border-left: 2px solid rgba(124, 115, 192, 0.65);
+  box-shadow:
+    inset 5px 0 28px rgba(124, 115, 192, 0.13),
+    2px 0 24px rgba(0, 0, 0, 0.75);
+}
+
+/* Logo — purple glow */
+.cozy-sidebar[data-theme="lofi"] .sb-logo-title {
+  color: #c5b8ff;
+  text-shadow:
+    0 0 14px rgba(124, 115, 192, 0.95),
+    0 0 30px rgba(124, 115, 192, 0.45);
+}
+.cozy-sidebar[data-theme="lofi"] .sb-logo-subtitle {
+  color: #c5b8ff;
+}
+
+/* Dividers and section borders */
+.cozy-sidebar[data-theme="lofi"] .sb-divider {
+  border-top-color: rgba(124, 115, 192, 0.22);
+}
+.cozy-sidebar[data-theme="lofi"] .sb-section {
+  border-top-color: rgba(124, 115, 192, 0.14);
+}
+
+/* Section titles */
+.cozy-sidebar[data-theme="lofi"] .sb-section-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Sticker grid cells */
+.cozy-sidebar[data-theme="lofi"] .sticker-thumb-cell {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(124, 115, 192, 0.14);
+}
+.cozy-sidebar[data-theme="lofi"] .sticker-thumb-cell:hover {
+  background: rgba(124, 115, 192, 0.14);
+  border-color: rgba(124, 115, 192, 0.5);
+}
+
+/* Pomodoro widget hover */
+.cozy-sidebar[data-theme="lofi"] .pomo-widget:hover {
+  box-shadow: 0 0 16px rgba(124, 115, 192, 0.22);
+  transform: translateY(-1px);
+  background: var(--sb-accent-light);
+}
+
+/* ── Lofi section label ───────────────────────── */
+.lofi-section-label {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.6rem;
+  color: #a29bfe;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  margin-top: 2px;
+}
+
+.lofi-section-block {
+  margin-top: 12px;
+  padding-top: 6px;
+}
+
+/* ── Big square icon cards ────────────────────── */
+.lofi-big-card {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(124, 115, 192, 0.22);
+  border-radius: 14px;
+  padding: 14px 12px 12px;
+  cursor: grab;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.lofi-big-card:hover {
+  background: rgba(124, 115, 192, 0.14);
+  border-color: rgba(162, 155, 254, 0.7);
+  box-shadow:
+    0 0 16px rgba(162, 155, 254, 0.55),
+    0 0 36px rgba(124, 115, 192, 0.3),
+    inset 0 0 12px rgba(124, 115, 192, 0.08);
+  transform: translateY(-2px);
+}
+.lofi-big-card:active { cursor: grabbing; }
+
+/* Pomodoro card is not draggable — glow but no lift */
+.lofi-pomo-card { cursor: default; }
+.lofi-pomo-card:hover { transform: none; }
+
+/* Dark inner icon box */
+.lofi-icon-box {
+  width: 76px;
+  height: 76px;
+  background: rgba(15, 10, 42, 0.72);
+  border: 1px solid rgba(124, 115, 192, 0.28);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 2px 10px rgba(0, 0, 0, 0.35),
+    0 0 10px rgba(124, 115, 192, 0.1);
+}
+
+/* Card label */
+.lofi-card-label {
+  font-family: 'Fredoka', cursive;
+  font-size: 0.63rem;
+  color: #a29bfe;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── Retro clock display inside Clock card ─────── */
+.lofi-retro-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0 2px;
+}
+.lofi-retro-time {
+  font-family: 'Courier New', monospace;
+  font-size: 2rem;
+  color: #c5b8ff;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-shadow:
+    0 0 12px rgba(197, 184, 255, 0.75),
+    0 0 28px rgba(124, 115, 192, 0.4);
+}
+.lofi-retro-ampm {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: #7c73c0;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.lofi-retro-dots {
+  font-size: 0.65rem;
+  color: #3d3660;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+/* ── Full-width settings button ─────────────────── */
+.lofi-settings-full-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--btn-bg) !important;
+  border: none !important;
+  border-radius: 12px;
+  color: var(--btn-text) !important;
+  font-family: var(--btn-font) !important;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s, filter 0.2s, transform 0.2s;
+  margin-bottom: 4px;
+}
+.lofi-settings-full-btn:hover {
+  filter: brightness(0.92);
+  transform: scale(1.02);
+}
+
+
+/* ════════════════════════════════════════════════
+   Steampunk Sidebar
+   Victorian airship captain's control panel
+   meets gentleman's library
+   ════════════════════════════════════════════════ */
+
+/* Glossy mahogany wood panel — layered grain texture */
+.cozy-sidebar[data-theme="steampunk"] {
+  position: relative;
+  background:
+    /* Lacquer sheen — warm highlight left edge, shadow right */
+    linear-gradient(
+      90deg,
+      rgba(255,180,100,0.10) 0%,
+      rgba(255,150,70,0.05)  18%,
+      transparent            42%,
+      transparent            62%,
+      rgba(0,0,0,0.18)      100%
+    ),
+    /* Fine vertical grain lines — organic irregular spacing */
+    repeating-linear-gradient(
+      90deg,
+      transparent           0px,
+      transparent           2px,
+      rgba(0,0,0,0.15)      2px,
+      rgba(0,0,0,0.15)      3px,
+      transparent           3px,
+      transparent           6px,
+      rgba(160,55,15,0.08)  6px,
+      rgba(160,55,15,0.08)  7px,
+      transparent           7px,
+      transparent           12px,
+      rgba(0,0,0,0.11)      12px,
+      rgba(0,0,0,0.11)      13px,
+      transparent           13px,
+      transparent           19px,
+      rgba(100,25,8,0.07)   19px,
+      rgba(100,25,8,0.07)   21px,
+      transparent           21px,
+      transparent           27px,
+      rgba(0,0,0,0.09)      27px,
+      rgba(0,0,0,0.09)      28px
+    ),
+    /* Broader grain bands at slight angle for natural organic feel */
+    repeating-linear-gradient(
+      88.8deg,
+      transparent           0px,
+      transparent           20px,
+      rgba(0,0,0,0.07)      20px,
+      rgba(0,0,0,0.07)      24px,
+      transparent           24px,
+      transparent           48px,
+      rgba(150,45,12,0.05)  48px,
+      rgba(150,45,12,0.05)  53px
+    ),
+    /* Subtle horizontal grain variation */
+    repeating-linear-gradient(
+      180deg,
+      transparent           0px,
+      transparent           30px,
+      rgba(0,0,0,0.04)      30px,
+      rgba(0,0,0,0.04)      32px
+    ),
+    /* Base mahogany — warm reddish-brown, depth varies down the panel */
+    linear-gradient(
+      176deg,
+      #2e1208 0%,
+      #1c0a06 18%,
+      #341508 35%,
+      #200e06 52%,
+      #2e1208 68%,
+      #180a05 84%,
+      #281008 100%
+    );
+  border-right: 2px solid #5a3a1e;
+  border-radius: 0 12px 12px 0;
+  box-shadow:
+    inset 3px 0 20px rgba(0,0,0,0.55),
+    2px 0 22px rgba(0,0,0,0.65);
+}
+
+/* Content layers above the gear overlay */
+.cozy-sidebar[data-theme="steampunk"] .sb-inner-wrapper,
+.cozy-sidebar[data-theme="steampunk"] > .sb-section,
+.cozy-sidebar[data-theme="steampunk"] > .sb-spacer,
+.cozy-sidebar[data-theme="steampunk"] > .sb-action-btn {
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo title — Cinzel Decorative, brass glow */
+.cozy-sidebar[data-theme="steampunk"] .sb-logo-title {
+  font-family: 'Cinzel Decorative', serif;
+  color: #d4a050;
+  letter-spacing: 0.07em;
+  text-shadow:
+    0 1px 5px rgba(0,0,0,0.7),
+    0 0 20px rgba(184,115,51,0.45),
+    0 0 44px rgba(184,115,51,0.18);
+}
+
+/* Logo subtitle */
+.cozy-sidebar[data-theme="steampunk"] .sb-logo-subtitle {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.48rem;
+  color: #d4a050;
+  letter-spacing: 0.14em;
+}
+
+/* ── Ornate brass divider ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-divider {
+  border: none;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #4a2e10 8%,
+    #b87333 28%,
+    #e8c060 50%,
+    #b87333 72%,
+    #4a2e10 92%,
+    transparent 100%
+  );
+  margin: 12px 0 14px;
+  position: relative;
+}
+
+.cozy-sidebar[data-theme="steampunk"] .sb-divider::before,
+.cozy-sidebar[data-theme="steampunk"] .sb-divider::after {
+  content: '◆';
+  position: absolute;
+  top: -9px;
+  color: #b87333;
+  font-size: 12px;
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(184,115,51,0.6);
+}
+.cozy-sidebar[data-theme="steampunk"] .sb-divider::before { left: 14%; }
+.cozy-sidebar[data-theme="steampunk"] .sb-divider::after  { right: 14%; }
+
+/* ── Section ornate borders ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-section {
+  border-top: 1px solid rgba(184,115,51,0.32);
+  position: relative;
+}
+
+/* ── Section titles — Cinzel Decorative, gold ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-section-title {
+  font-family: 'Cinzel Decorative', serif;
+  color: #d4a050;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6), 0 0 12px rgba(184,115,51,0.25);
+}
+
+/* ── Action buttons — brass bordered ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-action-btn {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.07em;
+  border: 1.5px solid #b87333;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #3a2a1a 0%, #241608 100%);
+  color: #e8d4b0;
+  box-shadow: inset 0 1px 0 rgba(255,200,100,0.12), 0 2px 8px rgba(0,0,0,0.5);
+  transition: background 0.25s, box-shadow 0.25s, transform 0.2s;
+}
+.cozy-sidebar[data-theme="steampunk"] .sb-action-btn:hover {
+  background: linear-gradient(180deg, #4a3420 0%, #2e1a0c 100%);
+  box-shadow: 0 0 12px rgba(184,115,51,0.55), inset 0 1px 0 rgba(255,200,100,0.18);
+  transform: scale(1.02);
+}
+.cozy-sidebar[data-theme="steampunk"] .sb-action-settings {
+  border-color: #7a5a30;
+}
+
+/* ── Save / My Desks / Settings — theme-aware via CSS variables ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-action-save,
+.cozy-sidebar[data-theme="steampunk"] .sb-action-mydesks,
+.cozy-sidebar[data-theme="steampunk"] .sb-action-settings {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  font-family: var(--btn-font);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  box-shadow: none;
+}
+.cozy-sidebar[data-theme="steampunk"] .sb-action-save:hover,
+.cozy-sidebar[data-theme="steampunk"] .sb-action-mydesks:hover,
+.cozy-sidebar[data-theme="steampunk"] .sb-action-settings:hover {
+  filter: brightness(0.88);
+  box-shadow: none;
+}
+
+/* ── Icon labels — brass copper ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-icon-label {
+  font-family: 'Cinzel Decorative', serif;
+  color: #b87333;
+  letter-spacing: 0.07em;
+  font-size: 0.52rem;
+}
+
+/* ── Todo/icon container hover ── */
+.cozy-sidebar[data-theme="steampunk"] .sb-todo-container:hover {
+  border-color: rgba(184,115,51,0.55);
+  background: rgba(80,50,24,0.28);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45), 0 0 10px rgba(184,115,51,0.2);
+}
+
+/* ── Scrollbar ── */
+.cozy-sidebar[data-theme="steampunk"]::-webkit-scrollbar-thumb {
+  background: #5a3a1e;
+}
+
+/* ── Theme dropdown ── */
+.cozy-sidebar[data-theme="steampunk"] .theme-dropdown {
+  background: linear-gradient(180deg, #3a2a1a, #241608);
+  border-color: #b87333;
+  color: #e8d4b0;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.68rem;
+}
+
+/* ── Pomodoro widget ── */
+.cozy-sidebar[data-theme="steampunk"] .pomo-widget {
+  background: linear-gradient(180deg, #2e1e10, #1e1208);
+  border-color: #5a3a1e;
+  border-radius: 6px;
+}
+.cozy-sidebar[data-theme="steampunk"] .pomo-widget:hover {
+  background: linear-gradient(180deg, #3a2418, #261608);
+  box-shadow: 0 0 14px rgba(184,115,51,0.3);
+  transform: translateY(-1px);
+}
+.cozy-sidebar[data-theme="steampunk"] .pomo-btn,
+.cozy-sidebar[data-theme="steampunk"] .pomo-main-btn {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  border-color: #7a5a30;
+  background: linear-gradient(180deg, #2e2010, #1c1208);
+  color: #e8d4b0;
+  border-radius: 4px;
+}
+.cozy-sidebar[data-theme="steampunk"] .pomo-btn:hover,
+.cozy-sidebar[data-theme="steampunk"] .pomo-main-btn:hover {
+  background: linear-gradient(180deg, #3e2c18, #241810);
+  box-shadow: 0 0 8px rgba(184,115,51,0.35);
+}
+.cozy-sidebar[data-theme="steampunk"] .pomo-timer {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1rem;
+}
+
+/* ── Sticker grid cells ── */
+.cozy-sidebar[data-theme="steampunk"] .sticker-thumb-cell {
+  background: rgba(184,115,51,0.06);
+  border-color: rgba(184,115,51,0.2);
+  border-radius: 4px;
+}
+.cozy-sidebar[data-theme="steampunk"] .sticker-thumb-cell:hover {
+  background: rgba(184,115,51,0.18);
+  border-color: rgba(184,115,51,0.55);
+  box-shadow: 0 0 8px rgba(184,115,51,0.2);
+}
+
+/* ════════════════════════════════════════════════
+   Steampunk Clock Icon — sidebar live digit overlay
+   4 glowing orange digits over the 4 glass tubes in
+   steampunkclock.png (750×982, tubes at ~28% from top)
+   ════════════════════════════════════════════════ */
+.sb-sp-clock-digit {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #FF6600;
+  line-height: 1;
+  text-shadow:
+    0 0 5px rgba(255,102,0,0.95),
+    0 0 12px rgba(255,102,0,0.65),
+    0 0 24px rgba(255,140,0,0.35);
+  -webkit-font-smoothing: none;
+}
+.sb-sp-clock-ampm {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.36rem;
+  color: #FF6600;
+  opacity: 0.82;
+  line-height: 1;
+  text-shadow: 0 0 5px rgba(255,102,0,0.7);
+  -webkit-font-smoothing: none;
+  padding-bottom: 1px;
+}
+
+
+/* ════════════════════════════════════════════════
+   Steampunk Gear Animations
+   ════════════════════════════════════════════════ */
+
+@keyframes sp-gear-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.sp-spin-cw-12 {
+  animation: sp-gear-spin 12s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+  display: block;
+}
+.sp-spin-ccw-9 {
+  animation: sp-gear-spin 9s linear infinite reverse;
+  transform-box: fill-box;
+  transform-origin: center;
+  display: block;
+}
+.sp-spin-cw-15 {
+  animation: sp-gear-spin 15s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+  display: block;
+}
+
+/* Gear wrapper — absolutely positioned, behind all content */
+.sp-gear-decor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  line-height: 0;
+  opacity: 0.55;
+}
+.sp-gear-tr-large { top: 4px;   right: -4px;  }
+.sp-gear-tr-small { top: 40px;  right: 36px;  }
+.sp-gear-bl-mid   { bottom: 72px; left: -8px; }
+
+
+/* ══════════════════════════════════════════════════════════
+   Saved Desks Section
+   ══════════════════════════════════════════════════════════ */
+
+.saved-desks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Individual slot card ── */
+.saved-slot {
+  border-radius: 10px;
+  padding: 6px 8px;
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  transition: border-color 0.2s;
+}
+.saved-slot--filled {
+  border-color: var(--sb-accent-secondary);
+}
+.saved-slot--filled:hover {
+  border-color: var(--sb-accent);
+}
+
+/* ── Slot info (name + date) ── */
+.saved-slot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 5px;
+}
+.saved-slot-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--sb-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.saved-slot-date {
+  font-size: 0.65rem;
+  color: var(--sb-subtext);
+  opacity: 0.85;
+}
+
+/* ── Action buttons row ── */
+.saved-slot-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* ── Empty row ── */
+.saved-slot-empty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.saved-slot-empty-label {
+  font-size: 0.72rem;
+  color: var(--sb-subtext);
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* ── Inline input row (save / rename) ── */
+.saved-slot-inline-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.saved-slot-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--sb-input-bg);
+  border: 1px solid var(--sb-input-border);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  color: var(--sb-text);
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+}
+.saved-slot-input:focus {
+  border-color: var(--sb-accent);
+}
+
+/* ── Buttons ── */
+.sds-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+  line-height: 1.5;
+  color: #fff;
+}
+.sds-btn:hover  { opacity: 0.85; transform: scale(1.04); }
+.sds-btn:active { transform: scale(0.97); }
+
+.sds-btn--save    { background: #27ae60; }
+.sds-btn--load    { background: #2980b9; }
+.sds-btn--rename  { background: #7f8c8d; }
+.sds-btn--delete  { background: #c0392b; }
+.sds-btn--confirm { background: #27ae60; padding: 4px 8px; }
+.sds-btn--cancel  { background: #95a5a6; padding: 4px 8px; }
+
+/* ── Delete confirmation overlay ── */
+.sds-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sds-confirm-box {
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+  text-align: center;
+  min-width: 200px;
+  max-width: 260px;
+}
+.sds-confirm-text {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: var(--sb-text);
+  line-height: 1.4;
+}
+.sds-confirm-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   Saved Desks Modal  (portal — rendered on document.body)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Sidebar button ── */
+.sb-action-saveddesks {
+  background: var(--sb-card);
+  color: var(--sb-text);
+  border: 1px solid var(--sb-border);
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+}
+.sb-action-saveddesks:hover { background: var(--sb-accent-light); }
+
+/* ── Backdrop ── */
+.sds-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Modal box — self-contained with theme vars ── */
+.sds-modal-box {
+  width: 320px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  font-family: 'Nunito', sans-serif;
+
+  /* Default / kawaii vars */
+  --sb-bg:               #fff8f0;
+  --sb-text:             #4b3b2a;
+  --sb-accent:           #f5a8b8;
+  --sb-accent-secondary: #c8dfa8;
+  --sb-accent-light:     #ffdca8;
+  --sb-border:           #ecddd0;
+  --sb-card:             #fffdf8;
+  --sb-heading:          #6b4b3a;
+  --sb-subtext:          #a07850;
+  --sb-input-bg:         #fffdf8;
+  --sb-input-border:     #e0d4c8;
+  --sb-btn-primary:      #f5a8b8;
+  --sb-btn-secondary:    #c8dfa8;
+  --sb-btn-secondary-text: #3a5a20;
+
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  border: 1px solid var(--sb-border);
+}
+
+.sds-modal-box[data-theme="steampunk"] {
+  --sb-bg:               #2a2018;
+  --sb-text:             #e8d4b0;
+  --sb-accent:           #b87333;
+  --sb-accent-secondary: #8a6a40;
+  --sb-accent-light:     #6a5030;
+  --sb-border:           #5a4a3a;
+  --sb-card:             #3a2e22;
+  --sb-heading:          #f0deb8;
+  --sb-subtext:          #b8a080;
+  --sb-input-bg:         #3a2e22;
+  --sb-input-border:     #5a4a3a;
+  --sb-btn-primary:      #b87333;
+  --sb-btn-secondary:    #8a6a40;
+  --sb-btn-secondary-text: #f0deb8;
+}
+
+.sds-modal-box[data-theme="lofi"] {
+  --sb-bg:               #1a1a2e;
+  --sb-text:             #c8c4d8;
+  --sb-accent:           #7c73c0;
+  --sb-accent-secondary: #5a7070;
+  --sb-accent-light:     #3a3468;
+  --sb-border:           #3a3a5c;
+  --sb-card:             #252540;
+  --sb-heading:          #e0dce8;
+  --sb-subtext:          #8888a8;
+  --sb-input-bg:         #252540;
+  --sb-input-border:     #3a3a5c;
+  --sb-btn-primary:      #7c73c0;
+  --sb-btn-secondary:    #5a7070;
+  --sb-btn-secondary-text: #c8e0d8;
+  font-family: 'Fredoka', cursive;
+}
+
+/* ── Header ── */
+.sds-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--sb-border);
+  flex-shrink: 0;
+}
+.sds-modal-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--sb-heading);
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: 0.02em;
+}
+.sds-modal-close-btn {
+  background-color: #ff4444 !important;
+  border: none !important;
+  color: white !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  padding: 3px 9px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  line-height: 1.5;
+}
+.sds-modal-close-btn:hover {
+  background-color: #cc0000 !important;
+}
+
+/* ── Scrollable body ── */
+.sds-modal-body {
+  overflow-y: auto;
+  padding: 12px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-border) transparent;
+  flex: 1;
+}
+.sds-modal-body::-webkit-scrollbar { width: 4px; }
+.sds-modal-body::-webkit-scrollbar-thumb {
+  background: var(--sb-border);
+  border-radius: 4px;
+}
+
+
+/* ── Saved Desks slot additions ── */
+
+/* Filled slot header (click to expand) */
+.saved-slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  user-select: none;
+}
+.saved-slot-chevron {
+  font-size: 0.65rem;
+  color: var(--sb-subtext);
+  flex-shrink: 0;
+}
+.saved-slot--expanded {
+  border-color: var(--sb-accent);
+}
+
+/* Inline delete confirmation */
+.saved-slot-confirm-inline {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--sb-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.saved-slot-confirm-text {
+  font-size: 0.75rem;
+  color: var(--sb-text);
+  line-height: 1.3;
+}
+
+
+/* ── SAVE button ── */
+.sb-action-save {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-family: var(--btn-font);
+  font-weight: 600;
+}
+.sb-action-save:hover { filter: brightness(0.92); }
+
+/* ── My Desks button ── */
+.sb-action-mydesks {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-family: var(--btn-font);
+  font-weight: 600;
+}
+.sb-action-mydesks:hover { filter: brightness(0.92); }
+
+/* ── Lofi SAVE button ── */
+.lofi-save-btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-family: var(--btn-font);
+  font-weight: 600;
+}
+.lofi-save-btn:hover { filter: brightness(0.92); }

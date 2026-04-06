@@ -1,0 +1,412 @@
+:root {
+  font-family: 'Nunito', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #333;
+  background-color: #fdf6f0;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+}
+
+.sidebar {
+  font-family: 'Patrick Hand', 'Segoe UI', sans-serif;
+  font-size: 1.05rem;
+  color: #4b3b2a;
+  background: #fff8f0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  border-radius: 0 16px 16px 0;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e0cfc0 transparent;
+}
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: #e0cfc0;
+  border-radius: 10px;
+}
+
+/* Cozy checkbox animations */
+@keyframes cozy-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45); }
+  70%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}
+
+
+@keyframes cozy-sparkle {
+  0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+  50%  { opacity: 1; transform: scale(1.2) rotate(20deg); }
+  100% { opacity: 0; transform: scale(0) rotate(45deg); }
+}
+
+.checkbox-done {
+  animation: cozy-pop 0.35s ease-out;
+}
+.sparkle {
+  position: absolute;
+  pointer-events: none;
+  font-size: 14px;
+  animation: cozy-sparkle 0.6s ease-out forwards;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+}
+
+/* Inline reminder input on paper */
+.paper-item-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(180,140,100,0.4);
+  outline: none;
+  font-family: 'Patrick Hand', cursive;
+  color: #4b3b2a;
+  width: 100%;
+  padding: 1px 2px;
+}
+.paper-item-input::placeholder { color: rgba(150,110,70,0.45); }
+
+/* Reminder widget */
+.reminder-section-title {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #a07850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 16px 0 8px;
+}
+
+.reminder-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.reminder-input {
+  flex: 1;
+  border: 1.5px solid #e0d4c8;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.95rem;
+  color: #4b3b2a;
+  background: #fffdf8;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.07);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.reminder-input:focus {
+  border-color: #f5c89a;
+}
+
+.emoji-picker-btn {
+  background: #fff3e0 !important;
+  border: 1.5px solid #e0d4c8 !important;
+  border-radius: 10px !important;
+  padding: 6px 8px !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+.emoji-picker-btn:hover {
+  background: #ffe8c8 !important;
+  border-color: #c8a97e !important;
+}
+
+.emoji-dropdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: #fffdf8;
+  border: 1.5px solid #e0d4c8;
+  border-radius: 12px;
+  padding: 8px;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  max-height: 100px;
+  overflow-y: auto;
+}
+.emoji-option {
+  font-size: 20px;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.emoji-option:hover {
+  background: #ffe8c8;
+}
+
+.reminder-add-btn {
+  background: #ffdca8 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 8px 14px !important;
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 0.95rem !important;
+  font-weight: bold !important;
+  color: #7a5230 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
+  transition: background 0.2s, transform 0.15s !important;
+  white-space: nowrap;
+}
+.reminder-add-btn:hover {
+  background: #ffc97a !important;
+  transform: scale(1.04) !important;
+}
+
+.reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.reminder-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: #fffdf8;
+  border: 1px solid #ecddd0;
+  cursor: grab;
+  transition: background 0.2s, box-shadow 0.2s;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.95rem;
+  color: #4b3b2a;
+}
+.reminder-item:hover {
+  background: #fff3e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.reminder-item.done {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.send-to-desk-btn {
+  font-size: 12px;
+  background: #e8f4e8 !important;
+  color: #4a7a4a !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 3px 7px !important;
+  cursor: pointer !important;
+  margin-left: auto;
+  flex-shrink: 0;
+  box-shadow: none !important;
+  transition: background 0.2s !important;
+}
+.send-to-desk-btn:hover {
+  background: #c8e6c8 !important;
+}
+
+/* Undo / Redo bar */
+.undo-redo-bar {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.undo-redo-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #6b4b3a;
+  background: #f0e4d8;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.undo-redo-btn:hover:not(:disabled) {
+  background: #e4d0bc;
+  transform: scale(1.03);
+}
+.undo-redo-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+  padding-bottom: 4px;
+}
+
+.sticker-thumb-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.55);
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+  padding: 4px;
+}
+.sticker-thumb-wrapper:hover {
+  border-color: #e0cfc0;
+  background: rgba(255,248,240,0.9);
+}
+
+.sticker-thumb {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  cursor: grab;
+  border-radius: 6px;
+  transition: transform 0.2s;
+  border: none !important;
+  box-shadow: none;
+  display: block;
+}
+.sticker-thumb:active {
+  cursor: grabbing;
+}
+.sticker-thumb:hover {
+  transform: scale(1.12);
+}
+
+.delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  z-index: 30;
+  padding: 0;
+  color: #ff4d4d;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background: #f0f0f0;
+}
+
+.sticky-note {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1rem;
+  color: #3a2a1a;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Placeholder text for empty contentEditable notes */
+[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(120, 80, 40, 0.35);
+  font-family: 'Patrick Hand', cursive;
+  font-style: italic;
+  pointer-events: none;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+/* Only apply global button reset to non-CozyDesk buttons */
+button:not(.delete-btn):not(.flip-handle):not(.rotate-handle):not(.emoji-picker-btn):not(.reminder-add-btn):not(.send-to-desk-btn):not(.undo-redo-btn):not(.sb-action-btn):not(.lofi-settings-full-btn):not(.sds-modal-close-btn):not(.sb-undo-btn):not(.sb-redo-btn) {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+.sticker-corner-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: rgba(255,255,255,0.85) !important;
+  border: 1.5px solid #bbb !important;
+  border-radius: 50% !important;
+  transition: box-shadow 0.15s, background 0.15s !important;
+}
+.sticker-corner-handle.nwse { cursor: nwse-resize !important; }
+.sticker-corner-handle.nesw { cursor: nesw-resize !important; }
+.sticker-corner-handle:hover {
+  box-shadow: 0 0 8px rgba(255,255,255,0.6) !important;
+  background: #fff !important;
+}
+
+.rotate-handle:hover, .flip-handle:hover {
+  box-shadow: 0 0 8px rgba(255,255,255,0.6) !important;
+  background: #fff !important;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Consistent hover glow effect for desk objects */
+.hover-glow {
+  filter: drop-shadow(0 0 12px rgba(255, 235, 150, 0.5)) brightness(1.05);
+  transition: filter 0.3s ease;
+}

@@ -1,0 +1,313 @@
+/* ════════════════════════════════════════════════
+   Reminders.css — Cozy Notebook Paper To-Do Widget
+   ════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Patrick+Hand&family=Shadows+Into+Light&display=swap');
+
+/* ── Theme Variables (Cozy Kawaii — default) ── */
+.rw-notebook,
+.rw-notebook[data-theme="cozykawaii"] {
+  --rw-text: #4b3b2a;
+  --rw-accent: #f5a8b8;
+  --rw-accent-light: #ffdca8;
+  --rw-border: #ecddd0;
+  --rw-card: #fff8f0;
+  --rw-heading: #6b4b3a;
+  --rw-subtext: #a07850;
+  --rw-checkbox-border: #c8a97e;
+  --rw-checkbox-fill: #ffdca8;
+  --rw-shadow: rgba(0,0,0,0.12);
+  --rw-btn-hover: rgba(255,236,208,0.5);
+  --rw-strikethrough: #c8a97e;
+  --rw-plus-color: #6b4b3a;
+  --rw-popup-bg: #fff8f0;
+  --rw-popup-border: #ecddd0;
+}
+
+.rw-notebook[data-theme="lofi"] {
+  --rw-text: #c8c4d8;
+  --rw-accent: #7c73c0;
+  --rw-accent-light: #3a3468;
+  --rw-border: #3a3a5c;
+  --rw-card: #1a1a2e;
+  --rw-heading: #e0dce8;
+  --rw-subtext: #8888a8;
+  --rw-checkbox-border: #7c73c0;
+  --rw-checkbox-fill: #3a3468;
+  --rw-shadow: rgba(0,0,0,0.3);
+  --rw-btn-hover: rgba(58,52,104,0.4);
+  --rw-strikethrough: #7c73c0;
+  --rw-plus-color: #c8c4d8;
+  --rw-popup-bg: #2a2a48;
+  --rw-popup-border: #3a3a5c;
+}
+
+.rw-notebook[data-theme="steampunk"] {
+  --rw-text: #e8d4b0;
+  --rw-accent: #b87333;
+  --rw-accent-light: #6a5030;
+  --rw-border: #5a4a3a;
+  --rw-card: #2a2018;
+  --rw-heading: #f0deb8;
+  --rw-subtext: #b8a080;
+  --rw-checkbox-border: #b87333;
+  --rw-checkbox-fill: #6a5030;
+  --rw-shadow: rgba(0,0,0,0.35);
+  --rw-btn-hover: rgba(90,64,48,0.4);
+  --rw-strikethrough: #b87333;
+  --rw-plus-color: #e8d4b0;
+  --rw-popup-bg: #3a2e22;
+  --rw-popup-border: #5a4a3a;
+}
+
+/* ════════════════════════════════════════
+   Notebook Paper Container
+   ════════════════════════════════════════ */
+.rw-notebook {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  background-image: var(--rw-bg-img);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Shadows Into Light', cursive;
+  font-size: clamp(10px, calc(var(--rw-w, 300px) * 0.045), 22px);
+  position: relative;
+}
+
+/* ── Header (transparent spacer over PNG title + underline) ── */
+.rw-header {
+  min-height: 28%;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ── Content Area ── */
+.rw-content {
+  flex: 1;
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 0 8% 8% 10%;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.rw-content::-webkit-scrollbar { width: 0; }
+
+.rw-content:hover {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rw-border) transparent;
+}
+.rw-content:hover::-webkit-scrollbar { width: 4px; }
+.rw-content:hover::-webkit-scrollbar-track { background: transparent; }
+.rw-content:hover::-webkit-scrollbar-thumb {
+  background: var(--rw-border);
+  border-radius: 10px;
+}
+
+/* ══ Blank State ══ */
+.rw-blank {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 2px 0;
+  position: relative;
+}
+
+/* ══ Plus Buttons ══ */
+.rw-plus-btn {
+  background: none;
+  border: none;
+  width: 1.6em;
+  height: 1.6em;
+  font-family: 'Shadows Into Light', cursive;
+  font-size: 1.3em;
+  font-weight: bold;
+  color: var(--rw-plus-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.15s;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+
+.rw-plus-btn:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.rw-plus-btn-large {
+  width: 2em;
+  height: 2em;
+  font-size: 1.6em;
+  opacity: 0.8;
+}
+
+/* Tail plus row — always visible, directly below last reminder */
+.rw-plus-row-tail {
+  display: flex;
+  justify-content: flex-start;
+  padding: 1px 0 0;
+  margin: 0;
+}
+
+/* ══ Task List ══ */
+.rw-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ══ Task Item ══ */
+.rw-task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.15em 0.3em;
+  border-radius: 6px;
+  transition: background 0.15s;
+  position: relative;
+  min-height: 1.6em;
+}
+
+.rw-task-item:hover {
+  background: var(--rw-btn-hover);
+}
+
+/* Checkbox */
+.rw-checkbox {
+  width: 1.15em;
+  height: 1.15em;
+  min-width: 1.15em;
+  border-radius: 4px;
+  border: 2px solid var(--rw-checkbox-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75em;
+  font-weight: bold;
+  color: var(--rw-heading);
+  transition: background 0.25s;
+}
+
+.rw-checkbox-checked {
+  background: var(--rw-checkbox-fill);
+  animation: rw-pop 0.35s ease-out;
+}
+
+@keyframes rw-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* Task content */
+.rw-task-content {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.rw-task-text {
+  font-family: 'Shadows Into Light', cursive;
+  font-size: 1em;
+  color: var(--rw-text);
+  word-break: break-word;
+  position: relative;
+  display: inline;
+  line-height: 1.3;
+}
+
+.rw-task-text-done {
+  color: var(--rw-subtext);
+  opacity: 0.55;
+}
+
+/* Strike-through animation */
+.rw-task-text-done::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--rw-strikethrough);
+  border-radius: 1px;
+  animation: rw-strike 0.3s ease-out forwards;
+}
+
+@keyframes rw-strike {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+.rw-task-item-done {
+  opacity: 0.65;
+}
+
+/* Date/time below task */
+.rw-task-datetime {
+  font-size: 0.65em;
+  color: var(--rw-subtext);
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+/* ── Alarm Light ── */
+.rw-alarm-light {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3333;
+  flex-shrink: 0;
+  animation: rw-alarm-flash 0.6s ease-in-out infinite;
+}
+
+@keyframes rw-alarm-flash {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff3333; }
+  50%      { opacity: 0.2; box-shadow: 0 0 2px #ff3333; }
+}
+
+.rw-alarm-icon {
+  font-size: 0.55em;
+  flex-shrink: 0;
+}
+
+/* Delete task button */
+.rw-task-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7em;
+  color: var(--rw-subtext);
+  padding: 0.15em 0.3em;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.rw-task-item:hover .rw-task-delete {
+  opacity: 1;
+}
+
+.rw-task-delete:hover {
+  background: var(--rw-accent-light);
+}
+
+

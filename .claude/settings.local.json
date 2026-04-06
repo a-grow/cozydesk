@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r manifest /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk --include=*.html --include=*.json)",
+      "Bash(ls:*)",
+      "Bash(grep -r \"serviceWorker\\\\|manifest\\\\|pwa\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src --include=*.jsx --include=*.js)",
+      "Bash(grep -r \"alt=\\\\|aria-\\\\|role=\\\\|label\\\\|htmlFor\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src --include=*.jsx)",
+      "Bash(grep -r \"console\\\\.\\\\|debugger\\\\|alert\\(\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src --include=*.jsx --include=*.js)",
+      "Bash(npm install:*)",
+      "Bash(npm show:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(curl:*)",
+      "Bash(identify /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/themes/cozykawaii/stickers/cozyclock.png)",
+      "Bash(grep -r \"top:\\\\|right:\\\\|left:\\\\|bottom:\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/components/*.jsx)",
+      "Bash(file /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/assets/stickynotes/*.png)",
+      "Bash(python3 -c \":*)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/assets/stickynotes/*.png)",
+      "Bash(ln -s ../vite/bin/vite.js node_modules/.bin/vite)",
+      "Bash(cp:*)",
+      "Bash(python3 -c ':*)",
+      "Bash(python3:*)",
+      "Bash(grep -n \"saveToSlot\\\\|loadFromSlot\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/hooks/*.js)"
+    ]
+  }
+}
