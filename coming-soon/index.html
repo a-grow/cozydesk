@@ -1,87 +1,375 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f5e6d3" />
-  <meta name="description" content="Your cozy productivity workspace — coming soon." />
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
-  <title>CozyDesk — Coming Soon</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#1e0f05"/>
+<meta name="description" content="CozyDesk — Your cozy productivity workspace. Sticky notes, timers, stickers and more."/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<title>CozyDesk — Your Cozy Workspace</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:#1e0f05;color:#fff8ee;overflow-x:hidden}
 
-    body {
-      font-family: 'Nunito', sans-serif;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f5e6d3;
-      background-image:
-        radial-gradient(circle at 20% 20%, #fde8f0 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, #dff0fb 0%, transparent 50%);
-      padding: 2rem;
-    }
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-16px) rotate(15deg)}}
+@keyframes floatY2{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-10px) rotate(-10deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 
-    .card {
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(12px);
-      border-radius: 28px;
-      padding: 3rem 2.5rem;
-      max-width: 420px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(180, 140, 110, 0.15);
-      border: 1.5px solid rgba(255, 255, 255, 0.9);
-    }
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.6rem 2rem;
+  background:linear-gradient(135deg,rgba(30,15,5,0.97),rgba(60,30,8,0.97));
+  backdrop-filter:blur(20px);
+  border-bottom:2px solid rgba(255,180,60,0.25);
+  box-shadow:0 4px 30px rgba(0,0,0,0.5);
+}
+.nav-logo img{height:44px;width:auto;filter:drop-shadow(0 2px 10px rgba(255,160,0,0.6))}
+.nav-cta{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:0.95rem;
+  color:#2d1200;text-decoration:none;
+  padding:0.55rem 1.4rem;border-radius:999px;
+  background:linear-gradient(135deg,#FFD700,#FF8C00);
+  border:3px solid rgba(255,255,255,0.45);
+  box-shadow:0 4px 18px rgba(255,140,0,0.5),inset 0 2px 0 rgba(255,255,255,0.45);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.nav-cta:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 8px 26px rgba(255,140,0,0.65),inset 0 2px 0 rgba(255,255,255,0.45)}
 
-    .emoji { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.hero{
+  position:relative;overflow:hidden;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;
+  padding:6.5rem 2rem 2rem;
+  text-align:center;
+  background:
+    radial-gradient(ellipse at 50% 0%,#7a3a08 0%,transparent 60%),
+    radial-gradient(ellipse at 10% 60%,rgba(255,120,0,0.12) 0%,transparent 40%),
+    radial-gradient(ellipse at 90% 60%,rgba(255,80,0,0.1) 0%,transparent 40%),
+    linear-gradient(180deg,#2d1408 0%,#1e0f05 100%);
+}
+.hero-deco{position:absolute;pointer-events:none;z-index:0}
+.blob-1{width:120px;height:120px;background:radial-gradient(circle,#FF6B35,#FF4500);border-radius:50%;top:12%;left:3%;opacity:0.18;filter:blur(2px);animation:pulse 3s ease-in-out infinite}
+.blob-2{width:80px;height:80px;background:radial-gradient(circle,#FFD700,#FF8C00);border-radius:50%;top:20%;right:4%;opacity:0.2;filter:blur(1px);animation:pulse 3.5s ease-in-out infinite 0.5s}
+.blob-3{width:50px;height:50px;background:radial-gradient(circle,#FF69B4,#FF1493);border-radius:50%;top:45%;left:5%;opacity:0.25;animation:floatY 5s ease-in-out infinite}
+.blob-4{width:40px;height:40px;background:radial-gradient(circle,#00CED1,#008B8B);border-radius:50%;top:55%;right:6%;opacity:0.2;animation:floatY2 4s ease-in-out infinite}
+.deco-star{position:absolute;pointer-events:none;z-index:0}
+.star-1{top:15%;left:8%;font-size:2rem;animation:floatY 3s ease-in-out infinite}
+.star-2{top:25%;right:7%;font-size:1.6rem;animation:floatY2 4s ease-in-out infinite 0.8s}
+.star-3{top:60%;left:2%;font-size:1.2rem;animation:floatY 5s ease-in-out infinite 1s}
+.star-4{top:10%;right:15%;font-size:1rem;animation:floatY2 3.5s ease-in-out infinite 0.3s}
+.star-5{top:70%;right:3%;font-size:1.4rem;animation:floatY 4s ease-in-out infinite 1.5s}
 
-    h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #5c3d2e;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.5px;
-    }
+.hero-logo{
+  position:relative;z-index:1;
+  width:min(420px,80vw);
+  margin-bottom:0.5rem;
+  filter:drop-shadow(0 6px 30px rgba(255,160,0,0.7)) drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  animation:floatY 5s ease-in-out infinite;
+}
+.hero-tagline{
+  position:relative;z-index:1;
+  font-family:'Baloo 2',cursive;font-weight:800;
+  font-size:clamp(1.2rem,3vw,1.8rem);
+  color:#FFD38A;
+  text-shadow:0 2px 14px rgba(0,0,0,0.5);
+  margin-bottom:0.6rem;
+}
+.hero-sub{
+  position:relative;z-index:1;
+  font-size:0.98rem;color:#c4956a;font-weight:600;
+  max-width:440px;line-height:1.75;margin-bottom:2rem;
+}
+.hero-btns{
+  position:relative;z-index:1;
+  display:flex;gap:0.85rem;flex-wrap:wrap;
+  justify-content:center;margin-bottom:3.5rem;
+}
+.btn-hero-primary{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:1.05rem;
+  color:#2d1200;text-decoration:none;
+  padding:0.85rem 2rem;border-radius:999px;
+  background:linear-gradient(135deg,#FFD700 0%,#FF8C00 60%,#FFB830 100%);
+  border:3px solid rgba(255,255,255,0.5);
+  box-shadow:0 6px 24px rgba(255,140,0,0.55),0 3px 0 #b35a00,inset 0 2px 0 rgba(255,255,255,0.5);
+  transition:transform 0.2s,box-shadow 0.2s;
+  display:inline-flex;align-items:center;gap:0.4rem;
+}
+.btn-hero-primary:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 10px 32px rgba(255,140,0,0.7),0 3px 0 #b35a00,inset 0 2px 0 rgba(255,255,255,0.5)}
+.btn-hero-ghost{
+  font-family:'Baloo 2',cursive;font-weight:700;font-size:1rem;
+  color:#FFD38A;text-decoration:none;
+  padding:0.85rem 2rem;border-radius:999px;
+  background:rgba(255,255,255,0.06);
+  border:2.5px solid rgba(255,180,60,0.45);
+  box-shadow:0 4px 16px rgba(0,0,0,0.25);
+  transition:all 0.2s;display:inline-flex;align-items:center;gap:0.4rem;
+}
+.btn-hero-ghost:hover{background:rgba(255,180,60,0.14);border-color:rgba(255,180,60,0.75);transform:translateY(-2px)}
 
-    .tagline {
-      font-size: 1rem;
-      color: #a07858;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-    }
+.showcase{
+  position:relative;z-index:1;
+  width:100%;max-width:1040px;
+  height:440px;
+  margin:0 auto;
+}
+.sc-card{
+  position:absolute;
+  border-radius:20px;overflow:hidden;
+  transition:transform 0.4s cubic-bezier(.175,.885,.32,1.275),box-shadow 0.4s;
+  cursor:pointer;
+}
+.sc-card img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;pointer-events:none}
+.sc-left{
+  width:38%;height:300px;left:0;top:80px;
+  transform:perspective(900px) rotateY(18deg) rotate(-3deg);
+  z-index:1;
+  box-shadow:-12px 20px 50px rgba(0,0,0,0.55),0 0 0 2.5px rgba(255,160,40,0.3);
+  opacity:0.88;
+}
+.sc-left:hover{transform:perspective(900px) rotateY(8deg) rotate(-1deg) translateY(-10px) scale(1.03);opacity:1;z-index:5}
+.sc-center{
+  width:50%;height:400px;
+  left:50%;transform:translateX(-50%);
+  top:10px;z-index:3;
+  box-shadow:0 28px 70px rgba(0,0,0,0.65),0 0 0 3px rgba(255,200,80,0.55);
+}
+.sc-center:hover{transform:translateX(-50%) translateY(-14px) scale(1.03);z-index:10}
+.sc-right{
+  width:38%;height:300px;right:0;top:80px;
+  transform:perspective(900px) rotateY(-18deg) rotate(3deg);
+  z-index:1;
+  box-shadow:12px 20px 50px rgba(0,0,0,0.55),0 0 0 2.5px rgba(255,160,40,0.3);
+  opacity:0.88;
+}
+.sc-right:hover{transform:perspective(900px) rotateY(-8deg) rotate(1deg) translateY(-10px) scale(1.03);opacity:1;z-index:5}
+.sc-pill{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(30,15,5,0.94),rgba(60,30,8,0.94));
+  backdrop-filter:blur(8px);
+  border-radius:999px;padding:0.3rem 1rem;
+  font-family:'Baloo 2',cursive;font-weight:700;
+  font-size:0.82rem;color:#FFD38A;
+  white-space:nowrap;
+  border:1.5px solid rgba(255,180,60,0.4);
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+}
 
-    p {
-      font-size: 0.95rem;
-      color: #7a5c46;
-      line-height: 1.7;
-      margin-bottom: 1.75rem;
-    }
+.wave-down svg,.wave-up svg{display:block;width:100%}
 
-    .badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #f9b8d0, #b8d8f9);
-      color: #5c3d2e;
-      font-weight: 800;
-      font-size: 0.8rem;
-      padding: 0.4rem 1rem;
-      border-radius: 999px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-  </style>
+.features{
+  padding:5rem 2rem 5.5rem;
+  background:linear-gradient(180deg,#FDF0DC 0%,#FCE0B0 100%);
+  position:relative;overflow:hidden;
+}
+.features::before{content:'';position:absolute;top:-60px;left:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,180,60,0.18),transparent 70%);border-radius:50%}
+.features::after{content:'';position:absolute;bottom:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,100,30,0.12),transparent 70%);border-radius:50%}
+.features-inner{max-width:920px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.eyebrow{
+  display:inline-block;
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:0.78rem;
+  letter-spacing:2px;text-transform:uppercase;
+  background:linear-gradient(135deg,#FF6B35,#FF8C00);
+  color:#fff;padding:0.3rem 1rem;border-radius:999px;
+  margin-bottom:0.75rem;
+  box-shadow:0 4px 14px rgba(255,100,0,0.3);
+}
+.sec-title{font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(1.9rem,4.5vw,2.9rem);color:#2d1200;line-height:1.1;margin-bottom:0.6rem}
+.sec-sub{font-size:0.98rem;color:#7a4520;font-weight:700;max-width:440px;margin:0 auto 2.8rem;line-height:1.7}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:1.2rem}
+.feat-card{
+  background:linear-gradient(145deg,#FFFBF2,#FFF3D6);
+  border-radius:26px;padding:1.75rem 1.1rem;
+  border:3px solid rgba(255,180,60,0.22);
+  box-shadow:0 6px 24px rgba(160,80,0,0.1),inset 0 2px 0 rgba(255,255,255,0.9);
+  text-align:center;
+  transition:transform 0.25s,box-shadow 0.25s,border-color 0.25s;
+}
+.feat-card:hover{transform:translateY(-8px) rotate(-1.5deg);box-shadow:0 16px 40px rgba(160,80,0,0.18);border-color:rgba(255,140,0,0.5)}
+.feat-icon{font-size:2.4rem;margin-bottom:0.65rem;display:block;filter:drop-shadow(0 2px 5px rgba(160,80,0,0.2))}
+.feat-name{font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;color:#2d1200;margin-bottom:0.3rem}
+.feat-desc{font-size:0.8rem;color:#7a4520;font-weight:600;line-height:1.6}
+
+.themes-sec{
+  padding:5rem 2rem;
+  background:linear-gradient(160deg,#1e0f05 0%,#3d1f08 40%,#2d1408 100%);
+  position:relative;overflow:hidden;text-align:center;
+}
+.themes-sec::before{content:'✨';position:absolute;top:8%;left:4%;font-size:2rem;opacity:0.4;animation:floatY 4s ease-in-out infinite}
+.themes-sec::after{content:'⭐';position:absolute;top:12%;right:5%;font-size:1.6rem;opacity:0.35;animation:floatY2 5s ease-in-out infinite}
+.themes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:1.5rem;max-width:940px;margin:2.5rem auto 0}
+.theme-card{border-radius:26px;overflow:hidden;border:3px solid rgba(255,180,60,0.3);box-shadow:0 10px 40px rgba(0,0,0,0.45);transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;cursor:pointer}
+.theme-card:hover{transform:translateY(-10px) scale(1.02);box-shadow:0 22px 55px rgba(0,0,0,0.55);border-color:rgba(255,200,80,0.65)}
+.theme-card img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;object-position:top}
+.theme-label{padding:0.85rem 1rem;background:linear-gradient(135deg,rgba(30,15,5,0.97),rgba(60,30,8,0.97));font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;color:#FFD38A;display:flex;align-items:center;gap:0.5rem}
+
+.waitlist-sec{padding:6rem 2rem;background:linear-gradient(180deg,#FCE0B0,#FDF0DC);text-align:center;position:relative;overflow:hidden}
+.waitlist-sec::before{content:'🌸';position:absolute;top:8%;left:5%;font-size:2.5rem;opacity:0.35;animation:floatY 4s ease-in-out infinite}
+.waitlist-sec::after{content:'⭐';position:absolute;bottom:10%;right:5%;font-size:2rem;opacity:0.3;animation:floatY2 5s ease-in-out infinite}
+.wl-card{
+  background:linear-gradient(145deg,#FFFBF2,#FFF3D6);
+  border-radius:36px;padding:3.5rem 2.5rem;
+  max-width:530px;margin:0 auto;
+  border:4px solid rgba(255,160,0,0.28);
+  box-shadow:0 18px 64px rgba(160,80,0,0.16),inset 0 3px 0 rgba(255,255,255,0.95);
+  position:relative;z-index:1;
+}
+.wl-emoji{font-size:3rem;margin-bottom:0.75rem;display:block;animation:pulse 2.5s ease-in-out infinite}
+.wl-card h2{font-family:'Baloo 2',cursive;font-weight:800;font-size:2.1rem;color:#2d1200;margin-bottom:0.5rem}
+.wl-card p{font-size:0.95rem;color:#7a4520;font-weight:700;margin-bottom:1.75rem;line-height:1.7}
+.email-row{display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center}
+.email-inp{
+  flex:1;min-width:190px;
+  padding:0.82rem 1.3rem;border-radius:999px;
+  border:2.5px solid rgba(180,100,20,0.18);
+  background:#fff;
+  font-family:'Nunito',sans-serif;font-size:0.9rem;
+  color:#2d1200;font-weight:700;outline:none;
+  box-shadow:inset 0 2px 6px rgba(180,100,20,0.07);
+}
+.email-inp:focus{border-color:rgba(255,140,0,0.65);box-shadow:0 0 0 3px rgba(255,140,0,0.14)}
+.email-inp::placeholder{color:#c4956a}
+.btn-wl{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:1rem;
+  color:#2d1200;
+  padding:0.82rem 1.6rem;border-radius:999px;
+  background:linear-gradient(135deg,#FFD700,#FF8C00);
+  border:3px solid rgba(255,255,255,0.5);
+  box-shadow:0 6px 22px rgba(255,140,0,0.42),0 3px 0 #b35a00,inset 0 2px 0 rgba(255,255,255,0.5);
+  cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;white-space:nowrap;
+}
+.btn-wl:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,140,0,0.56),0 3px 0 #b35a00,inset 0 2px 0 rgba(255,255,255,0.5)}
+.success-msg{display:none;font-family:'Baloo 2',cursive;font-weight:800;color:#c8752a;font-size:1rem;margin-top:0.85rem}
+
+footer{padding:2rem;text-align:center;background:linear-gradient(135deg,#1e0f05,#2d1408);font-size:0.82rem;color:#c4956a;font-weight:700;border-top:2px solid rgba(255,180,60,0.18)}
+footer a{color:#FFD38A;text-decoration:none;border-bottom:1px dotted rgba(255,200,80,0.4)}
+footer a:hover{color:#FFD700}
+</style>
 </head>
 <body>
-  <div class="card">
-    <span class="emoji">🌸</span>
-    <h1>CozyDesk</h1>
-    <p class="tagline">Your cozy productivity workspace</p>
-    <p>Something warm and wonderful is on its way — sticky notes, stickers, timers, and your perfect little desk setup.</p>
-    <span class="badge">✨ Coming Soon</span>
+
+<nav>
+  <a href="#" class="nav-logo"><img src="images/cozydesklogo.png" alt="CozyDesk"/></a>
+  <a href="#waitlist" class="nav-cta">✨ Get Early Access</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-deco blob-1"></div>
+  <div class="hero-deco blob-2"></div>
+  <div class="hero-deco blob-3"></div>
+  <div class="hero-deco blob-4"></div>
+  <div class="hero-deco deco-star star-1">⭐</div>
+  <div class="hero-deco deco-star star-2">✨</div>
+  <div class="hero-deco deco-star star-3">🌟</div>
+  <div class="hero-deco deco-star star-4">💫</div>
+  <div class="hero-deco deco-star star-5">⭐</div>
+  <img src="images/cozydesklogo.png" alt="CozyDesk App" class="hero-logo"/>
+  <p class="hero-tagline">Your Cozy Workspace — Anywhere You Work ☕</p>
+  <p class="hero-sub">A beautifully themed productivity desk with sticky notes, timers, stickers and more. All in your browser, free forever.</p>
+  <div class="hero-btns">
+    <a href="#waitlist" class="btn-hero-primary">🌸 Get Early Access</a>
+    <a href="#themes" class="btn-hero-ghost">See the Themes ✨</a>
   </div>
+  <div class="showcase">
+    <div class="sc-card sc-left">
+      <img src="images/lofi.png" alt="Lo-Fi Night theme"/>
+      <div class="sc-pill">🌙 Lo-Fi Night</div>
+    </div>
+    <div class="sc-card sc-center">
+      <img src="images/kawaii.png" alt="Cozy Kawaii theme"/>
+      <div class="sc-pill">🌸 Cozy Kawaii</div>
+    </div>
+    <div class="sc-card sc-right">
+      <img src="images/steampunk.png" alt="Steampunk theme"/>
+      <div class="sc-pill">⚙️ Steampunk</div>
+    </div>
+  </div>
+</section>
+
+<div class="wave-down">
+  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,0 C360,90 1080,0 1440,60 L1440,90 L0,90 Z" fill="#FDF0DC"/>
+  </svg>
+</div>
+
+<section class="features" id="features">
+  <div class="features-inner">
+    <div class="eyebrow">🛠️ What's Inside</div>
+    <h2 class="sec-title">Everything you need to feel cozy &amp; focused</h2>
+    <p class="sec-sub">Beautiful tools that make getting things done feel like a treat.</p>
+    <div class="feat-grid">
+      <div class="feat-card"><span class="feat-icon">📝</span><div class="feat-name">Sticky Notes</div><div class="feat-desc">Drag, drop and pin your thoughts anywhere on your desk</div></div>
+      <div class="feat-card"><span class="feat-icon">✅</span><div class="feat-name">To-Do Lists</div><div class="feat-desc">Keep track of tasks in a way that actually feels good</div></div>
+      <div class="feat-card"><span class="feat-icon">⏱️</span><div class="feat-name">Pomodoro Timer</div><div class="feat-desc">Stay focused with beautiful built-in work and break sessions</div></div>
+      <div class="feat-card"><span class="feat-icon">📅</span><div class="feat-name">Calendar</div><div class="feat-desc">Always know the date without leaving your workspace</div></div>
+      <div class="feat-card"><span class="feat-icon">🎨</span><div class="feat-name">Stickers</div><div class="feat-desc">Decorate with hundreds of gorgeous themed stickers</div></div>
+      <div class="feat-card"><span class="feat-icon">📱</span><div class="feat-name">Install as App</div><div class="feat-desc">Add to your home screen — works like a native app</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="wave-up" style="background:#FDF0DC">
+  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,90 C360,0 1080,90 1440,30 L1440,0 L0,0 Z" fill="#1e0f05"/>
+  </svg>
+</div>
+
+<section class="themes-sec" id="themes">
+  <div class="eyebrow" style="background:linear-gradient(135deg,#FFD700,#FF8C00);color:#2d1200">🎨 Choose Your Vibe</div>
+  <h2 class="sec-title" style="color:#FFD38A;margin-top:0.5rem">Your desk, your world</h2>
+  <p class="sec-sub" style="color:#c4956a">Switch between hand-crafted themes — each one a completely different world.</p>
+  <div class="themes-grid">
+    <div class="theme-card"><img src="images/kawaii.png" alt="Cozy Kawaii"/><div class="theme-label">🌸 Cozy Kawaii</div></div>
+    <div class="theme-card"><img src="images/lofi.png" alt="Lo-Fi Night"/><div class="theme-label">🌙 Lo-Fi Night</div></div>
+    <div class="theme-card"><img src="images/steampunk.png" alt="Steampunk"/><div class="theme-label">⚙️ Steampunk</div></div>
+  </div>
+</section>
+
+<div class="wave-down" style="background:#1e0f05">
+  <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,0 C360,90 1080,0 1440,60 L1440,90 L0,90 Z" fill="#FCE0B0"/>
+  </svg>
+</div>
+
+<section class="waitlist-sec" id="waitlist">
+  <div class="wl-card">
+    <span class="wl-emoji">☕</span>
+    <h2>Save My Cozy Spot!</h2>
+    <p>Be first through the door when CozyDesk opens. One warm little email — no spam, ever.</p>
+    <div class="email-row">
+      <input type="email" class="email-inp" placeholder="your@email.com" id="emailInput"/>
+      <button class="btn-wl" onclick="handleNotify()">Notify Me! 🌸</button>
+    </div>
+    <div class="success-msg" id="successMsg">🎉 Yay! You're on the list — see you soon!</div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 CozyDesk &nbsp;·&nbsp; Built with ☕ by <a href="https://andrewgrow.com" target="_blank">Andrew Grow</a></p>
+</footer>
+
+<script>
+function handleNotify(){
+  const input=document.getElementById('emailInput');
+  const msg=document.getElementById('successMsg');
+  if(input.value&&input.value.includes('@')){
+    input.style.display='none';
+    document.querySelector('.btn-wl').style.display='none';
+    msg.style.display='block';
+    window.location.href='mailto:growandygrow@gmail.com?subject=CozyDesk Early Access&body=Add me! My email: '+input.value;
+  } else {
+    input.style.borderColor='#ff6b6b';
+    input.placeholder='Enter a valid email first!';
+  }
+}
+document.getElementById('emailInput').addEventListener('keypress',function(e){
+  if(e.key==='Enter')handleNotify();
+});
+</script>
 </body>
 </html>
