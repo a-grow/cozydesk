@@ -14,54 +14,8 @@ import ContextMenu from "../components/ContextMenu";
 import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
-import pastelClickSrc from "../assets/sounds/pastel-click.mp3";
-import lofiPopSrc from "../assets/sounds/lofi-pop.mp3";
-import gearShiftSrc from "../assets/sounds/gear-shift.mp3";
-import defaultClickSrc from "../assets/sounds/default-click.mp3";
-
-// ─── Theme tab appearance ─────────────────────────────────────────────────────
-const THEME_TAB_STYLES = {
-  cozykawaii: { backgroundColor: '#f5d0e5', color: '#fff',    boxShadow: '0 2px 8px rgba(245,208,229,0.5)',           hoverGlow: '0 0 14px rgba(245,208,229,0.7)' },
-  lofi:       { backgroundColor: '#6d5fc0', color: '#e8e0ff', boxShadow: '0 0 12px rgba(109,95,192,0.7), 0 2px 6px rgba(0,0,0,0.3)', hoverGlow: '0 0 22px rgba(109,95,192,1), 0 0 44px rgba(109,95,192,0.45)' },
-  steampunk:  { backgroundColor: '#b87333', color: '#3b2f2f', boxShadow: 'inset 0 0 4px #2a1f1f, 0 2px 6px rgba(0,0,0,0.3)', hoverGlow: '0 0 14px rgba(184,115,51,0.6)' },
-  _default:   { backgroundColor: '#ddd',    color: '#000',    boxShadow: '0 2px 6px rgba(0,0,0,0.2)',                 hoverGlow: '0 0 10px rgba(200,200,200,0.5)' },
-};
 
 const SIDEBAR_WIDTH = 250;
-
-const getTabStyle = (themeName, sidebarVisible) => {
-  const t = THEME_TAB_STYLES[themeName] || THEME_TAB_STYLES._default;
-  return {
-    position: 'absolute', top: '50%',
-    left: sidebarVisible ? `${SIDEBAR_WIDTH}px` : '0px',
-    transform: 'translateY(-50%)',
-    width: '28px', height: '56px',
-    borderRadius: '0 28px 28px 0',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    border: 'none', cursor: 'pointer',
-    transition: 'all 0.3s ease-in-out',
-    zIndex: 100, fontSize: '14px', lineHeight: 1,
-    backgroundColor: t.backgroundColor,
-    color: t.color,
-    boxShadow: t.boxShadow,
-  };
-};
-
-// ─── Sound ────────────────────────────────────────────────────────────────────
-const SOUND_MAP = {
-  cozykawaii: pastelClickSrc,
-  lofi:       lofiPopSrc,
-  steampunk:  gearShiftSrc,
-  _default:   defaultClickSrc,
-};
-
-const playToggleSound = (tn) => {
-  try {
-    const audio = new Audio(SOUND_MAP[tn] || SOUND_MAP._default);
-    audio.volume = 0.3;
-    audio.play().catch(() => {});
-  } catch (_) {}
-};
 
 // ─── Settings overlay position ────────────────────────────────────────────────
 const overlayStyle = {
@@ -109,6 +63,34 @@ export default function Cozykawaii() {
   const desk = useDeskState({ dimensions, themeName });
 
   const availableStickers = allThemeStickers.filter(s => !s.name.includes('cozyclock'));
+  const stickyNoteSize = theme.stickyNoteSize || 180;
+
+  const getTabStyle = (sidebarVisible) => {
+    const t = theme.tabStyle;
+    return {
+      position: 'absolute', top: '50%',
+      left: sidebarVisible ? `${SIDEBAR_WIDTH}px` : '0px',
+      transform: 'translateY(-50%)',
+      width: '28px', height: '56px',
+      borderRadius: '0 28px 28px 0',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      border: 'none', cursor: 'pointer',
+      transition: 'all 0.3s ease-in-out',
+      zIndex: 100, fontSize: '14px', lineHeight: 1,
+      backgroundColor: t.backgroundColor,
+      color: t.color,
+      boxShadow: t.boxShadow,
+    };
+  };
+
+  const playToggleSound = () => {
+    try {
+      const soundName = theme.sound || 'default-click';
+      const audio = new Audio(`/src/assets/sounds/${soundName}.mp3`);
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch (_) {}
+  };
 
   // ─── Keyboard shortcuts ────────────────────────────────────────────
   useEffect(() => {
@@ -128,7 +110,7 @@ export default function Cozykawaii() {
   // ─── Sidebar toggle ────────────────────────────────────────────────
   const toggleSidebar = useCallback(() => {
     setSidebarVisible(v => !v);
-    playToggleSound(themeName);
+    playToggleSound();
   }, [themeName]);
 
   // ─── Layer management ──────────────────────────────────────────────
@@ -241,7 +223,7 @@ export default function Cozykawaii() {
         ...getDesktopBackground(),
         width: "100vw", height: "100vh",
         position: "relative", overflow: "hidden",
-        fontFamily: "'Patrick Hand', cursive",
+        fontFamily: "'Nunito', sans-serif",
       }}
       onClick={() => { setSelectedId(null); setActiveMenu(null); setContextMenu(null); }}
       onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedId(null); }}
@@ -252,15 +234,9 @@ export default function Cozykawaii() {
       <button
         onClick={(e) => { e.stopPropagation(); toggleSidebar(); }}
         title={sidebarVisible ? 'Hide sidebar (Shift+S)' : 'Show sidebar (Shift+S)'}
-        style={getTabStyle(themeName, sidebarVisible)}
-        onMouseEnter={(e) => {
-          const t = THEME_TAB_STYLES[themeName] || THEME_TAB_STYLES._default;
-          e.currentTarget.style.boxShadow = t.hoverGlow;
-        }}
-        onMouseLeave={(e) => {
-          const t = THEME_TAB_STYLES[themeName] || THEME_TAB_STYLES._default;
-          e.currentTarget.style.boxShadow = t.boxShadow;
-        }}
+        style={getTabStyle(sidebarVisible)}
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = theme.tabStyle.hoverGlow; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = theme.tabStyle.boxShadow; }}
       >
         {sidebarVisible ? '◀' : '▶'}
       </button>
@@ -349,7 +325,7 @@ export default function Cozykawaii() {
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
           background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)",
-          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10100,
         }}>
           <div
             style={{
@@ -512,7 +488,7 @@ export default function Cozykawaii() {
 
       {/* ── Clock stickers ── */}
       {desk.clocks.map(clock => {
-        const ClockComponent = themeName === 'lofi' ? LofiClockSticker : themeName === 'steampunk' ? SteampunkClockSticker : ClockSticker;
+        const ClockComponent = theme.clockComponent || ClockSticker;
         return (
           <ClockComponent
             key={clock.id}
@@ -537,7 +513,7 @@ export default function Cozykawaii() {
 
       {/* ── Calendar stickers ── */}
       {desk.calendars.map(cal => {
-        const CalComponent = themeName === 'lofi' ? LofiCalendarSticker : CalendarSticker;
+        const CalComponent = theme.calendarComponent || CalendarSticker;
         return (
           <CalComponent
             key={cal.id}

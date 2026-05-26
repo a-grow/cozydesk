@@ -20,7 +20,7 @@ const handleDot = {
 };
 
 // Individual reminder row with cozy checkbox + sparkle animation
-function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, isLofi }) {
+function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, theme }) {
   const [showSparkle, setShowSparkle] = useState(false);
   const [animKey, setAnimKey] = useState(0);
 
@@ -66,8 +66,8 @@ function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, isLofi }
           width: "15px",
           height: "15px",
           borderRadius: "4px",
-          border: isLofi ? "2px solid rgba(255,255,255,0.6)" : "2px solid #c8a97e",
-          background: rem.done ? (isLofi ? "rgba(255,255,255,0.25)" : "#ffdca8") : "rgba(255,255,255,0.15)",
+          border: theme.checkboxBorder,
+          background: rem.done ? (theme.todoInputColor ? "rgba(255,255,255,0.25)" : "#ffdca8") : "rgba(255,255,255,0.15)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -86,7 +86,7 @@ function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, isLofi }
         style={{
           fontFamily: fontFamily,
           fontSize: `${fontSize}px`,
-          color: isLofi ? (rem.done ? "rgba(255,255,255,0.5)" : "#ffffff") : (rem.done ? "#b5977a" : "#4b3b2a"),
+          color: theme.todoInputColor ? (rem.done ? "rgba(255,255,255,0.5)" : "#ffffff") : (rem.done ? "#b5977a" : "#4b3b2a"),
           textDecoration: rem.done ? "line-through" : "none",
           opacity: rem.done ? 0.55 : 1,
           transition: "color 0.3s, opacity 0.3s, text-decoration 0.3s",
@@ -116,11 +116,11 @@ const ReminderPaper = ({
   layer,
   onContextMenu,
 }) => {
-  const { themeStickyNotes, themeName } = useTheme();
+  const { themeStickyNotes, themeName, theme } = useTheme();
   const todoImg = themeStickyNotes.find(a => a.name.includes('todo'))?.src || paperImg;
   const [newText, setNewText] = useState("");
   const [rotation, setRotation] = useState(0);
-  const [fontFamily, setFontFamily] = useState(themeName === 'lofi' ? "'Caveat', cursive" : "Patrick Hand");
+  const [fontFamily, setFontFamily] = useState(theme.defaultNoteFont || "'Nunito', sans-serif");
   const [fontSizeRatio, setFontSizeRatio] = useState(0.055);
   const [isHovered, setIsHovered] = useState(false);
   const inputRef = useRef(null);
@@ -211,7 +211,7 @@ const ReminderPaper = ({
       />
 
       {/* Transparent tape at top — kawaii only */}
-      {themeName !== 'lofi' && (
+      {theme.showTape && (
         <div style={{
           position: "absolute",
           top: "-10px",
@@ -230,10 +230,10 @@ const ReminderPaper = ({
       <div
         style={{
           position: "absolute",
-          top: themeName === 'lofi' ? "calc(46% + 20px)" : "30%",
-          left: themeName === 'lofi' ? "10%" : "12%",
-          right: themeName === 'lofi' ? "10%" : "6%",
-          bottom: themeName === 'lofi' ? "14%" : "8%",
+          top: theme.todoTextArea?.top ?? '30%',
+          left: theme.todoTextArea?.left ?? '12%',
+          right: theme.todoTextArea?.right ?? '6%',
+          bottom: theme.todoTextArea?.bottom ?? '8%',
           display: "flex",
           flexDirection: "column",
           gap: "2px",
@@ -251,7 +251,7 @@ const ReminderPaper = ({
             width={width}
             fontSizeRatio={fontSizeRatio}
             fontFamily={fontFamily}
-            isLofi={themeName === 'lofi'}
+            theme={theme}
           />
         ))}
 
@@ -267,7 +267,7 @@ const ReminderPaper = ({
             <div style={{
               width: "15px", height: "15px",
               borderRadius: "4px",
-              border: themeName === 'lofi' ? "1.5px dashed rgba(255,255,255,0.5)" : "1.5px dashed #c8a97e",
+              border: theme.todoInputColor ? "1.5px dashed rgba(255,255,255,0.5)" : "1.5px dashed #c8a97e",
               flexShrink: 0,
               opacity: 0.5,
             }} />
@@ -275,7 +275,7 @@ const ReminderPaper = ({
               ref={inputRef}
               className="paper-item-input"
               placeholder="Add item & press Enter…"
-              style={{ fontSize: `${fontSize}px`, fontFamily: fontFamily, color: themeName === 'lofi' ? '#ffffff' : undefined }}
+              style={{ fontSize: `${fontSize}px`, fontFamily: fontFamily, color: theme.todoInputColor }}
               value={newText}
               onChange={e => setNewText(e.target.value)}
               onKeyDown={handleAddInline}

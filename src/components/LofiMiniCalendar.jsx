@@ -12,6 +12,8 @@ export default function LofiMiniCalendar({
   events = {},
   onAddEvent,
   onRemoveEvent,
+  noPopup = false,
+  onDayClick,
 }) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -150,7 +152,7 @@ export default function LofiMiniCalendar({
               <div
                 key={d}
                 className={`cal-cell ${isToday(d) ? 'cal-today' : ''} ${selectedDay === d ? 'cal-selected' : ''}`}
-                onClick={() => setSelectedDay(selectedDay === d ? null : d)}
+                onClick={() => { if (noPopup) { onDayClick?.(); } else { setSelectedDay(selectedDay === d ? null : d); } }}
                 style={{
                   position: 'relative',
                   fontSize: '9px',
@@ -183,7 +185,7 @@ export default function LofiMiniCalendar({
         </div>
 
         {/* Day popup */}
-        {selectedDay && (
+        {!noPopup && selectedDay && (
           <div ref={popupRef} className="cal-popup" style={{
             position: 'absolute',
             bottom: '100%',

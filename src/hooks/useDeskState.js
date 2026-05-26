@@ -361,7 +361,7 @@ export function useDeskState({ dimensions, themeName }) {
 
   // ─── Calendars ────────────────────────────────────────────────────
   const addCalendarAtPosition = (xRatio, yRatio) => {
-    if (calendars.length >= 1) return;
+    if (stateRef.current.calendars.length >= 1) return;
     pushUndo();
     setCalendars(prev => [...prev, { id: Date.now(), xRatio, yRatio, sizePreset: 'md', layer: getNextLayer() }]);
   };

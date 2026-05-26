@@ -27,11 +27,11 @@ const StickyNote = ({
   layer,
   onContextMenu,
 }) => {
-  const { themeStickyNotes, themeName } = useTheme();
+  const { themeStickyNotes, themeName, theme } = useTheme();
   const stickyNoteAssets = themeStickyNotes.filter(a => !a.name.includes('todo'));
   const [text, setText] = useState(initialText);
   const [rotation, setRotation] = useState(0);
-  const [fontFamily, setFontFamily] = useState("Patrick Hand");
+  const [fontFamily, setFontFamily] = useState(theme.defaultNoteFont || "'Nunito', sans-serif");
   const [fontSizeRatio, setFontSizeRatio] = useState(0.055);
   const [isHovered, setIsHovered] = useState(false);
   const [isPinned, setIsPinned] = useState(pinned);
@@ -176,10 +176,10 @@ const StickyNote = ({
           data-placeholder="Write a note..."
           style={{
             position: "absolute",
-            top: themeName === 'lofi' ? `8%` : `28%`,
-            left: themeName === 'lofi' ? `8%` : `10%`,
-            right: themeName === 'lofi' ? `10%` : `8%`,
-            bottom: themeName === 'lofi' ? `6%` : `12%`,
+            top: theme.stickyNoteTextArea?.top ?? '28%',
+            left: theme.stickyNoteTextArea?.left ?? '10%',
+            right: theme.stickyNoteTextArea?.right ?? '8%',
+            bottom: theme.stickyNoteTextArea?.bottom ?? '12%',
             outline: "none",
             fontSize: `${Math.max(12, Math.min(24, width * fontSizeRatio))}px`,
             fontFamily: fontFamily,
