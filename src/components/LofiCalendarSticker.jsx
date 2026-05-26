@@ -1,35 +1,44 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import LofiMiniCalendar, { LOFI_CAL_BASE_W, LOFI_CAL_BASE_H } from './LofiMiniCalendar';
+import LargeCalendarModal from './LargeCalendarModal';
 
-// Fixed preset sizes maintaining the lofi calendar aspect ratio (260×300)
 export const LOFI_CAL_PRESETS = {
-  xs:  { w: 140, h: Math.round(140 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },   // 140×162
-  sm:  { w: 200, h: Math.round(200 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },   // 200×231
-  md:  { w: LOFI_CAL_BASE_W, h: LOFI_CAL_BASE_H },                            // 260×300
-  lg:  { w: 320, h: Math.round(320 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },   // 320×369
-  xl:  { w: 400, h: Math.round(400 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },   // 400×462
+  xs:  { w: 140, h: Math.round(140 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },
+  sm:  { w: 200, h: Math.round(200 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },
+  md:  { w: LOFI_CAL_BASE_W, h: LOFI_CAL_BASE_H },
+  lg:  { w: 320, h: Math.round(320 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },
+  xl:  { w: 400, h: Math.round(400 * LOFI_CAL_BASE_H / LOFI_CAL_BASE_W) },
 };
 const PRESET_LABELS = { xs: 'XS', sm: 'S', md: 'M', lg: 'L', xl: 'XL' };
 
 export default function LofiCalendarSticker({
   x, y, sizePreset = 'md', isSelected, onSelect, onUpdate, onDelete, onChangeSize,
-  events, onAddEvent, onRemoveEvent, layer, onContextMenu,
+  events, onAddEvent, onRemoveEvent, layer, onContextMenu, snapToGrid = false,
+  stickerCalendarLinks, onSyncToSticker, onUpdateLink, onRemoveLink,
 }) {
   const nodeRef = useRef(null);
   const preset = LOFI_CAL_PRESETS[sizePreset] || LOFI_CAL_PRESETS.md;
-  const scale = preset.w / LOFI_CAL_BASE_W;
+  const scale  = preset.w / LOFI_CAL_BASE_W;
+  const [showModal, setShowModal] = useState(false);
 
-  const handleDrag = (e, data) => {
-    onUpdate({ x: data.x, y: data.y });
-  };
+  useEffect(() => {
+    if (!showModal) return;
+    const onKey = (e) => { if (e.key === 'Escape') setShowModal(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showModal]);
+
+  const handleDrag = (e, data) => { onUpdate({ x: data.x, y: data.y }); };
 
   return (
+    <>
     <Draggable
       nodeRef={nodeRef}
       position={{ x, y }}
       onDrag={handleDrag}
       onStart={onSelect}
+      grid={snapToGrid ? [20, 20] : [1, 1]}
       cancel=".cal-nav, .cal-popup, .cal-cell, .cal-header, .cal-day-label, .cal-icon-option, .cal-popup-remove, .cal-popup-add-btn, input, button"
     >
       <div
@@ -44,17 +53,15 @@ export default function LofiCalendarSticker({
           filter: isSelected ? 'drop-shadow(0 0 12px rgba(124,115,192,0.8))' : 'none',
         }}
         onClick={(e) => { e.stopPropagation(); onSelect(); }}
+        onDoubleClick={(e) => { e.stopPropagation(); setShowModal(true); }}
       >
-        <div style={{
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: LOFI_CAL_BASE_W,
-          height: LOFI_CAL_BASE_H,
-        }}>
+        <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: LOFI_CAL_BASE_W, height: LOFI_CAL_BASE_H }}>
           <LofiMiniCalendar
             events={events}
             onAddEvent={onAddEvent}
             onRemoveEvent={onRemoveEvent}
+            noPopup={true}
+            onDayClick={() => { onSelect(); setShowModal(true); }}
           />
         </div>
 
@@ -81,28 +88,30 @@ export default function LofiCalendarSticker({
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
               style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                background: '#ff4d4d',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                zIndex: 110,
+                position: 'absolute', top: '-8px', right: '-8px',
+                width: '24px', height: '24px', borderRadius: '50%',
+                background: '#ff4d4d', color: 'white', border: 'none',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)', zIndex: 110,
               }}
-            >
-              ✕
-            </button>
+            >✕</button>
           </>
         )}
       </div>
     </Draggable>
+
+    {showModal && (
+      <LargeCalendarModal
+        events={events}
+        onAddEvent={onAddEvent}
+        onRemoveEvent={onRemoveEvent}
+        onClose={() => setShowModal(false)}
+        stickerCalendarLinks={stickerCalendarLinks}
+        onSyncToSticker={onSyncToSticker}
+        onUpdateLink={onUpdateLink}
+        onRemoveLink={onRemoveLink}
+      />
+    )}
+    </>
   );
 }

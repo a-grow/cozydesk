@@ -7,7 +7,9 @@ const EVENT_ICONS = ['●', '⭐', '🌸', '📌', '🎉'];
 export default function MiniCalendar({ 
   events = {}, 
   onAddEvent, 
-  onRemoveEvent 
+  onRemoveEvent,
+  noPopup = false,
+  onDayClick,
 }) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -115,7 +117,7 @@ export default function MiniCalendar({
               <div
                 key={d}
                 className={`cal-cell ${isToday(d) ? 'cal-today' : ''} ${selectedDay === d ? 'cal-selected' : ''}`}
-                onClick={() => setSelectedDay(selectedDay === d ? null : d)}
+                onClick={() => { if (noPopup) { onDayClick?.(); } else { setSelectedDay(selectedDay === d ? null : d); } }}
                 style={{ 
                   position: 'relative',
                   fontSize: '13px',
@@ -140,7 +142,7 @@ export default function MiniCalendar({
           })}
         </div>
 
-        {selectedDay && (
+        {!noPopup && selectedDay && (
           <div ref={popupRef} className="cal-popup" style={{ 
             position: 'absolute',
             bottom: '100%',
