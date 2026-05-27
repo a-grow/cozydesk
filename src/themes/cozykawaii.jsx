@@ -58,6 +58,8 @@ export default function Cozykawaii() {
   }, [activeMenu]);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [stickyCalendarPopup, setStickyCalendarPopup] = useState(null);
+  const [noCalendarPopup, setNoCalendarPopup]         = useState(false);
 
   // All desk state + operations
   const desk = useDeskState({ dimensions, themeName });
@@ -191,6 +193,14 @@ export default function Cozykawaii() {
   }, [contextMenu, desk.notes, desk.stickers, desk.papers, desk.calendars,
       desk.clocks, desk.remindersVisible, desk.remindersLayer, desk.applyNormalizedLayers,
       desk.attachSticker, desk.detachSticker]);
+
+  // ─── Sticky note → calendar integration ──────────────────────────────────
+  const handleDateDetected = (dateKey, eventText, noteId) => {
+    const existing = desk.calendarEvents[dateKey] || [];
+    if (!existing.some(ev => ev.text === eventText)) {
+      setStickyCalendarPopup({ dateKey, eventText, noteId });
+    }
+  };
 
   // ─── Background ────────────────────────────────────────────────────
   // Each theme supplies its own background. cozykawaii uses the photo background
@@ -483,6 +493,7 @@ export default function Cozykawaii() {
           }}
           onDelete={() => { desk.removeNote(note.id); setSelectedId(null); }}
           onContextMenu={(e) => handleContextMenu(e, 'note', note.id)}
+          onDateDetected={(dateKey, eventText) => handleDateDetected(dateKey, eventText, note.id)}
         />
       ))}
 
@@ -538,6 +549,100 @@ export default function Cozykawaii() {
           />
         );
       })}
+
+      {/* ── Sticky note → calendar: confirmation popup ── */}
+      {stickyCalendarPopup && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10100,
+          }}
+          onClick={() => setStickyCalendarPopup(null)}
+        >
+          <div
+            style={{
+              background: 'white', padding: '24px 28px', borderRadius: '16px',
+              maxWidth: '340px', width: '90%', textAlign: 'center',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+              fontFamily: "'Nunito', sans-serif",
+              animation: 'modalFadeIn 0.3s ease-out',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '36px', marginBottom: '8px' }}>📅</div>
+            <h3 style={{ margin: '0 0 8px', color: '#4b3b2a', fontSize: '1.05rem', fontWeight: 800, fontFamily: "'Nunito', sans-serif" }}>
+              Add this event to your calendar?
+            </h3>
+            <p style={{ margin: '0 0 4px', color: '#6b5b4a', fontSize: '0.9rem', fontFamily: "'Nunito', sans-serif", wordBreak: 'break-word' }}>
+              "{stickyCalendarPopup.eventText}"
+            </p>
+            <p style={{ margin: '0 0 20px', color: '#9b8b7a', fontSize: '0.8rem', fontFamily: "'Nunito', sans-serif" }}>
+              {stickyCalendarPopup.dateKey}
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={() => {
+                  const { dateKey, eventText, noteId } = stickyCalendarPopup;
+                  desk.addCalendarEvent(dateKey, { text: eventText, category: 'personal', noteId });
+                  setStickyCalendarPopup(null);
+                  if (desk.calendars.length === 0) setNoCalendarPopup(true);
+                }}
+                style={{ padding: '9px 24px', borderRadius: '10px', border: 'none', background: '#d4a373', color: 'white', fontWeight: 'bold', cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontSize: '0.9rem' }}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setStickyCalendarPopup(null)}
+                style={{ padding: '9px 20px', borderRadius: '10px', border: 'none', background: '#eee', color: '#4b3b2a', fontWeight: 'bold', cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontSize: '0.9rem' }}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── No calendar on desk: prompt to drag one ── */}
+      {noCalendarPopup && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10100,
+          }}
+          onClick={() => setNoCalendarPopup(false)}
+        >
+          <div
+            style={{
+              background: 'white', padding: '24px 28px', borderRadius: '16px',
+              maxWidth: '320px', width: '90%', textAlign: 'center',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+              fontFamily: "'Nunito', sans-serif",
+              animation: 'modalFadeIn 0.3s ease-out',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '40px', marginBottom: '10px' }}>📅</div>
+            <h3 style={{ margin: '0 0 8px', color: '#4b3b2a', fontSize: '1.1rem', fontWeight: 800, fontFamily: "'Nunito', sans-serif" }}>
+              Event Added!
+            </h3>
+            <p style={{ margin: '0 0 20px', color: '#6b5b4a', lineHeight: 1.5, fontSize: '0.9rem', fontFamily: "'Nunito', sans-serif" }}>
+              Drag the calendar to your desk to see it.
+            </p>
+            <button
+              onClick={() => setNoCalendarPopup(false)}
+              style={{
+                padding: '10px 28px', borderRadius: '10px', border: 'none',
+                background: '#d4a373', color: 'white', fontWeight: 'bold',
+                cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontSize: '0.95rem',
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Layer context menu ── */}
       {contextMenu && (
