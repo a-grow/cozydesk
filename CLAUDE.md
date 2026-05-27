@@ -250,3 +250,8 @@ src/
 - Calendar limit fixed (May 26, 2026) — stateRef.current.calendars.length
 - Calendar widget double-click → large modal (May 26, 2026)
 - noPopup support added to MiniCalendar + LofiMiniCalendar (May 26, 2026)
+- Sticky note → calendar date detection restored (May 27, 2026)
+  - detectAllDates() and isMountedRef restored to StickyNote.jsx
+  - handleDateDetected, stickyCalendarPopup, noCalendarPopup restored to cozykawaii.jsx
+  - Root cause: system was completely missing after previous refactor
+  - Lesson: always verify restored features actually exist in running code, not just by visual check
