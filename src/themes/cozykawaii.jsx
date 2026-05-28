@@ -504,6 +504,8 @@ export default function Cozykawaii() {
               desk.updateClock(clock.id, data);
               desk.moveAttachedStickers(clock.id, dxRatio, dyRatio);
             }}
+            flipped={clock.flipped || false}
+            onFlip={() => desk.changeClockFlip(clock.id)}
             onDelete={() => { desk.removeClock(clock.id); setSelectedId(null); }}
             onChangeSize={preset => desk.changeClockSize(clock.id, preset)}
             onContextMenu={(e) => handleContextMenu(e, 'clock', clock.id)}

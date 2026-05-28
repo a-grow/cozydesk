@@ -25,6 +25,7 @@ const PRESET_LABELS = { xs: "XS", sm: "S", md: "M", lg: "L", xl: "XL" };
 
 export default function SteampunkClockSticker({
   x, y, sizePreset = "md",
+  flipped = false, onFlip,
   isSelected, onSelect, onUpdate, onDelete, onChangeSize,
   layer, onContextMenu,
 }) {
@@ -69,7 +70,7 @@ export default function SteampunkClockSticker({
       onDragStart={() => onSelect()}
       onDragStop={(e, d) => onUpdate({ x: d.x, y: d.y })}
     >
-      <div onContextMenu={onContextMenu} style={{ width: "100%", height: "100%", position: "relative" }}>
+      <div onContextMenu={onContextMenu} style={{ width: "100%", height: "100%", position: "relative", transform: flipped ? 'scaleX(-1)' : 'none' }}>
 
         {/* Steampunk clock PNG */}
         <img
@@ -85,31 +86,38 @@ export default function SteampunkClockSticker({
         />
 
         {/* One digit per glass tube, perfectly centered */}
-        {digits.map((digit, i) => (
-          <span
-            key={i}
-            style={{
-              ...glowStyle,
-              position: "absolute",
-              left: TUBES[i].cx,
-              top: TUBES[i].cy,
-              transform: "translate(-50%, -50%)",
-              fontSize: `${digitFont}px`,
-              pointerEvents: "none",
-              userSelect: "none",
-            }}
-          >
-            {digit}
-          </span>
-        ))}
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, pointerEvents: 'none', transform: flipped ? 'scaleX(-1)' : 'none' }}>
+          {digits.map((digit, i) => (
+            <span
+              key={i}
+              style={{
+                ...glowStyle,
+                position: "absolute",
+                left: TUBES[i].cx,
+                top: TUBES[i].cy,
+                transform: "translate(-50%, -50%)",
+                fontSize: `${digitFont}px`,
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+            >
+              {digit}
+            </span>
+          ))}
+        </div>
 
         {/* Size controls + delete when selected */}
         {isSelected && (
           <>
             <div style={{
               position: "absolute", top: "-26px", left: "50%",
-              transform: "translateX(-50%)", display: "flex", gap: "4px", zIndex: 30,
+              transform: flipped ? 'translateX(-50%) scaleX(-1)' : 'translateX(-50%)', display: "flex", gap: "4px", zIndex: 30,
             }}>
+              <button
+                onClick={(e) => { e.stopPropagation(); onFlip?.(); }}
+                title="Flip"
+                style={{ padding: '2px 8px', fontSize: '13px', fontWeight: 600, background: flipped ? '#b87333' : '#fff', color: flipped ? '#fff' : '#7a4a1e', border: '1px solid #b87333', borderRadius: '6px', cursor: 'pointer', lineHeight: 1.4 }}
+              >↔</button>
               {Object.entries(PRESET_LABELS).map(([key, label]) => (
                 <button
                   key={key}
@@ -127,7 +135,7 @@ export default function SteampunkClockSticker({
             <button
               className="delete-btn"
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              style={{ top: "4px", right: "4px" }}
+              style={{ top: "4px", right: flipped ? undefined : "4px", left: flipped ? "4px" : undefined }}
             >✕</button>
           </>
         )}

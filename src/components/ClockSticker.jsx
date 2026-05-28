@@ -29,6 +29,7 @@ const PRESET_LABELS = { xs: 'XS', sm: 'S', md: 'M', lg: 'L', xl: 'XL' };
 
 export default function ClockSticker({
   x, y, sizePreset = 'md',
+  flipped = false, onFlip,
   isSelected, onSelect, onUpdate, onDelete, onChangeSize,
   layer, onContextMenu,
 }) {
@@ -63,7 +64,7 @@ export default function ClockSticker({
       onDragStart={() => onSelect()}
       onDragStop={(e, d) => onUpdate({ x: d.x, y: d.y })}
     >
-      <div onContextMenu={onContextMenu} style={{ width: "100%", height: "100%", position: "relative" }}>
+      <div onContextMenu={onContextMenu} style={{ width: "100%", height: "100%", position: "relative", transform: flipped ? 'scaleX(-1)' : 'none' }}>
 
         {/* Clock PNG background */}
         <img
@@ -99,6 +100,7 @@ export default function ClockSticker({
             MozOsxFontSmoothing: "none",
             pointerEvents: "none",
             userSelect: "none",
+            transform: flipped ? 'scaleX(-1)' : 'none',
           }}
         >
           <p style={{
@@ -128,8 +130,13 @@ export default function ClockSticker({
           <>
             <div style={{
               position: 'absolute', top: '-26px', left: '50%',
-              transform: 'translateX(-50%)', display: 'flex', gap: '4px', zIndex: 30,
+              transform: flipped ? 'translateX(-50%) scaleX(-1)' : 'translateX(-50%)', display: 'flex', gap: '4px', zIndex: 30,
             }}>
+              <button
+                onClick={(e) => { e.stopPropagation(); onFlip?.(); }}
+                title="Flip"
+                style={{ padding: '2px 8px', fontSize: '13px', fontWeight: 600, background: flipped ? '#d4a373' : '#fff', color: flipped ? '#fff' : '#8b5e3c', border: '1px solid #d4a373', borderRadius: '6px', cursor: 'pointer', lineHeight: 1.4 }}
+              >↔</button>
               {Object.entries(PRESET_LABELS).map(([key, label]) => (
                 <button
                   key={key}
@@ -147,7 +154,7 @@ export default function ClockSticker({
             <button
               className="delete-btn"
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              style={{ top: "4px", right: "4px" }}
+              style={{ top: "4px", right: flipped ? undefined : "4px", left: flipped ? "4px" : undefined }}
             >
               ✕
             </button>

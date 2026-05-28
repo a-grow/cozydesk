@@ -415,6 +415,11 @@ export function useDeskState({ dimensions, themeName }) {
     setClocks(prev => prev.map(c => c.id === id ? { ...c, sizePreset: preset } : c));
   };
 
+  const changeClockFlip = (id) => {
+    pushUndo();
+    setClocks(prev => prev.map(c => c.id === id ? { ...c, flipped: !c.flipped } : c));
+  };
+
   // ─── Papers (to-do lists) ─────────────────────────────────────────
   const addPaperAtPosition = (xRatio, yRatio) => {
     if (papers.length >= 5) return;
@@ -612,7 +617,7 @@ export function useDeskState({ dimensions, themeName }) {
     addCalendarAtPosition, removeCalendar, updateCalendar, changeCalendarSize,
     addCalendarEvent, removeCalendarEvent,
     // clocks
-    removeClock, updateClock, changeClockSize,
+    removeClock, updateClock, changeClockSize, changeClockFlip,
     // papers
     addPaperAtPosition, addTodoList, removePaper, updatePaper,
     sendReminderToDeskPaper, addInlineReminder,

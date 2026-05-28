@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-# Last Updated: May 27, 2026
+# Last Updated: May 28, 2026
 
 ## What is CozyDesk?
 A React/Vite PWA productivity app with themed desktops (sticky notes, calendars,
@@ -87,7 +87,8 @@ stickyNoteTextArea, todoTextArea, showTape, todoInputColor, checkboxBorder,
 clockComponent, calendarComponent, stickyNoteSize
 
 ### Asset Discovery
-Vite glob auto-discovers: stickers/, productivitystickers/
+Vite glob auto-discovers: stickers/, stickynotes/
+Note: productivitystickers/ is RETIRED — do not use this folder name ever again
 Background images live in: src/assets/backgrounds/
 
 ### Current Themes
@@ -112,40 +113,13 @@ Background images live in: src/assets/backgrounds/
 
 ---
 
-## Calendar ↔ Sticky Note Sync
-
-### How It Works
-- Sticky notes link to calendar via stickerCalendarLinks array
-- Each link: { linkId, stickerId, stickerType, eventText, dateKey }
-- eventText in the link MUST stay in sync when events are edited
-
-### What Works (May 26, 2026)
-- Add date to sticky note → popup → yes → event on calendar ✅
-- Edit calendar event → auto-updates linked sticky note ✅
-- Calendar limited to 1 per desk (stateRef.current.calendars.length) ✅
-- All popups appear above stickers (zIndex: 10100) ✅
-- Double-click calendar widget → large modal opens (all themes) ✅
-
-### Known Broken
-- Delete calendar event → popup does NOT appear → sticky note unchanged ❌
-  Diagnostic: add console.log('deleteEdit', {stickerCalendarLinks, originalText, originalDateKey})
-  DO NOT patch again without confirming data is populated first
-
-- Small calendar widget doesn't show events added via large modal ❌
-  Needs investigation of events prop flow from LargeCalendarModal back to widget
-
-- Calendar popup fires while still typing on sticky note ❌
-  Should only fire on blur, not during active typing
-
-### Dedup Rule
-Same dateKey + same eventText = skip. Never add duplicates.
-
----
-
 ## Sticky Note Rules
 - Default size: 180×180px, locked aspect ratio, ALL themes
 - Yellow kawaii note has separate size override — do not remove
 - Color picker: exactly 4 swatches (blue, green, pink, yellow) — no sticker assets
+- Sticky note → calendar sync is PERMANENTLY REMOVED as of May 28, 2026
+- Sticky notes are standalone notepads only — no date detection, no calendar popup, no reverse sync
+- Never restore this feature without explicit instruction
 
 ---
 
@@ -167,6 +141,12 @@ src/
     cozykawaii/             ← kawaii assets
     lofi/                   ← lofi assets
     steampunk/              ← steampunk assets
+  Each theme folder must contain: stickynotes/, stickers/, widgets/, wallart/, props/
+  Sticky note assets → stickynotes/ (glob reads here only)
+  Calendar widget images → widgets/ (NOT stickynotes/)
+  Any file in stickynotes/ gets picked up as a color swatch — keep it clean
+  Filenames must contain "blue", "green", "pink", or "yellow" for color swatches to appear
+  loficalendarbase.png lives in lofi/widgets/ — imported directly in LofiSidebar.jsx and LofiMiniCalendar.jsx
   components/
     StickyNote.jsx          ← do not touch unless fixing sticky note bugs
     ReminderPaper.jsx       ← do not touch unless fixing todo bugs
@@ -203,6 +183,8 @@ src/
 - Snap to grid
 - Theme-color meta tag
 - Aspect ratio locking on sticky notes and todo lists
+- Event dots on mini calendar widget (MiniCalendar.jsx and LofiMiniCalendar.jsx) — uses {ev.icon || '●'}
+- Sticky note assets loading from stickynotes/ folder for all themes
 
 ---
 
@@ -239,9 +221,15 @@ src/
 - DO NOT put on resume yet
 
 ## Deployment
-- Hosted: GitHub Pages (free)
+- Hosted: GitHub Pages (free, no limits)
 - Repo: github.com/a-grow/cozydesk
 - Custom domain: cozydesk.app (GoDaddy, renews Mar 30, 2027)
+- dev branch = active development, push here daily
+- main branch = landing page only, never push app code here
+- cozydesk.netlify.app = frozen old build, ignore it, do not use it
+- Tauri desktop app: src-tauri folder exists but CLI not installed — future dedicated task
+- Plan: cozydesk.app = landing page with download button, Tauri app = actual shipped product
+- localhost:5173 is the test environment for all development
 
 ## Completed Fixes Log
 - Font violations fixed (April 17, 2026)
@@ -250,8 +238,15 @@ src/
 - Calendar limit fixed (May 26, 2026) — stateRef.current.calendars.length
 - Calendar widget double-click → large modal (May 26, 2026)
 - noPopup support added to MiniCalendar + LofiMiniCalendar (May 26, 2026)
-- Sticky note → calendar date detection restored (May 27, 2026)
-  - detectAllDates() and isMountedRef restored to StickyNote.jsx
-  - handleDateDetected, stickyCalendarPopup, noCalendarPopup restored to cozykawaii.jsx
-  - Root cause: system was completely missing after previous refactor
-  - Lesson: always verify restored features actually exist in running code, not just by visual check
+- May 28, 2026:
+  - Calendar event dots fixed — ev.icon was always undefined for modal-created events. Fixed with {ev.icon || '●'} in MiniCalendar.jsx and LofiMiniCalendar.jsx
+  - Sticky note assets fixed — glob was pointing at productivitystickers/ (empty). Updated to stickynotes/
+  - Steampunk sticky note images recovered from dist/assets/ and placed in src/themes/steampunk/stickynotes/
+  - loficalendarbase.png moved from lofi/stickynotes/ to lofi/widgets/ — imports updated in LofiSidebar.jsx and LofiMiniCalendar.jsx
+  - Sticky note → calendar sync REMOVED permanently — detectAllDates, MONTH_MAP, isMountedRef, handleDateDetected, stickyCalendarPopup, noCalendarPopup all deleted from StickyNote.jsx and cozykawaii.jsx
+  - Empty productivitystickers/ folders deleted from cozykawaii and steampunk theme folders
+
+## Still To Do / Known Bugs
+- Fix Patrick Hand showing as default font in steampunk and lofi sticky note pickers
+- Set up Tauri desktop app as dedicated session
+- Refactor MiniCalendar.jsx and LofiMiniCalendar.jsx into one shared component when adding next theme
