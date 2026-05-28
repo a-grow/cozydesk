@@ -8,7 +8,7 @@ import SavePopup from './sidebar/SavePopup';
 import clockIcon from '../themes/lofi/stickers/loficlock.png';
 import lofiTodoImg from '../themes/lofi/stickynotes/lofotodolist.png';
 import lofiStickyNoteImg from '../themes/lofi/stickynotes/lofistickynoteblue.png';
-import lofiCalendarImg from '../themes/lofi/stickynotes/loficalendarbase.png';
+import lofiCalendarImg from '../themes/lofi/widgets/loficalendarbase.png';
 import { useTheme } from '../themes/ThemeContext';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────

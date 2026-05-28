@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import calendarBase from '../themes/lofi/stickynotes/loficalendarbase.png';
+import calendarBase from '../themes/lofi/widgets/loficalendarbase.png';
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const EVENT_ICONS = ['●', '⭐', '🌸', '📌', '🎉'];
@@ -175,7 +175,7 @@ export default function LofiMiniCalendar({
                     display: 'flex', gap: '1px',
                   }}>
                     {dayEvents.slice(0, 2).map((ev, j) => (
-                      <span key={j} className="cal-event-dot" style={{ fontSize: '5px' }}>{ev.icon}</span>
+                      <span key={j} className="cal-event-dot" style={{ fontSize: '5px' }}>{ev.icon || '●'}</span>
                     ))}
                   </div>
                 )}

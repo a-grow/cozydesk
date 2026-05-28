@@ -133,7 +133,7 @@ export default function MiniCalendar({
                 {dayEvents.length > 0 && (
                   <div className="cal-event-dots" style={{ position: 'absolute', bottom: '1px', display: 'flex', gap: '1px' }}>
                     {dayEvents.slice(0, 3).map((ev, j) => (
-                      <span key={j} className="cal-event-dot" style={{ fontSize: '7px' }}>{ev.icon}</span>
+                      <span key={j} className="cal-event-dot" style={{ fontSize: '7px' }}>{ev.icon || '●'}</span>
                     ))}
                   </div>
                 )}

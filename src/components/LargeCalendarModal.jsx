@@ -197,6 +197,7 @@ export default function LargeCalendarModal({
       const link = stickerCalendarLinks.find(
         l => l.eventText === originalText && l.dateKey === originalDateKey
       );
+      console.log('deleteEdit diagnostic', { stickerCalendarLinks, originalText, originalDateKey, foundLink: link, calDeleteSync });
       if (link) {
         if (calDeleteSync === 'yes') {
           onSyncToSticker?.(link, null, null, true);

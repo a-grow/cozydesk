@@ -14,7 +14,7 @@ const allThemeStickers = import.meta.glob(
 );
 
 const allThemeStickyNotes = import.meta.glob(
-  './*/productivitystickers/*.{png,jpg,jpeg,webp,gif}',
+  './*/stickynotes/*.{png,jpg,jpeg,webp,gif}',
   { eager: true }
 );
 

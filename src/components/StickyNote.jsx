@@ -3,48 +3,6 @@ import { Rnd } from "react-rnd";
 import defaultNoteImg from "../assets/stickynotes/stickynotecozyyellow.png";
 import { useTheme } from "../themes/ThemeContext";
 
-// ── Date detection ──────────────────────────────────────────────────────────
-const MONTH_MAP = {
-  january:1, february:2, march:3, april:4, may:5, june:6,
-  july:7, august:8, september:9, october:10, november:11, december:12,
-  jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12,
-};
-
-function detectAllDates(text) {
-  const found = [];
-  const curYear = new Date().getFullYear();
-
-  const re1 = /\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(\d{1,2})(?:st|nd|rd|th)?\b/gi;
-  for (const m of text.matchAll(re1)) {
-    const monthNum = MONTH_MAP[m[1].toLowerCase()];
-    const day = parseInt(m[2], 10);
-    if (monthNum && day >= 1 && day <= 31) {
-      found.push({ index: m.index, end: m.index + m[0].length, dateKey: `${curYear}-${String(monthNum).padStart(2,'0')}-${String(day).padStart(2,'0')}` });
-    }
-  }
-
-  const re2 = /\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/g;
-  for (const m of text.matchAll(re2)) {
-    const month = parseInt(m[1], 10);
-    const day   = parseInt(m[2], 10);
-    let year    = m[3] ? parseInt(m[3], 10) : curYear;
-    if (year < 100) year += 2000;
-    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-      found.push({ index: m.index, end: m.index + m[0].length, dateKey: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}` });
-    }
-  }
-
-  if (found.length === 0) return [];
-  found.sort((a, b) => a.index - b.index);
-
-  return found.map((f, i) => {
-    const nextStart = i + 1 < found.length ? found[i + 1].index : text.length;
-    const afterText = text.slice(f.end, nextStart).replace(/[\n\r]+/g, ' ').trim();
-    const eventText = (afterText || text.slice(0, f.index).replace(/[\n\r]+/g, ' ').trim()).slice(0, 80);
-    return { dateKey: f.dateKey, eventText };
-  });
-}
-// ────────────────────────────────────────────────────────────────────────────
 
 const handleDot = {
   position: "absolute",
@@ -69,7 +27,6 @@ const StickyNote = ({
   onDelete,
   layer,
   onContextMenu,
-  onDateDetected,
 }) => {
   const { themeStickyNotes, themeName, theme } = useTheme();
   const stickyNoteAssets = themeStickyNotes.filter(a => !a.name.includes('todo'));
@@ -80,21 +37,12 @@ const StickyNote = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isPinned, setIsPinned] = useState(pinned);
   const contentRef = useRef(null);
-  const isMountedRef = useRef(false);
 
-  // Set initial text imperatively
   useEffect(() => {
-    if (contentRef.current) {
-      // Always sync the dom to the initialText provided by props IF we just mounted
-      // BUT if we are updating, we must only set it if the internal text state matches the prop
-      // For simplicity on color change: the component re-renders but doesn't unmount.
-      // So we must ensure initialText from props is placed in the div if it changed from outside.
-      if (contentRef.current.innerText !== initialText) {
-         contentRef.current.innerText = initialText;
-         setText(initialText);
-      }
+    if (contentRef.current && contentRef.current.innerText !== initialText) {
+      contentRef.current.innerText = initialText;
+      setText(initialText);
     }
-    isMountedRef.current = true;
   }, [initialText]);
 
   const handleRotate = (e) => {
@@ -123,12 +71,6 @@ const StickyNote = ({
     if (!contentRef.current) return;
     const currentText = contentRef.current.innerText;
     onUpdate({ text: currentText });
-    if (onDateDetected && isMountedRef.current) {
-      const pairs = detectAllDates(currentText);
-      pairs.forEach(({ dateKey, eventText }) => {
-        onDateDetected(dateKey, eventText);
-      });
-    }
   };
 
   return (
