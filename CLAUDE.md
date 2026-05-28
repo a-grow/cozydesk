@@ -196,6 +196,7 @@ src/
 5. Test in browser before moving to next change
 6. Never touch files not related to the current task
 7. When intent is ambiguous — ask, don't assume
+8. Before writing any Claude Code prompt, reason through the FULL chain of consequences. Read the files, think every layer, be certain — then act. Predictable side effects caught after testing are a failure of preparation, not bad luck.
 
 ---
 
@@ -245,8 +246,19 @@ src/
   - loficalendarbase.png moved from lofi/stickynotes/ to lofi/widgets/ — imports updated in LofiSidebar.jsx and LofiMiniCalendar.jsx
   - Sticky note → calendar sync REMOVED permanently — detectAllDates, MONTH_MAP, isMountedRef, handleDateDetected, stickyCalendarPopup, noCalendarPopup all deleted from StickyNote.jsx and cozykawaii.jsx
   - Empty productivitystickers/ folders deleted from cozykawaii and steampunk theme folders
+  - Clock flip button restored across all 3 themes (lost in May 28 cleanup)
+  - Clock flip alignment fixed — scaleX(-1) on outer wrapper div, counter-flip on text overlays and controls row, delete button swaps right/left instead of using transform
 
 ## Still To Do / Known Bugs
 - Fix Patrick Hand showing as default font in steampunk and lofi sticky note pickers
 - Set up Tauri desktop app as dedicated session
 - Refactor MiniCalendar.jsx and LofiMiniCalendar.jsx into one shared component when adding next theme
+- Clock flip: fully restored and working across all 3 themes ✅
+
+## CSS Transform Rules — Clock Flip Pattern
+When applying scaleX(-1) to an outer wrapper div, ALL children are affected:
+- Absolutely positioned children: right/left values are visually swapped — fix by swapping right/left values when flipped, NOT by adding transform
+- Text overlays: must have their own counter-flip scaleX(-1) to read correctly
+- Controls row: translateX(-50%) must become translateX(-50%) scaleX(-1) when flipped
+- Steampunk-style digit spans: wrap in counter-flip div with explicit left/right/top/bottom: 0
+- Future clock components must follow this same pattern — it is universal
