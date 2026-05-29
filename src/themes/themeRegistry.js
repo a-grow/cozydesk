@@ -2,11 +2,14 @@ import ClockSticker from '../components/ClockSticker';
 import LofiClockSticker from '../components/LofiClockSticker';
 import SteampunkClockSticker from '../components/SteampunkClockSticker';
 import CalendarSticker from '../components/CalendarSticker';
-import LofiCalendarSticker from '../components/LofiCalendarSticker';
 
 import cozyBackground from '../assets/backgrounds/cozycornerbg.png';
 import lofiBackground from '../assets/backgrounds/lofiblue.png';
 import steampunkBackground from '../assets/backgrounds/steampunkbg.png';
+
+import kawaiiCalendarBase from './cozykawaii/widgets/cozycalendarbase.png';
+import lofiCalendarBase from './lofi/widgets/loficalendarbase.png';
+import steampunkCalendarBase from './steampunk/widgets/stmpnkcalendarbase.png';
 
 const allThemeStickers = import.meta.glob(
   './*/stickers/*.{png,jpg,jpeg,webp,gif}',
@@ -41,6 +44,30 @@ const THEME_CONFIGS = {
     clockComponent: ClockSticker,
     calendarComponent: CalendarSticker,
     stickyNoteSize: 180,
+    calendarTheme: {
+      image: kawaiiCalendarBase,
+      baseW: 260,
+      baseH: 270,
+      contentArea: { top: '62px', left: '18px', right: '18px', bottom: '58px' },
+      font: "'Nunito', sans-serif",
+      colors: {
+        accent: '#8b5e3c',
+        text: '#4b3b2a',
+        today: '#d4a373',
+        selectedBg: 'rgba(200,169,126,0.2)',
+        dayLabel: '#b5977a',
+        navBtn: '#8b5e3c',
+        popupBg: 'white',
+        popupBorder: '#e0d4c8',
+        popupText: '#4b3b2a',
+        addBtn: '#d4a373',
+        contentBg: 'transparent',
+      },
+      sizeButtons: {
+        active: { bg: '#d4a373', color: '#fff', border: '#d4a373' },
+        inactive: { bg: '#fff', color: '#8b5e3c', border: '#d4a373' },
+      },
+    },
   },
   lofi: {
     name: 'Lo-Fi',
@@ -62,8 +89,32 @@ const THEME_CONFIGS = {
     todoInputColor: '#ffffff',
     checkboxBorder: '2px solid rgba(255,255,255,0.6)',
     clockComponent: LofiClockSticker,
-    calendarComponent: LofiCalendarSticker,
+    calendarComponent: CalendarSticker,
     stickyNoteSize: 180,
+    calendarTheme: {
+      image: lofiCalendarBase,
+      baseW: 260,
+      baseH: 340,
+      contentArea: { top: '140px', left: '18px', right: '18px', bottom: '40px' },
+      font: "'Nunito', sans-serif",
+      colors: {
+        accent: '#6d5fc0',
+        text: '#e8e0ff',
+        today: '#6d5fc0',
+        selectedBg: 'rgba(124,115,192,0.2)',
+        dayLabel: '#c5b8ff',
+        navBtn: '#6d5fc0',
+        popupBg: '#1e1640',
+        popupBorder: '#7c73c0',
+        popupText: '#e8e0ff',
+        addBtn: '#7c73c0',
+        contentBg: 'transparent',
+      },
+      sizeButtons: {
+        active: { bg: '#7c73c0', color: '#fff', border: '#7c73c0' },
+        inactive: { bg: '#fff', color: '#4d3fa0', border: '#7c73c0' },
+      },
+    },
   },
   steampunk: {
     name: 'Steampunk',
@@ -87,6 +138,30 @@ const THEME_CONFIGS = {
     clockComponent: SteampunkClockSticker,
     calendarComponent: CalendarSticker,
     stickyNoteSize: 180,
+    calendarTheme: {
+      image: steampunkCalendarBase,
+      baseW: 260,
+      baseH: 300,
+      contentArea: { top: '85px', left: '25px', right: '25px', bottom: '60px' },
+      font: "'Nunito', sans-serif",
+      colors: {
+        accent: '#b87333',
+        text: '#3b2f2f',
+        today: '#b87333',
+        selectedBg: 'rgba(184,115,51,0.2)',
+        dayLabel: '#8b6914',
+        navBtn: '#b87333',
+        popupBg: '#2a2018',
+        popupBorder: '#5a4a3a',
+        popupText: '#e8d4b0',
+        addBtn: '#b87333',
+        contentBg: 'transparent',
+      },
+      sizeButtons: {
+        active: { bg: '#b87333', color: '#fff', border: '#b87333' },
+        inactive: { bg: '#fff', color: '#3b2f2f', border: '#b87333' },
+      },
+    },
   },
 };
 

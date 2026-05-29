@@ -275,12 +275,12 @@ const StickyNote = ({
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", color: "#333", background: "#f9f9f9", padding: "4px", borderRadius: "6px" }}>
                 <span>Font</span>
                 <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} style={{ width: "90px", border: "1px solid #ccc", borderRadius: "4px", padding: "2px", cursor: "pointer" }}>
-                  <option value="'Patrick Hand', cursive">Patrick Hand</option>
-                  <option value="'Fredoka', cursive">Fredoka</option>
-                  <option value="Arial">Arial</option>
-                  <option value="Courier New">Courier New</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Comic Sans MS">Comic Sans MS</option>
+                  <option value="'Caveat', cursive">Caveat</option>
+                  <option value="'Indie Flower', cursive">Indie Flower</option>
+                  <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
+                  <option value="'Permanent Marker', cursive">Permanent Marker</option>
+                  <option value="'Fredoka', sans-serif">Fredoka</option>
+                  <option value="'Nunito', sans-serif">Nunito</option>
                 </select>
               </div>
             </div>

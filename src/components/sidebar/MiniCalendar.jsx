@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import calendarBase from '../../assets/icons/cozycalendarbase.png';
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const EVENT_ICONS = ['●', '⭐', '🌸', '📌', '🎉'];
 
-export default function MiniCalendar({ 
-  events = {}, 
-  onAddEvent, 
+export default function MiniCalendar({
+  events = {},
+  onAddEvent,
   onRemoveEvent,
   noPopup = false,
   onDayClick,
+  calendarTheme,
 }) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -19,7 +19,18 @@ export default function MiniCalendar({
   const [popupIcon, setPopupIcon] = useState('●');
   const popupRef = useRef(null);
 
-  // Close popup when clicking outside
+  const baseW = calendarTheme?.baseW || 260;
+  const baseH = calendarTheme?.baseH || 260;
+  const contentArea = calendarTheme?.contentArea || { top: '46px', left: '36px', right: '36px', bottom: '52px' };
+  const font = calendarTheme?.font || "'Nunito', sans-serif";
+  const colors = calendarTheme?.colors || {
+    accent: '#8b5e3c', text: '#4b3b2a', today: '#d4a373',
+    selectedBg: 'rgba(200,169,126,0.2)', dayLabel: '#b5977a',
+    navBtn: '#8b5e3c', popupBg: 'white', popupBorder: '#e0d4c8',
+    popupText: '#4b3b2a', addBtn: '#d4a373', contentBg: 'white',
+  };
+  const image = calendarTheme?.image;
+
   useEffect(() => {
     if (selectedDay == null) return;
     const handleOutsideClick = (e) => {
@@ -69,48 +80,73 @@ export default function MiniCalendar({
     d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
 
   return (
-    <div className="cal-widget" style={{ 
-      background: 'transparent', 
-      border: 'none', 
-      padding: 0, 
-      width: '260px', 
-      height: '260px',
+    <div className="cal-widget" style={{
+      background: 'transparent',
+      border: 'none',
+      padding: 0,
+      width: `${baseW}px`,
+      height: `${baseH}px`,
       position: 'relative',
-      fontFamily: "'Patrick Hand', cursive"
+      fontFamily: font,
     }}>
-      {/* 1. THE CALENDAR FRAME IMAGE - Now using the user's baked-in background version */}
-      <img src={calendarBase} alt="Calendar Frame" style={{ 
-        position: 'absolute', 
-        inset: 0, 
-        width: '100%', 
-        height: '100%', 
-        objectFit: 'contain',
-        pointerEvents: 'none',
-        zIndex: 2
-      }} />
+      {image && (
+        <img src={image} alt="Calendar Frame" style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'fill',
+          pointerEvents: 'none',
+          zIndex: 2,
+        }} />
+      )}
 
-      {/* 2. FUNCTIONAL CALENDAR CONTENT - Positioned to fit the new frame perfectly */}
-      <div style={{ 
-        position: 'absolute', 
-        top: '46px',
-        left: '36px',
-        right: '36px',
-        bottom: '52px',
+      <div style={{
+        position: 'absolute',
+        top: contentArea.top,
+        left: contentArea.left,
+        right: contentArea.right,
+        bottom: contentArea.bottom,
         display: 'flex',
         flexDirection: 'column',
-        padding: '0 6px',
-        zIndex: 5
+        padding: '0 2px',
+        zIndex: 5,
+        overflow: 'hidden',
+        background: colors.contentBg || 'transparent',
+        borderRadius: '4px',
       }}>
-        <div className="cal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-          <button className="cal-nav" onClick={prevMonth} style={{ background: 'transparent', border: 'none', padding: '0 4px', fontSize: '20px', cursor: 'pointer', color: '#8b5e3c' }}>‹</button>
-          <span className="cal-month-label" style={{ fontSize: '18px', fontWeight: 'bold', color: '#8b5e3c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{monthName} {year}</span>
-          <button className="cal-nav" onClick={nextMonth} style={{ background: 'transparent', border: 'none', padding: '0 4px', fontSize: '20px', cursor: 'pointer', color: '#8b5e3c' }}>›</button>
+        <div className="cal-header" style={{
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', marginBottom: '0px', flexShrink: 0,
+        }}>
+          <button className="cal-nav" onClick={prevMonth} style={{
+            background: 'transparent', border: 'none', padding: '0 4px',
+            fontSize: '20px', cursor: 'pointer', color: colors.navBtn, lineHeight: 1,
+          }}>‹</button>
+          <span className="cal-month-label" style={{
+            fontSize: '13px', fontWeight: 'bold', color: colors.accent,
+            textTransform: 'uppercase', letterSpacing: '0.05em',
+          }}>{monthName} {year}</span>
+          <button className="cal-nav" onClick={nextMonth} style={{
+            background: 'transparent', border: 'none', padding: '0 4px',
+            fontSize: '20px', cursor: 'pointer', color: colors.navBtn, lineHeight: 1,
+          }}>›</button>
         </div>
 
-        <div className="cal-grid" style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1px' }}>
-          {DAYS.map(d => <div key={d} className="cal-day-label" style={{ fontSize: '11px', textAlign: 'center', color: '#b5977a', fontWeight: 'bold' }}>{d}</div>)}
+        <div className="cal-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: '0px', alignContent: 'start',
+          gridAutoRows: '13px',
+        }}>
+          {DAYS.map(d => (
+            <div key={d} className="cal-day-label" style={{
+              fontSize: '7px', textAlign: 'center',
+              color: colors.dayLabel, fontWeight: 'bold', lineHeight: '1.1',
+            }}>{d}</div>
+          ))}
           {cells.map((d, i) => {
-            if (d === null) return <div key={`e${i}`} className="cal-cell cal-empty" />;
+            if (d === null) return <div key={`e${i}`} className="cal-cell cal-empty" style={{ lineHeight: '1.1' }} />;
             const key = dayKey(d);
             const dayEvents = events[key] || [];
             return (
@@ -118,22 +154,23 @@ export default function MiniCalendar({
                 key={d}
                 className={`cal-cell ${isToday(d) ? 'cal-today' : ''} ${selectedDay === d ? 'cal-selected' : ''}`}
                 onClick={() => { if (noPopup) { onDayClick?.(); } else { setSelectedDay(selectedDay === d ? null : d); } }}
-                style={{ 
-                  position: 'relative',
-                  fontSize: '13px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  borderRadius: '3px',
-                  background: selectedDay === d ? 'rgba(200, 169, 126, 0.2)' : 'transparent'
+                style={{
+                  position: 'relative', fontSize: '9px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', borderRadius: '3px', lineHeight: '1.1',
+                  background: selectedDay === d ? colors.selectedBg : 'transparent',
                 }}
               >
-                <span className="cal-day-num" style={{ color: isToday(d) ? '#d4a373' : '#4b3b2a', fontWeight: isToday(d) ? 'bold' : 'normal' }}>{d}</span>
+                <span className="cal-day-num" style={{
+                  color: isToday(d) ? colors.today : colors.text,
+                  fontWeight: isToday(d) ? 'bold' : 'normal',
+                }}>{d}</span>
                 {dayEvents.length > 0 && (
-                  <div className="cal-event-dots" style={{ position: 'absolute', bottom: '1px', display: 'flex', gap: '1px' }}>
-                    {dayEvents.slice(0, 3).map((ev, j) => (
-                      <span key={j} className="cal-event-dot" style={{ fontSize: '7px' }}>{ev.icon || '●'}</span>
+                  <div className="cal-event-dots" style={{
+                    position: 'absolute', bottom: '0px', display: 'flex', gap: '1px',
+                  }}>
+                    {dayEvents.slice(0, 2).map((ev, j) => (
+                      <span key={j} className="cal-event-dot" style={{ fontSize: '5px' }}>{ev.icon || '●'}</span>
                     ))}
                   </div>
                 )}
@@ -143,44 +180,50 @@ export default function MiniCalendar({
         </div>
 
         {!noPopup && selectedDay && (
-          <div ref={popupRef} className="cal-popup" style={{ 
-            position: 'absolute',
-            bottom: '100%',
-            left: '-10px',
-            right: '-10px',
-            background: 'white',
-            border: '2px solid #e0d4c8',
-            borderRadius: '16px',
-            padding: '12px',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-            zIndex: 10,
-            marginBottom: '15px'
+          <div ref={popupRef} className="cal-popup" style={{
+            position: 'absolute', bottom: '100%',
+            left: '-10px', right: '-10px',
+            background: colors.popupBg,
+            border: `2px solid ${colors.popupBorder}`,
+            borderRadius: '14px', padding: '10px',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+            zIndex: 10, marginBottom: '12px',
           }}>
-            <div className="cal-popup-title" style={{ fontSize: '16px', fontWeight: 'bold', color: '#8b5e3c', marginBottom: '8px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>
+            <div className="cal-popup-title" style={{
+              fontSize: '14px', fontWeight: 'bold', color: colors.accent,
+              marginBottom: '6px', borderBottom: `1px solid ${colors.popupBorder}`,
+              paddingBottom: '4px',
+            }}>
               {monthName} {selectedDay}
             </div>
-            <div style={{ maxHeight: '80px', overflowY: 'auto', marginBottom: '8px' }}>
+            <div style={{ maxHeight: '70px', overflowY: 'auto', marginBottom: '6px' }}>
               {(events[dayKey(selectedDay)] || []).map((ev, i) => (
-                <div key={i} className="cal-popup-event" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
+                <div key={i} className="cal-popup-event" style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  fontSize: '12px', marginBottom: '3px', color: colors.popupText,
+                }}>
                   <span>{ev.icon} {ev.text}</span>
-                  <button className="cal-popup-remove" onClick={() => internalRemoveEvent(selectedDay, i)} style={{ background: 'transparent', border: 'none', color: '#ff6b6b', cursor: 'pointer', padding: '0 4px' }}>✕</button>
+                  <button className="cal-popup-remove" onClick={() => internalRemoveEvent(selectedDay, i)} style={{
+                    background: 'transparent', border: 'none',
+                    color: '#ff8080', cursor: 'pointer', padding: '0 4px',
+                  }}>✕</button>
                 </div>
               ))}
             </div>
             <div className="cal-popup-add">
-              <div className="cal-popup-icon-row" style={{ display: 'flex', gap: '8px', marginBottom: '10px', justifyContent: 'center' }}>
+              <div className="cal-popup-icon-row" style={{
+                display: 'flex', gap: '6px', marginBottom: '8px', justifyContent: 'center',
+              }}>
                 {EVENT_ICONS.map(ic => (
                   <span
                     key={ic}
                     className={`cal-icon-option ${popupIcon === ic ? 'cal-icon-active' : ''}`}
                     onClick={() => setPopupIcon(ic)}
-                    style={{ 
-                      cursor: 'pointer', 
-                      padding: '4px 6px', 
-                      borderRadius: '6px',
-                      fontSize: '16px',
-                      background: popupIcon === ic ? '#fdf2e8' : 'transparent',
-                      border: popupIcon === ic ? '1px solid #c8a97e' : '1px solid transparent'
+                    style={{
+                      cursor: 'pointer', padding: '3px 5px', borderRadius: '6px',
+                      fontSize: '14px',
+                      background: popupIcon === ic ? colors.selectedBg : 'transparent',
+                      border: popupIcon === ic ? `1px solid ${colors.accent}` : '1px solid transparent',
                     }}
                   >{ic}</span>
                 ))}
@@ -189,19 +232,21 @@ export default function MiniCalendar({
                 <input
                   className="cal-popup-input"
                   placeholder="Add note..."
-                  style={{ 
-                    flex: 1, 
-                    fontSize: '12px', 
-                    padding: '6px 10px', 
-                    border: '1px solid #e0d4c8', 
-                    borderRadius: '10px',
-                    fontFamily: 'inherit'
+                  style={{
+                    flex: 1, fontSize: '12px', padding: '5px 8px',
+                    border: `1px solid ${colors.popupBorder}`, borderRadius: '8px',
+                    background: 'transparent', color: colors.popupText,
+                    fontFamily: 'inherit',
                   }}
                   value={popupText}
                   onChange={e => setPopupText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && internalAddEvent()}
                 />
-                <button className="cal-popup-add-btn" onClick={internalAddEvent} style={{ background: '#d4a373', color: 'white', border: 'none', borderRadius: '10px', padding: '0 12px', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
+                <button className="cal-popup-add-btn" onClick={internalAddEvent} style={{
+                  background: colors.addBtn, color: 'white', border: 'none',
+                  borderRadius: '8px', padding: '0 10px',
+                  cursor: 'pointer', fontWeight: 'bold',
+                }}>+</button>
               </div>
             </div>
           </div>

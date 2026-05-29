@@ -9,7 +9,6 @@ import SteampunkClockSticker from "../components/SteampunkClockSticker";
 import Sidebar from "../components/Sidebar";
 import Reminders from "../components/Reminders";
 import CalendarSticker from "../components/CalendarSticker";
-import LofiCalendarSticker from "../components/LofiCalendarSticker";
 import ContextMenu from "../components/ContextMenu";
 import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";

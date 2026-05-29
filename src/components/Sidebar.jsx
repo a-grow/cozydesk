@@ -170,7 +170,6 @@ import StickyNotesSection from './sidebar/StickyNotesSection';
 import SavedDesksModal from './sidebar/SavedDesksModal';
 import SavePopup from './sidebar/SavePopup';
 import sidebarTodoListIcon from '../assets/stickynotes/todolist1.png';
-import calendarIcon from '../assets/icons/calendar.png';
 import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
 
@@ -187,7 +186,7 @@ export default function Sidebar({
   onSaveSlot,
   onLoadSlot,
 }) {
-  const { themeName } = useTheme();
+  const { themeName, theme } = useTheme();
   const [savedDesksOpen, setSavedDesksOpen] = React.useState(false);
   const [savePopupOpen, setSavePopupOpen]   = React.useState(false);
   const [currentDesk, setCurrentDesk]       = React.useState(null);
@@ -296,7 +295,7 @@ export default function Sidebar({
                 style={{ position: 'relative' }}
               >
                 <img
-                  src={calendarIcon}
+                  src={theme.calendarTheme?.image}
                   alt="Calendar"
                   className="sb-todo-icon-img"
                   draggable

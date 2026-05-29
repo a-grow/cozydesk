@@ -42,7 +42,7 @@ export default function Reminders({
   const { themeName } = useTheme();
 
   const [inputText, setInputText] = useState('');
-  const [inputFont, setInputFont] = useState(FONT_OPTIONS[0].value);
+  const [inputFont, setInputFont] = useState("'Caveat', cursive");
   const [fontSizeRatio, setFontSizeRatio] = useState(0.055);
   const [alarmedIds, setAlarmedIds] = useState(new Set());
   const [rotation, setRotation] = useState(0);
@@ -332,9 +332,12 @@ export default function Reminders({
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", color: "#333", background: "#f9f9f9", padding: "4px", borderRadius: "6px" }}>
                 <span>Font</span>
                 <select value={inputFont} onChange={(e) => setInputFont(e.target.value)} style={{ width: "90px", border: "1px solid #ccc", borderRadius: "4px", padding: "2px", cursor: "pointer" }}>
-                  {FONT_OPTIONS.map(f => (
-                    <option key={f.value} value={f.value}>{f.label}</option>
-                  ))}
+                  <option value="'Caveat', cursive">Caveat</option>
+                  <option value="'Indie Flower', cursive">Indie Flower</option>
+                  <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
+                  <option value="'Permanent Marker', cursive">Permanent Marker</option>
+                  <option value="'Fredoka', sans-serif">Fredoka</option>
+                  <option value="'Nunito', sans-serif">Nunito</option>
                 </select>
               </div>
             </div>

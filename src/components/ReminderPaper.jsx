@@ -120,7 +120,7 @@ const ReminderPaper = ({
   const todoImg = themeStickyNotes.find(a => a.name.includes('todo'))?.src || paperImg;
   const [newText, setNewText] = useState("");
   const [rotation, setRotation] = useState(0);
-  const [fontFamily, setFontFamily] = useState(theme.defaultNoteFont || "'Nunito', sans-serif");
+  const [fontFamily, setFontFamily] = useState(theme.defaultNoteFont || "'Caveat', cursive");
   const [fontSizeRatio, setFontSizeRatio] = useState(0.055);
   const [isHovered, setIsHovered] = useState(false);
   const inputRef = useRef(null);
@@ -340,11 +340,11 @@ const ReminderPaper = ({
                 <span>Font</span>
                 <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} style={{ width: "90px", border: "1px solid #ccc", borderRadius: "4px", padding: "2px", cursor: "pointer" }}>
                   <option value="'Caveat', cursive">Caveat</option>
-                  <option value="'Patrick Hand', cursive">Patrick Hand</option>
-                  <option value="'Fredoka', cursive">Fredoka</option>
-                  <option value="Arial">Arial</option>
-                  <option value="Courier New">Courier New</option>
-                  <option value="Georgia">Georgia</option>
+                  <option value="'Indie Flower', cursive">Indie Flower</option>
+                  <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
+                  <option value="'Permanent Marker', cursive">Permanent Marker</option>
+                  <option value="'Fredoka', sans-serif">Fredoka</option>
+                  <option value="'Nunito', sans-serif">Nunito</option>
                 </select>
               </div>
             </div>

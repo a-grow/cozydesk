@@ -19,20 +19,18 @@ const ThemeContext = createContext({
 export const ThemeProvider = ({ children }) => {
   const [themeName, setThemeName] = useState('cozykawaii');
 
-  const themeColors = { cozykawaii: '#e6cba8', lofi: '#1e1e2f', steampunk: '#2a1f1f' };
-
   const setTheme = (name) => {
     if (THEME_CONFIGS[name] || availableThemeNames.includes(name)) {
       setThemeName(name);
     }
   };
 
+  const theme = getThemeConfig(themeName);
+
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', themeColors[themeName] || '#e6cba8');
+    if (meta) meta.setAttribute('content', theme.themeColor || '#e6cba8');
   }, [themeName]);
-
-  const theme = getThemeConfig(themeName);
   const themeStickers = getThemeStickers(themeName);
   const themeStickyNotes = getThemeStickyNotes(themeName);
 
