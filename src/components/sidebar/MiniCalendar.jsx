@@ -137,7 +137,7 @@ export default function MiniCalendar({
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
           gap: '0px', alignContent: 'start',
-          gridAutoRows: '13px',
+          gridAutoRows: '17px',
         }}>
           {DAYS.map(d => (
             <div key={d} className="cal-day-label" style={{
@@ -167,7 +167,7 @@ export default function MiniCalendar({
                 }}>{d}</span>
                 {dayEvents.length > 0 && (
                   <div className="cal-event-dots" style={{
-                    position: 'absolute', bottom: '0px', display: 'flex', gap: '1px',
+                    position: 'absolute', bottom: '3px', display: 'flex', gap: '1px',
                   }}>
                     {dayEvents.slice(0, 2).map((ev, j) => (
                       <span key={j} className="cal-event-dot" style={{ fontSize: '5px' }}>{ev.icon || '●'}</span>

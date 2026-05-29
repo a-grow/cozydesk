@@ -1549,8 +1549,8 @@
   line-height: 0;
   opacity: 0.55;
 }
-.sp-gear-tr-large { top: 4px;   right: -4px;  }
-.sp-gear-tr-small { top: 40px;  right: 36px;  }
+.sp-gear-tr-large { top: 80px;  right: -4px;  }
+.sp-gear-tr-small { top: 116px; right: 36px;  }
 .sp-gear-bl-mid   { bottom: 72px; left: -8px; }
 
 

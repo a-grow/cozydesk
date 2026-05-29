@@ -95,7 +95,7 @@ const THEME_CONFIGS = {
       image: lofiCalendarBase,
       baseW: 260,
       baseH: 340,
-      contentArea: { top: '140px', left: '18px', right: '18px', bottom: '40px' },
+      contentArea: { top: '130px', left: '18px', right: '18px', bottom: '20px' },
       font: "'Nunito', sans-serif",
       colors: {
         accent: '#6d5fc0',

@@ -233,9 +233,13 @@ export default function LofiSidebar({
 
       {/* ── Logo ── */}
       <div className="sb-logo">
-        <h1 className="sb-logo-title">CozyDesk</h1>
-        <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
-      </div>
+  <img
+    src="/src/assets/cozydesk-logo.png"
+    alt="CozyDesk"
+    style={{ width: '180px', display: 'block', margin: '0 auto', position: 'relative', zIndex: 1 }}
+  />
+  <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
+</div>
 
       {/* ── Theme ── */}
       <div className="lofi-section-block">
