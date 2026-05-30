@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { getThemeConfig } from "../themes/themeRegistry";
 
 const ITEMS_PER_PAPER = 6;
 
@@ -424,9 +425,10 @@ export function useDeskState({ dimensions, themeName }) {
   const addPaperAtPosition = (xRatio, yRatio) => {
     if (papers.length >= 5) return;
     pushUndo();
+    const { wRatio, hRatio } = getThemeConfig(themeName).todoSize;
     setPapers(prev => [...prev, {
       id: Date.now(), xRatio, yRatio,
-      wRatio: 0.18, hRatio: 0.38,
+      wRatio, hRatio,
       reminderIds: [], layer: getNextLayer(),
     }]);
   };
@@ -461,11 +463,12 @@ export function useDeskState({ dimensions, themeName }) {
       setPapers(prev => prev.map(p => p.id === existing.id
         ? { ...p, reminderIds: [...p.reminderIds, reminder.id] } : p));
     } else {
+      const { wRatio, hRatio } = getThemeConfig(themeName).todoSize;
       setPapers(prev => [...prev, {
         id: Date.now(),
         xRatio: 0.35 + Math.random() * 0.2,
         yRatio: 0.2  + Math.random() * 0.2,
-        wRatio: 0.18, hRatio: 0.36,
+        wRatio, hRatio,
         reminderIds: [reminder.id], layer: getNextLayer(),
       }]);
     }

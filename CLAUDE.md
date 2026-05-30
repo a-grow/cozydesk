@@ -230,3 +230,62 @@ src/
 - CozyDesk text logo replaced with cozydesk-logo.png in both sidebars
 - Steampunk gear overlap fixed: sp-gear-tr-large top 4→80px, sp-gear-tr-small top 40→116px
 - Music player (MusicPlayer.jsx) built: theme-aware, 3 tracks/theme, 1.5s crossfade, localStorage persistence
+
+---
+
+Session Summary — May 30 2026
+What we built/fixed today:
+
+Calendar event dots — moved up (bottom: 3px), no longer overlapping adjacent dates. Row spacing increased (gridAutoRows: 14px → 17px). Lofi last row clipping fixed (contentArea top: 140→130px, bottom: 40→20px).
+CozyDesk image logo — replaced <h1> text in both Sidebar.jsx AND LofiSidebar.jsx with <img src="/src/assets/cozydesk-logo.png" width="180px" />. Subtitle stays below.
+Steampunk gears — no longer overlap logo. Fixed in Sidebar.css: sp-gear-tr-large top: 4→80px, sp-gear-tr-small top: 40→116px.
+Music player — full feature built and working perfectly across all 3 themes.
+
+
+Music Player — How We Got There (important context):
+We went through several failed approaches before finding the right solution:
+
+❌ Absolute positioning in cozykawaii.jsx — player didn't scroll with sidebar, controls invisible in some themes
+❌ Prop passing musicPlayer={<MusicPlayer />} — React would still remount when moving between Sidebar/LofiSidebar tree positions, killing the crossfade
+❌ Spacer div + absolute position — still had scroll and visibility issues
+✅ Final solution: audioManager.js singleton — a plain JS class that holds the Audio object outside React entirely. It never unmounts because it's not a React component. MusicPlayer.jsx is just a thin UI shell that talks to it. This gives us:
+
+Crossfade works on ALL theme switches including lofi↔kawaii↔steampunk
+Player scrolls naturally with sidebar
+Controls visible on all themes
+No layout issues
+
+
+
+Key lesson learned: When React component lifecycle fights with persistent state needs, lift the state OUT of React entirely into a plain JS singleton. Don't fight the tree — go above it.
+
+Music Player specs:
+
+src/utils/audioManager.js — singleton, holds Audio object, handles crossfade (1.5s fade out → 1.5s fade in), localStorage persistence
+src/components/MusicPlayer.jsx — UI only, subscribes to audioManager via listener pattern
+Imported in BOTH Sidebar.jsx AND LofiSidebar.jsx — placed immediately after logo block
+NOT in cozykawaii.jsx — remove any remnants if found
+Always starts paused on first load
+localStorage key: cozydesk_music
+Kawaii theme: pink styling (rgba(245,168,184,0.25) bg, #6b4b3a text)
+Lofi/Steampunk: dark styling (rgba(0,0,0,0.18) bg, white text)
+
+Music files — src/assets/music/ (9 total):
+kawaii-cavnai-Mossy Tea Picnic.mp3
+kawaii-bluelike_u-5-strawberry-mousse-cute-bgm-274668.mp3
+kawaii-ruminamusic-magical-burger-town-cute-fantasy-pop-background-music-386974.mp3
+lofi_library-coffee-458900.mp3
+lofi-lemonmusiclab-499264.mp3
+lofi-lofi-production-522875.mp3
+steampunk-cavnai-Tea at Baker Street.mp3
+steampunk-luis_humanoide-clockwork-adventure-288524.mp3
+steampunk-pardeeppatel-under-the-london-fog-v1-inspired-by-sherlock-holmes-270425.mp3
+All from Pixabay — free commercial use. Keep original filenames as paper trail.
+
+Critical rules established today:
+
+Never propose structural/architectural changes unless explicitly asked. Fix only what was asked. Flag suspected deeper issues as a QUESTION before suggesting any fix that moves or refactors components.
+Any sidebar UI change must be applied to BOTH Sidebar.jsx AND LofiSidebar.jsx
+Music player styling is theme-aware — kawaii gets pink, others get dark
+audioManager.js is the single source of truth for all audio state — never duplicate audio logic in MusicPlayer.jsx
+Deployment: GitHub Pages only, NOT Netlify
