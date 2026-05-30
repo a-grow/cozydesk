@@ -20,7 +20,7 @@ Operate as a senior expert across three disciplines:
 - Dev server: `npm run dev` (check terminal for port)
 - Hard refresh: Cmd+Shift+R
 - Backup: `cp -r cozydesk cozydesk_backup_MMDD`
-- Deployed on Netlify — GitHub repo: a-grow/cozydesk
+- Deployed on GitHub Pages — GitHub repo: a-grow/cozydesk
 - `dev` branch = active development, `main` = landing page only
 - Custom domain: cozydesk.app
 
@@ -107,7 +107,7 @@ calendarTheme: {
 | Theme | baseH | top | left/right | bottom |
 |-------|-------|-----|------------|--------|
 | Kawaii | 270 | 62px | 18px | 58px |
-| Lofi | 340 | 140px | 18px | 40px |
+| Lofi | 340 | 130px | 18px | 20px |
 | Steampunk | 300 | 85px | 25px | 60px |
 
 ### Rules for tuning contentArea:
@@ -121,11 +121,49 @@ calendarTheme: {
 - 260×300px PNG, transparent outside frame, solid opaque fill inside grid area
 - Straight-on view, no angle or perspective
 - Save to: `src/themes/[name]/widgets/[name]calendarbase.png`
+- Future themes: decoration at TOP of image only — keeps contentArea bottom consistent across all themes
 
 ### MiniCalendar.jsx key values (do not change without recalculating):
-- `gridAutoRows: 14px`, `gap: 0px`, `alignContent: start`
+- `gridAutoRows: 17px`, `gap: 0px`, `alignContent: start`
 - All cell `lineHeight: 1.1`
 - Frame image `zIndex: 2`, content div `zIndex: 5`
+- Event dot position: `bottom: 3px` — do not change
+- Available height = baseH - top - bottom must be ≥ 118px — calculate this before implementing any new theme calendar
+- Calculate the complete solution before touching contentArea values — no trial and error
+
+---
+
+## Music Player — NEVER BREAK
+- Component: `src/components/MusicPlayer.jsx`
+- Imported in BOTH `Sidebar.jsx` AND `LofiSidebar.jsx` — placed immediately after the logo block
+- Uses only React built-ins — no external audio libraries
+- Always starts paused on first load — never autoplay
+- Theme switch: 1.5s fade out → load new theme tracks → 1.5s fade in — do not change without Andrew's approval
+- localStorage key: `cozydesk_music` (isPlaying, volume, isMuted)
+- THEME_TRACKS map: `cozykawaii / lofi / steampunk` — update if themes added
+- Styled with CSS variables only: `var(--sb-border)`, `var(--sb-card)`, `var(--sb-text)` — font: Nunito only
+
+### Music Files (`src/assets/music/` — 9 total, 3 per theme)
+All tracks from Pixabay — free for commercial use, no attribution required. Original filenames = commercial use paper trail — do not rename.
+```
+kawaii-abdipr-cat-dreams-kawaii-chill-future-house-259197.mp3
+kawaii-bluelike_u-5-strawberry-mousse-cute-bgm-274668.mp3
+kawaii-ruminamusic-magical-burger-town-cute-fantasy-pop-background-music-386974.mp3
+lofi_library-coffee-458900.mp3
+lofi-lemonmusiclab-499264.mp3
+lofi-lofi-production-522875.mp3
+steampunk-dstechnician-clock-tower-114282.mp3
+steampunk-luis_humanoide-clockwork-adventure-288524.mp3
+steampunk-pardeeppatel-under-the-london-fog-v1-inspired-by-sherlock-holmes-270425.mp3
+```
+
+---
+
+## Logo Rules — NEVER BREAK
+- Logo file: `src/assets/cozydesk-logo.png` — width: 180px, centered, zIndex 1
+- Renders in BOTH `Sidebar.jsx` AND `LofiSidebar.jsx`
+- The h1 `.sb-logo-title` text is RETIRED — never restore it
+- Subtitle "YOUR COZY WORKSPACE ✦" stays below logo in both files
 
 ---
 
@@ -135,6 +173,7 @@ src/
   components/
     CalendarSticker.jsx       — unified calendar sticker (all themes)
     sidebar/MiniCalendar.jsx  — unified mini calendar (all themes)
+    MusicPlayer.jsx           — music player component (all themes)
     StickyNote.jsx            — DO NOT touch unless fixing sticky note bugs
     Reminders.jsx             — DO NOT touch unless fixing todo bugs
     ReminderPaper.jsx         — DO NOT touch unless fixing todo bugs
@@ -145,7 +184,10 @@ src/
     cozykawaii/widgets/       — kawaii calendar image
     lofi/widgets/             — lofi calendar image
     steampunk/widgets/        — steampunk calendar image
-  assets/backgrounds/         — background images (leave here)
+  assets/
+    backgrounds/              — background images (leave here)
+    music/                    — all music files (9 total, 3 per theme)
+    cozydesk-logo.png         — app logo (replaces text h1)
 ```
 
 ---
@@ -161,18 +203,16 @@ src/
 1. Steampunk sticky note text positioning off — text area percentages tuned for kawaii/lofi, not steampunk's heavy image padding
 2. Steampunk blue sticky note 705×634px vs others 1024×1024px — needs asset re-export
 3. Sticky note default size too wide at non-maximized windows
-4. Calendar bottom padding slightly uneven across themes — cosmetic, low priority
 
 ---
 
 ## Lessons Learned — Never Repeat
 1. Read the actual file before suggesting anything — never work from memory
 2. Measure contentArea with Preview + math — never guess pixel offsets
-3. Available height = baseH - top - bottom must be ≥ 118px — calculate first
-4. Use DevTools for actual rendered dimensions — not estimates
-5. Calculate the complete solution before touching anything — no incremental trial and error
-6. One root cause fix beats ten symptom fixes
-7. When unsure what's in a file — ask Andrew to paste it before proceeding
+3. Use DevTools for actual rendered dimensions — not estimates
+4. One root cause fix beats ten symptom fixes
+5. When unsure what's in a file — ask Andrew to paste it before proceeding
+6. CalendarSticker.jsx does NOT render the grid — MiniCalendar.jsx does. Always confirm which component renders before suggesting fixes.
 
 ---
 
@@ -180,3 +220,13 @@ src/
 - NEVER change sidebar fonts, icons, or colors unless explicitly asked
 - NEVER touch steampunk animated gears (speed, size, color, animation)
 - NEVER touch lofi sidebar icon images
+- Any sidebar UI change (logo, music, etc.) must be applied to BOTH `Sidebar.jsx` AND `LofiSidebar.jsx`
+
+---
+
+## Session Notes — May 29 2026
+- Calendar event dots moved up (bottom: 3px), row spacing increased (gridAutoRows 14→17px)
+- Lofi calendar last row clipping fixed: contentArea top 140→130px, bottom 40→20px
+- CozyDesk text logo replaced with cozydesk-logo.png in both sidebars
+- Steampunk gear overlap fixed: sp-gear-tr-large top 4→80px, sp-gear-tr-small top 40→116px
+- Music player (MusicPlayer.jsx) built: theme-aware, 3 tracks/theme, 1.5s crossfade, localStorage persistence

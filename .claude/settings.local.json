@@ -20,7 +20,10 @@
       "Bash(cp:*)",
       "Bash(python3 -c ':*)",
       "Bash(python3:*)",
-      "Bash(grep -n \"saveToSlot\\\\|loadFromSlot\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/hooks/*.js)"
+      "Bash(grep -n \"saveToSlot\\\\|loadFromSlot\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/hooks/*.js)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

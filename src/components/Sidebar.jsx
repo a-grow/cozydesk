@@ -162,6 +162,7 @@ function SteampunkGearDecor() {
     </>
   );
 }
+import MusicPlayer from './MusicPlayer';
 import LofiSidebar from './LofiSidebar';
 import PomodoroTimer from './sidebar/PomodoroTimer';
 import StickersSection from './sidebar/StickersSection';
@@ -237,6 +238,7 @@ export default function Sidebar({
           />
           <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
         </div>
+        <MusicPlayer />
 
         {/* ═══════════════════════════════════════
             Themes

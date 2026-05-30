@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MusicPlayer from './MusicPlayer';
 import './Sidebar.css';
 import ThemesSection from './sidebar/ThemesSection';
 import StickersSection from './sidebar/StickersSection';
@@ -240,6 +241,7 @@ export default function LofiSidebar({
   />
   <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
 </div>
+      <MusicPlayer />
 
       {/* ── Theme ── */}
       <div className="lofi-section-block">
