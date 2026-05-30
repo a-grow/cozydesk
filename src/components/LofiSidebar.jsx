@@ -242,10 +242,9 @@ export default function LofiSidebar({
   <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
 </div>
       <MusicPlayer />
-
       {/* ── Theme ── */}
       <div className="lofi-section-block">
-        <div className="lofi-section-label">THEME</div>
+        <div className="lofi-section-label">THEMES</div>
         <ThemesSection />
       </div>
 

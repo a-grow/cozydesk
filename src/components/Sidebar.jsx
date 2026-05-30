@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MusicPlayer from './MusicPlayer';
 
 // ── Live clock overlay for the kawaii clock icon ──────────────────────────────
 function LiveClockIcon({ src, onDragStart }) {
@@ -162,7 +163,6 @@ function SteampunkGearDecor() {
     </>
   );
 }
-import MusicPlayer from './MusicPlayer';
 import LofiSidebar from './LofiSidebar';
 import PomodoroTimer from './sidebar/PomodoroTimer';
 import StickersSection from './sidebar/StickersSection';
