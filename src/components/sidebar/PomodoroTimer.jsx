@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { soundManager } from '../../utils/soundManager';
 
 export default function PomodoroTimer() {
   const [workMins, setWorkMins] = useState(25);
@@ -8,7 +9,6 @@ export default function PomodoroTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const completedRef = useRef(false);
 
   useEffect(() => {
@@ -16,34 +16,17 @@ export default function PomodoroTimer() {
     const id = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          setIsRunning(false);
-          setIsComplete(true);
-          completedRef.current = true;
-          return 0;
-        }
+  setIsRunning(false);
+  setIsComplete(true);
+  completedRef.current = true;
+  soundManager.play('sfx_timer_end');
+  return 0;
+}
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(id);
   }, [isRunning]);
-
-  // Sound cue when timer finishes
-  useEffect(() => {
-    if (!completedRef.current || !soundEnabled) return;
-    completedRef.current = false;
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      gain.gain.value = 0.15;
-      osc.frequency.value = 880;
-      osc.type = 'sine';
-      osc.start();
-      osc.stop(ctx.currentTime + 0.4);
-    } catch { /* ignore */ }
-  }, [isComplete, soundEnabled]);
 
   const handleStartStop = () => {
     if (isComplete) {
@@ -53,11 +36,15 @@ export default function PomodoroTimer() {
       setIsComplete(false);
       setIsRunning(true);
     } else {
-      setIsRunning(r => !r);
+      setIsRunning(r => {
+        if (!r) soundManager.play('sfx_timer_start');
+        return !r;
+      });
     }
   };
 
   const handleReset = () => {
+    soundManager.play('sfx_timer_reset');
     setIsRunning(false);
     setIsComplete(false);
     setTimeLeft((mode === 'work' ? workMins : breakMins) * 60);
@@ -107,10 +94,6 @@ export default function PomodoroTimer() {
               }}
             />
             min
-          </label>
-          <label className="pomo-setting">
-            <input type="checkbox" checked={soundEnabled} onChange={e => setSoundEnabled(e.target.checked)} />
-            🔊 Sound
           </label>
         </div>
       )}

@@ -173,6 +173,7 @@ import SavePopup from './sidebar/SavePopup';
 import sidebarTodoListIcon from '../assets/stickynotes/todolist1.png';
 import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
+import { soundManager } from '../utils/soundManager';
 
 export default function Sidebar({
   stickers,
@@ -191,6 +192,8 @@ export default function Sidebar({
   const [savedDesksOpen, setSavedDesksOpen] = React.useState(false);
   const [savePopupOpen, setSavePopupOpen]   = React.useState(false);
   const [currentDesk, setCurrentDesk]       = React.useState(null);
+  const [sfxEnabled, setSfxEnabled] = React.useState(soundManager.enabled);
+  const handleSfxToggle = () => { const next = !sfxEnabled; soundManager.setEnabled(next); setSfxEnabled(next); };
 
   // Intercept load to capture which desk is now active
   const handleLoad = React.useCallback((slot) => {
@@ -239,6 +242,15 @@ export default function Sidebar({
           <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
         </div>
         <MusicPlayer />
+        <div className="sfx-toggle-row">
+          <span className="sfx-toggle-label">🔊 Sound Effects</span>
+          <button
+            className={`sfx-toggle-btn ${sfxEnabled ? 'sfx-on' : 'sfx-off'}`}
+            onClick={handleSfxToggle}
+          >
+            {sfxEnabled ? 'ON' : 'OFF'}
+          </button>
+        </div>
 
         {/* ═══════════════════════════════════════
             Themes
@@ -248,7 +260,7 @@ export default function Sidebar({
           <ThemesSection />
         </div>
 
-        <button className="sb-action-btn sb-action-mydesks" onClick={() => setSavedDesksOpen(true)}>
+        <button className="sb-action-btn sb-action-mydesks" onClick={() => { soundManager.play('sfx_click_button'); setSavedDesksOpen(true); }}>
           📁 My Desks
         </button>
 
@@ -385,11 +397,11 @@ export default function Sidebar({
       {/* Push settings to the bottom */}
       <div className="sb-spacer" />
 
-      <button className="sb-action-btn sb-action-save" onClick={() => setSavePopupOpen(true)}>
+      <button className="sb-action-btn sb-action-save" onClick={() => { soundManager.play('sfx_click_button'); setSavePopupOpen(true); }}>
         💾 SAVE
       </button>
 
-      <button className="sb-action-btn sb-action-settings" onClick={onSettings}>
+      <button className="sb-action-btn sb-action-settings" onClick={() => { soundManager.play('sfx_click_button'); onSettings(); }}>
         ⚙️ Settings
       </button>
 

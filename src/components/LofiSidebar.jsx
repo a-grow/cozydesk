@@ -11,6 +11,7 @@ import lofiTodoImg from '../themes/lofi/stickynotes/lofotodolist.png';
 import lofiStickyNoteImg from '../themes/lofi/stickynotes/lofistickynoteblue.png';
 import lofiCalendarImg from '../themes/lofi/widgets/loficalendarbase.png';
 import { useTheme } from '../themes/ThemeContext';
+import { soundManager } from '../utils/soundManager';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 
@@ -200,6 +201,8 @@ export default function LofiSidebar({
   const [savedDesksOpen, setSavedDesksOpen] = React.useState(false);
   const [savePopupOpen, setSavePopupOpen]   = React.useState(false);
   const [currentDesk, setCurrentDesk]       = React.useState(null);
+  const [sfxEnabled, setSfxEnabled] = React.useState(soundManager.enabled);
+  const handleSfxToggle = () => { const next = !sfxEnabled; soundManager.setEnabled(next); setSfxEnabled(next); };
   const lofiNoteIcon = themeStickyNotes.find(s => s.name.includes('yellow')) || themeStickyNotes[0];
 
   // Intercept load to capture which desk is now active
@@ -242,13 +245,22 @@ export default function LofiSidebar({
   <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
 </div>
       <MusicPlayer />
+      <div className="sfx-toggle-row">
+        <span className="sfx-toggle-label">🔊 Sound Effects</span>
+        <button
+          className={`sfx-toggle-btn ${sfxEnabled ? 'sfx-on' : 'sfx-off'}`}
+          onClick={handleSfxToggle}
+        >
+          {sfxEnabled ? 'ON' : 'OFF'}
+        </button>
+      </div>
       {/* ── Theme ── */}
       <div className="lofi-section-block">
         <div className="lofi-section-label">THEMES</div>
         <ThemesSection />
       </div>
 
-      <button className="lofi-settings-full-btn" onClick={() => setSavedDesksOpen(true)}>
+      <button className="lofi-settings-full-btn" onClick={() => { soundManager.play('sfx_click_button'); setSavedDesksOpen(true); }}>
         📁 My Desks
       </button>
 
@@ -309,11 +321,11 @@ export default function LofiSidebar({
 
       <div className="sb-spacer" />
 
-      <button className="lofi-settings-full-btn lofi-save-btn" onClick={() => setSavePopupOpen(true)}>
+      <button className="lofi-settings-full-btn lofi-save-btn" onClick={() => { soundManager.play('sfx_click_button'); setSavePopupOpen(true); }}>
         💾 SAVE
       </button>
 
-      <button className="lofi-settings-full-btn" onClick={onSettings}>
+      <button className="lofi-settings-full-btn" onClick={() => { soundManager.play('sfx_click_button'); onSettings(); }}>
         ⊙ Settings
       </button>
 

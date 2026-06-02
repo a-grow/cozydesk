@@ -1,12 +1,13 @@
 import React from 'react';
+import { soundManager } from '../../utils/soundManager';
 
 export default function StickersSection({ stickers, canUndo, onUndo, canRedo, onRedo }) {
   return (
     <div className="stickers-section">
       {/* Undo / Redo bar — always visible */}
       <div className="stickers-undo-redo">
-        <button className="sb-undo-btn" disabled={!canUndo} onClick={onUndo}>↺ Undo</button>
-        <button className="sb-redo-btn" disabled={!canRedo} onClick={onRedo}>Redo ↻</button>
+        <button className="sb-undo-btn" disabled={!canUndo} onClick={() => { soundManager.play('sfx_undo_redo'); onUndo(); }}>↺ Undo</button>
+        <button className="sb-redo-btn" disabled={!canRedo} onClick={() => { soundManager.play('sfx_undo_redo'); onRedo(); }}>Redo ↻</button>
       </div>
 
       {/* Draggable sticker grid */}
@@ -23,6 +24,7 @@ export default function StickersSection({ stickers, canUndo, onUndo, canRedo, on
               className="sticker-thumb-img"
               draggable
               onDragStart={(e) => {
+                soundManager.play('sfx_sticker_lift');
                 e.dataTransfer.setData('application/json', JSON.stringify(sticker));
                 e.dataTransfer.effectAllowed = 'copy';
                 const ghost = e.currentTarget.cloneNode(true);

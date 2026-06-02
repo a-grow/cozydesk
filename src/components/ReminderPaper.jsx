@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Rnd } from "react-rnd";
 import paperImg from "../assets/stickynotes/todolist1.png";
 import { useTheme } from "../themes/ThemeContext";
+import { soundManager } from '../utils/soundManager';
 
 const ITEMS_PER_PAPER = 6;
 const SPARKLE_EMOJIS = ["✨", "⭐", "🌟", "💫", "🎉"];
@@ -28,6 +29,7 @@ function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, theme })
     e.stopPropagation();
     onToggle(rem.id);
     if (!rem.done) {
+      soundManager.play('sfx_ping');
       setShowSparkle(true);
       setAnimKey(k => k + 1);
       setTimeout(() => setShowSparkle(false), 650);
@@ -290,7 +292,7 @@ const ReminderPaper = ({
             <button
               className="delete-btn"
               style={{ top: "4px", right: "4px", zIndex: 20 }}
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              onClick={(e) => { e.stopPropagation(); soundManager.play('sfx_delete_whoosh'); onDelete(); }}
             >
               ✕
             </button>

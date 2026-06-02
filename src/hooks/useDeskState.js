@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getThemeConfig } from "../themes/themeRegistry";
+import { soundManager } from '../utils/soundManager';
 
 const ITEMS_PER_PAPER = 6;
 
@@ -284,11 +285,11 @@ export function useDeskState({ dimensions, themeName }) {
 
   // ─── Notes ────────────────────────────────────────────────────────
   const addNoteAtPosition = (src, xRatio, yRatio) => {
+    soundManager.play('sfx_place_note');
     pushUndo();
     setNotes(prev => [...prev, {
       id: Date.now(), src, xRatio, yRatio,
-      wRatio: 180 / dimensions.width,
-      hRatio: 180 / dimensions.height,
+      w: 180,
       text: "", pinned: false,
       layer: getNextLayer(),
     }]);
@@ -297,35 +298,30 @@ export function useDeskState({ dimensions, themeName }) {
   const addNote = (src) => addNoteAtPosition(src, 0.3 + Math.random() * 0.15, 0.2 + Math.random() * 0.15);
 
   const removeNote = (id) => {
+    soundManager.play('sfx_delete_whoosh');
     pushUndo();
     setNotes(n => n.filter(x => x.id !== id));
     setStickers(prev => prev.map(s =>
       s.attachedTo?.id === id ? { ...s, attachedTo: null, attachOffset: null } : s
     ));
   };
-
-  const updateNote = (id, data) => {
+const updateNote = (id, data) => {
     pushUndo();
     setNotes(prev => prev.map(n => {
       if (n.id !== id) return n;
-      let nextWRatio = n.wRatio;
-      let nextHRatio = n.hRatio;
-      if (data.src && data.width === undefined) {
-        nextWRatio = 180 / dimensions.width;
-        nextHRatio = 180 / dimensions.height;
-      }
       return {
         ...n, ...data,
-        xRatio: data.x     !== undefined ? data.x      / dimensions.width  : n.xRatio,
-        yRatio: data.y     !== undefined ? data.y      / dimensions.height : n.yRatio,
-        wRatio: data.width !== undefined ? data.width  / dimensions.width  : nextWRatio,
-        hRatio: data.height!== undefined ? data.height / dimensions.height : nextHRatio,
+        xRatio: data.x     !== undefined ? data.x     / dimensions.width  : n.xRatio,
+        yRatio: data.y     !== undefined ? data.y     / dimensions.height : n.yRatio,
+        w:      data.width !== undefined ? data.width : n.w,
       };
     }));
   };
+  
 
   // ─── Stickers ─────────────────────────────────────────────────────
   const addStickerAtPosition = useCallback((sticker, xRatio, yRatio) => {
+    soundManager.play('sfx_alert_box');
     pushUndo();
     if (sticker.name.includes("cozyclock") || sticker.name.includes("loficlock") || sticker.name.includes("steampunkclock")) {
       setClocks(prev => [...prev, { id: Date.now(), xRatio, yRatio, sizePreset: 'md', layer: getNextLayer() }]);
@@ -343,6 +339,7 @@ export function useDeskState({ dimensions, themeName }) {
   }, [pushUndo]);
 
   const removeSticker = (id) => {
+    soundManager.play('sfx_delete_whoosh');
     pushUndo();
     setStickers(s => s.filter(x => x.id !== id).map(x =>
       x.attachedTo?.id === id ? { ...x, attachedTo: null, attachOffset: null } : x
@@ -362,12 +359,14 @@ export function useDeskState({ dimensions, themeName }) {
 
   // ─── Calendars ────────────────────────────────────────────────────
   const addCalendarAtPosition = (xRatio, yRatio) => {
-    if (stateRef.current.calendars.length >= 1) return;
+    if (stateRef.current.calendars.length >= 1) { soundManager.play('sfx_uhoh'); return; }
+    soundManager.play('sfx_alert_box');
     pushUndo();
     setCalendars(prev => [...prev, { id: Date.now(), xRatio, yRatio, sizePreset: 'md', layer: getNextLayer() }]);
   };
 
   const removeCalendar = (id) => {
+    soundManager.play('sfx_delete_whoosh');
     pushUndo();
     setCalendars(c => c.filter(x => x.id !== id));
   };
@@ -398,6 +397,7 @@ export function useDeskState({ dimensions, themeName }) {
 
   // ─── Clocks ───────────────────────────────────────────────────────
   const removeClock = (id) => {
+    soundManager.play('sfx_delete_whoosh');
     pushUndo();
     setClocks(c => c.filter(x => x.id !== id));
   };
@@ -423,12 +423,14 @@ export function useDeskState({ dimensions, themeName }) {
 
   // ─── Papers (to-do lists) ─────────────────────────────────────────
   const addPaperAtPosition = (xRatio, yRatio) => {
-    if (papers.length >= 5) return;
+    if (papers.length >= 5) { soundManager.play('sfx_uhoh'); return; }
+    soundManager.play('sfx_alert_box');
     pushUndo();
-    const { wRatio, hRatio } = getThemeConfig(themeName).todoSize;
+    const { w: baseW, h: baseH } = getThemeConfig(themeName).todoBase;
+    const scale = Math.min(1, (dimensions.width * 0.7) / baseW);
     setPapers(prev => [...prev, {
       id: Date.now(), xRatio, yRatio,
-      wRatio, hRatio,
+      w: baseW * scale, h: baseH * scale,
       reminderIds: [], layer: getNextLayer(),
     }]);
   };
@@ -439,6 +441,7 @@ export function useDeskState({ dimensions, themeName }) {
   );
 
   const removePaper = (id) => {
+    soundManager.play('sfx_delete_whoosh');
     pushUndo();
     setPapers(p => p.filter(x => x.id !== id));
     setStickers(prev => prev.map(s =>
@@ -452,8 +455,8 @@ export function useDeskState({ dimensions, themeName }) {
       ...p,
       xRatio: data.x      / dimensions.width,
       yRatio: data.y      / dimensions.height,
-      wRatio: data.width  / dimensions.width,
-      hRatio: data.height / dimensions.height,
+      w: data.width,
+      h: data.height,
     } : p));
   };
 
@@ -463,12 +466,13 @@ export function useDeskState({ dimensions, themeName }) {
       setPapers(prev => prev.map(p => p.id === existing.id
         ? { ...p, reminderIds: [...p.reminderIds, reminder.id] } : p));
     } else {
-      const { wRatio, hRatio } = getThemeConfig(themeName).todoSize;
+      const { w: baseW, h: baseH } = getThemeConfig(themeName).todoBase;
+      const scale = Math.min(1, (dimensions.width * 0.7) / baseW);
       setPapers(prev => [...prev, {
         id: Date.now(),
         xRatio: 0.35 + Math.random() * 0.2,
         yRatio: 0.2  + Math.random() * 0.2,
-        wRatio, hRatio,
+        w: baseW * scale, h: baseH * scale,
         reminderIds: [reminder.id], layer: getNextLayer(),
       }]);
     }
@@ -522,6 +526,7 @@ export function useDeskState({ dimensions, themeName }) {
   const slotKey = (theme, slot) => `cozydesk_saved_${theme}_slot_${slot}`;
 
   const saveToSlot = (slot, name) => {
+    soundManager.play('sfx_save');
     const s = stateRef.current;
     try {
       localStorage.setItem(slotKey(themeName, slot), JSON.stringify({

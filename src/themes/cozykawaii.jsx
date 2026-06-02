@@ -13,6 +13,7 @@ import ContextMenu from "../components/ContextMenu";
 import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
+import { soundManager } from '../utils/soundManager';
 
 const SIDEBAR_WIDTH = 250;
 
@@ -61,7 +62,12 @@ export default function Cozykawaii() {
   // All desk state + operations
   const desk = useDeskState({ dimensions, themeName });
 
-  const availableStickers = allThemeStickers.filter(s => !s.name.includes('cozyclock'));
+  const availableStickers = allThemeStickers.filter(s =>
+  !s.name.includes('clock') &&
+  !s.name.includes('calendar') &&
+  !s.name.includes('todo') &&
+  !s.name.includes('stickynote')
+);
   const stickyNoteSize = theme.stickyNoteSize || 180;
 
   const getTabStyle = (sidebarVisible) => {
@@ -145,7 +151,11 @@ export default function Cozykawaii() {
       const cy = childSticker.yRatio + childSticker.hRatio / 2;
       const childLayer = childSticker.layer ?? 0;
       const candidates = [
-        ...desk.notes.map(n    => ({ ...n, _type: 'note'    })),
+        ...desk.notes.map(n    => ({
+          ...n, _type: 'note',
+          wRatio: n.w != null ? n.w / dimensions.width  : n.wRatio,
+          hRatio: n.w != null ? n.w / dimensions.height : n.hRatio,
+        })),
         ...desk.stickers.filter(s => s.id !== itemId).map(s => ({ ...s, _type: 'sticker' })),
         ...desk.papers.map(p   => ({ ...p, _type: 'paper'   })),
       ].filter(item =>
@@ -288,7 +298,7 @@ export default function Cozykawaii() {
           </button>
           <button
             style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#ffe0e0", color: "#c00", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}
-            onClick={(e) => { e.stopPropagation(); setShowClearConfirm(true); }}
+            onClick={(e) => { e.stopPropagation(); soundManager.play('sfx_areyousure'); setShowClearConfirm(true); }}
           >
             🗑️ Clear All
           </button>
@@ -342,7 +352,7 @@ export default function Cozykawaii() {
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button
-                onClick={() => { desk.clearDesk(); setShowClearConfirm(false); setActiveMenu(null); }}
+                onClick={() => { soundManager.play('sfx_clear_screen'); desk.clearDesk(); setShowClearConfirm(false); setActiveMenu(null); }}
                 style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#ff7675", color: "white", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
               >
                 Proceed
@@ -364,8 +374,8 @@ export default function Cozykawaii() {
           key={paper.id}
           x={paper.xRatio * dimensions.width}
           y={paper.yRatio * dimensions.height}
-          width={paper.wRatio * dimensions.width}
-          height={paper.hRatio * dimensions.height}
+          width={paper.w ?? paper.wRatio * dimensions.width}
+          height={paper.h ?? paper.hRatio * dimensions.height}
           layer={paper.layer}
           reminders={desk.reminders.filter(r => paper.reminderIds.includes(r.id))}
           isSelected={selectedId?.type === "paper" && selectedId?.id === paper.id}
@@ -462,8 +472,8 @@ export default function Cozykawaii() {
           key={note.id}
           x={note.xRatio * dimensions.width}
           y={note.yRatio * dimensions.height}
-          width={note.wRatio * dimensions.width}
-          height={note.hRatio * dimensions.height}
+          width={note.w ?? note.wRatio * dimensions.width}
+          height={note.w ?? note.wRatio * dimensions.width}
           src={note.src}
           pinned={note.pinned}
           layer={note.layer}

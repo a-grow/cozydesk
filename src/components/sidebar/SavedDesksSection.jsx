@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { soundManager } from '../../utils/soundManager';
 
 const FONT = "'Nunito', sans-serif";
 const slotKey = (theme, slot) => `cozydesk_saved_${theme}_slot_${slot}`;
@@ -50,7 +51,7 @@ export default function SavedDesksSection({ themeName, onLoad }) {
 
   const handleLoad = (e, slot) => { e.stopPropagation(); onLoad(slot); };
 
-  const askDelete = (e, slot) => { e.stopPropagation(); setConfirmDelete(slot); };
+  const askDelete = (e, slot) => { e.stopPropagation(); soundManager.play('sfx_areyousure'); setConfirmDelete(slot); };
   const doDelete  = (e, slot) => {
     e.stopPropagation();
     try { localStorage.removeItem(slotKey(themeName, slot)); } catch (_) {}

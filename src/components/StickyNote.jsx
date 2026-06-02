@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import defaultNoteImg from "../assets/stickynotes/stickynotecozyyellow.png";
 import { useTheme } from "../themes/ThemeContext";
+import { soundManager } from '../utils/soundManager';
 
 
 const handleDot = {
@@ -194,10 +195,11 @@ const StickyNote = ({
 
         {isSelected && (
           <>
-            <button 
-              className="delete-btn" 
+            <button
+              className="delete-btn"
               onClick={(e) => {
                 e.stopPropagation();
+                soundManager.play('sfx_delete_whoosh');
                 onDelete();
               }}
               style={{ top: "4px", right: "4px" }}

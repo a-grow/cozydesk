@@ -1903,3 +1903,34 @@
   font-weight: 600;
 }
 .lofi-save-btn:hover { filter: brightness(0.92); }
+
+/* ── SFX Toggle Row ─────────────────────────────────────── */
+.sfx-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px 8px 10px;
+  gap: 8px;
+}
+.sfx-toggle-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  color: var(--btn-text);
+  opacity: 0.85;
+}
+.sfx-toggle-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 10px !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--btn-text) !important;
+  background: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+.sfx-toggle-btn.sfx-off {
+  opacity: 0.4;
+}
