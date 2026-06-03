@@ -31,6 +31,12 @@ Communication: Direct and honest. Admit mistakes immediately without self-abasem
 - GitHub Pages, repo a-grow/cozydesk. dev = active development, main = landing page only. Domain: cozydesk.app
 - Stack: Vite + React (PWA). UI font: Nunito everywhere.
 
+## Environment — CRITICAL (added Jun 3 2026)
+- Project MUST live at ~/Developer/cozydesk — NOT on the iCloud-synced Desktop.
+  iCloud sync on Desktop creates conflict-duplicate files (e.g. "useDeskState 2.js")
+  and duplicates Vite's cache, causing stale builds and "fixes that don't show up."
+- Old Desktop location is now a backup only. Do not work in it.
+
 ## File Structure
 src/
   components/ — CalendarSticker, sidebar/MiniCalendar, MusicPlayer, StickyNote*, Reminders*, ReminderPaper* (* do not touch internals unless fixing that item's bugs)
@@ -150,6 +156,15 @@ Secondary issue during testing: old corrupted data in cozydesk_state_steampunk
 caused ghost to-do lists. Test pollution, not a real bug — clean localStorage
 before every carry-over test.
 
+## Stale PWA / Service Worker — KNOWN GREMLIN (added Jun 3 2026)
+- CozyDesk is a PWA; the browser registers a service worker that aggressively caches the
+  app on localhost. Stale symptoms: old version appears, hard-refresh doesn't help, broken
+  images, "rising client:438" errors, fixes don't show.
+- Manual fix: DevTools > Application > Service workers > Unregister + tick "Bypass for
+  network"; then Application > Storage > Clear site data; then close the tab and reopen.
+- PERMANENT FIX (still TODO): disable the PWA service worker in DEV mode only. Production
+  behavior must stay unchanged.
+
 ## Intentionally Removed Features — Do Not Restore
 - Calendar ↔ sticky note reverse sync popup (deleting calendar event prompting to delete from note) — removed intentionally. Do not restore or reference as a bug.
 - Sticky notes do NOT carry over on theme switch — intentional. They are visual assets tied to each theme's aesthetic. Only to-do lists and calendar events travel.
@@ -187,3 +202,11 @@ before every carry-over test.
 - May 30 2026 — Fixed sizing bug: notes/papers switched from window-ratio to absolute pixels; added todoBase per theme; render fallback heals old saves.
 - Jun 2 2026 — Sound effects system built (soundManager.js singleton, 14 sounds, SFX toggle in both sidebars). Steampunk sticky note text area fixed: { top:'20%', left:'5%', right:'12%', bottom:'22%' }. All steampunk notes now 703×634px. Sticker grid now filters clock/calendar/todo/stickynote assets across all themes.
 - Jun 2 2026 — Theme carry-over feature built. Popup asks to bring to-do lists and calendar events when switching themes. Sticky notes intentionally excluded (they belong to each theme's world). Calendar events merge with dedup. Papers/reminders merge by id. Pref stored in localStorage key: cozydesk_carryover_pref. Files: ThemeContext.jsx, cozykawaii.jsx, useDeskState.js, ThemesSection.jsx, Sidebar.jsx, LofiSidebar.jsx.
+
+## Theme Carry-Over — UPDATE (Jun 3 2026)
+- Calendar WIDGET now carries over on theme switch (not just events), so events are visible
+  on the new theme without re-adding a calendar. Respects the 1-calendar-per-theme cap.
+- Files: ThemeContext.jsx (snapshot now includes `calendars`), useDeskState.js
+  (mergeCarryOver has a guarded calendar-merge block).
+- The original carry-over was NEVER broken in code — the "popup doesn't appear" bug was the
+  stale service worker serving old code. Confirmed working Jun 3 2026.
