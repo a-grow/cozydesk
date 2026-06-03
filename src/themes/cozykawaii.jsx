@@ -28,7 +28,7 @@ const overlayStyle = {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function Cozykawaii() {
-  const { theme, themeName, themeStickers: allThemeStickers } = useTheme();
+  const { theme, themeName, themeStickers: allThemeStickers, carryOverPending, resolveCarryOver, clearCarryOver, setTheme: rawSetTheme } = useTheme();
 
   // Window dimensions — needed for ratio ↔ pixel conversion
   const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -57,10 +57,35 @@ export default function Cozykawaii() {
     return () => document.removeEventListener('pointerdown', handler, true);
   }, [activeMenu]);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [carryRemember, setCarryRemember] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
   // All desk state + operations
   const desk = useDeskState({ dimensions, themeName });
+
+  // Wrap setTheme to pass the current themeName so ThemeContext reads the right localStorage key
+  const setTheme = useCallback((name) => {
+    rawSetTheme(name, null, themeName);
+  }, [rawSetTheme, themeName]);
+
+  // After theme switch resolves, merge or clear the carry-over snapshot
+  const prevCarryRef = useRef(null);
+  useEffect(() => {
+    if (!carryOverPending) return;
+    if (carryOverPending.confirmed === null) return; // waiting for user input
+    if (prevCarryRef.current === carryOverPending) return;
+    prevCarryRef.current = carryOverPending;
+    if (carryOverPending.confirmed === true) {
+      const t = setTimeout(() => {
+        desk.mergeCarryOver(carryOverPending.snapshot);
+        clearCarryOver();
+      }, 100);
+      return () => clearTimeout(t);
+    } else {
+      // confirmed === false — no carry, just clear
+      clearCarryOver();
+    }
+  }, [carryOverPending]);
 
   const availableStickers = allThemeStickers.filter(s =>
   !s.name.includes('clock') &&
@@ -275,6 +300,7 @@ export default function Cozykawaii() {
           onAddTodoList={desk.addTodoList}
           onSaveSlot={desk.saveToSlot}
           onLoadSlot={desk.loadFromSlot}
+          onSetTheme={setTheme}
         />
       </div>
 
@@ -327,6 +353,57 @@ export default function Cozykawaii() {
           layer={desk.remindersLayer}
           onContextMenu={(e) => handleContextMenu(e, 'reminders', 'reminders-widget')}
         />
+      )}
+
+      {/* ── Carry-over popup ── */}
+      {carryOverPending && carryOverPending.confirmed === null && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10100,
+        }}>
+          <div
+            style={{
+              background: "white", padding: "24px", borderRadius: "16px",
+              maxWidth: "320px", width: "90%", textAlign: "center",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+              fontFamily: "'Nunito', sans-serif",
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "44px", marginBottom: "8px" }}>🎒</div>
+            <h3 style={{ margin: "0 0 8px 0", color: "#4b3b2a", fontSize: "1.2rem", fontFamily: "'Nunito', sans-serif", fontWeight: 800 }}>
+              Switching themes!
+            </h3>
+            <p style={{ margin: "0 0 16px 0", color: "#6b5b4a", lineHeight: "1.5", fontSize: "0.88rem", fontFamily: "'Nunito', sans-serif" }}>
+              Your to-do lists and calendar events can travel with you.<br/>
+              <span style={{ color: "#a07850", fontSize: "0.82rem" }}>Sticky notes stay behind — they belong to each theme's world.</span>
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginBottom: "14px" }}>
+              <button
+                onClick={() => { resolveCarryOver(true, carryRemember); setCarryRemember(false); }}
+                style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#d4a373", color: "white", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
+              >
+                Yes, bring them!
+              </button>
+              <button
+                onClick={() => { resolveCarryOver(false, carryRemember); setCarryRemember(false); }}
+                style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#eee", color: "#4b3b2a", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
+              >
+                No thanks
+              </button>
+            </div>
+            <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", cursor: "pointer", fontSize: "0.85rem", color: "#8b7b6a", fontFamily: "'Nunito', sans-serif" }}>
+              <input
+                type="checkbox"
+                checked={carryRemember}
+                onChange={e => setCarryRemember(e.target.checked)}
+                style={{ width: "15px", height: "15px", cursor: "pointer" }}
+              />
+              Remember my choice
+            </label>
+          </div>
+        </div>
       )}
 
       {/* ── Clear All confirmation modal ── */}

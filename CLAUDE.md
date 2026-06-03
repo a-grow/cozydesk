@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: May 30 2026. Read fully before touching any code.
+Last updated: Jun 2 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -7,109 +7,183 @@ A senior expert wearing three hats:
 - Disney Imagineer — every theme is a complete world; every pixel intentional. Assets, colors, fonts, interactions reinforce the theme.
 - PWA Designer — CozyDesk is used daily and must feel polished: performance, cross-browser, bulletproof state.
 
-Communication: Direct and honest. Admit mistakes immediately without self-abasement. One clarifying question at a time. Check in before acting. Andrew is the creative director and final decision-maker, and is non-technical — keep explanations plain. Never assign Andrew tasks to do outside the session.
+Communication: Direct and honest. Admit mistakes immediately without self-abasement. One clarifying question at a time. Check in before acting. Andrew is the creative director and final decision-maker, and is non-technical — keep explanations plain. Never assign Andrew tasks to do outside the session. Always include file paths when asking for files or giving instructions.
 
-## How Claude Solves Problems (the core discipline)
-1. Root cause, never symptom. If a bug has been "fixed" repeatedly and keeps returning, every past fix was a band-aid. Find the wrong DATA MODEL underneath and fix that.
-2. Read the real code first — never work from memory. For any visual/size/layout bug, trace the whole chain: where the item is CREATED -> how it's STORED -> how it's RENDERED back to pixels. The bug almost always lives in a mismatch between those.
-3. Follow accidental-fix clues. If an unrelated action (e.g. changing a note's color) accidentally fixes a bug, that exposes the real mechanism — chase it.
-4. Measure, don't guess. Use DevTools/Preview for real pixel values. Never estimate offsets or dimensions.
-5. One surgical change at a time. Give exact file path + exact find/replace. Andrew applies -> hard-refresh -> confirms -> next. Never bundle.
-6. Minimum footprint. Touch only what's asked. No refactors/renames/"improvements" unless requested. If you suspect a deeper issue, flag it as a question BEFORE proposing any structural change.
-7. Don't break neighbors. Changing a stored field can break other code that reads it — search for every reader first.
-8. Protect saved data. Always add a fallback so existing desks heal, not break (pattern: `item.w ?? item.wRatio * dimensions.width`).
-9. When unsure what's in a file, ask Andrew to paste it. Claude CANNOT read the codebase directly — never use bash/file-reading tools on it.
+## How Claude Solves Problems
+1. Root cause, never symptom.
+2. Read the real code first — never work from memory.
+3. Measure, don't guess. Use DevTools for real pixel values.
+4. One surgical change at a time. Give exact file path + exact find/replace.
+5. Minimum footprint. Touch only what's asked.
+6. Don't break neighbors. Search for every reader before changing a stored field.
+7. Protect saved data. Always add a fallback so existing desks heal.
+8. When unsure what's in a file, ask Andrew to paste it.
 
 ## Workflow
 - This chat = planning, diagnosis, small fixes. Claude Code = multi-file changes only.
-- Paste the full CLAUDE.md at the start of every Claude Code session. Never code there without an approved plan from this chat.
-- Applying changes: Andrew pastes into VS Code (Cmd+A -> Cmd+V -> Cmd+S), then hard-refreshes (Cmd+Shift+R). Hard refresh does NOT clear storage — only clear localStorage when explicitly chasing a "ghost data" bug.
+- Paste the full CLAUDE.md at the start of every Claude Code session.
+- Applying changes: Andrew pastes into VS Code (Cmd+A -> Cmd+V -> Cmd+S), then hard-refreshes (Cmd+Shift+R).
+- Backups: `cp -r cozydesk cozydesk_backup_MMDD` from AppDesignJourney directory before changes.
 
 ## Project Info
 - App: ~/Desktop/Desktop/Work/AppDesignJourney/cozydesk
-- Dev server: npm run dev (check terminal for port). Backup: cp -r cozydesk cozydesk_backup_MMDD
+- Dev server: npm run dev (check terminal for port).
 - GitHub Pages, repo a-grow/cozydesk. dev = active development, main = landing page only. Domain: cozydesk.app
 - Stack: Vite + React (PWA). UI font: Nunito everywhere.
 
-## ⭐ Size Model (authoritative — DO NOT REGRESS)
-The single biggest, longest-running bug. Now fixed; understand it before touching any sizing.
+## File Structure
+src/
+  components/ — CalendarSticker, sidebar/MiniCalendar, MusicPlayer, StickyNote*, Reminders*, ReminderPaper* (* do not touch internals unless fixing that item's bugs)
+  themes/ — themeRegistry.js (single source of config), ThemeContext.jsx, cozykawaii.jsx (main renderer ALL themes — in src/themes/ NOT src/themes/cozykawaii/), [theme]/widgets/ (calendar+clock), [theme]/stickynotes/ (notes + todo asset)
+  hooks/useDeskState.js — all desk state, CRUD, undo/redo, persistence
+  utils/audioManager.js — music audio singleton
+  utils/soundManager.js — SFX singleton
+  assets/ — backgrounds/, music/, sounds/, stickynotes/ (legacy fallback), cozydesk-logo.png
 
-THE OLD ROOT BUG: items stored size as a ratio of the LIVE window (`wRatio * window.width`, `hRatio * window.height`). Width tracked window width and height tracked window height independently, so items SCALED and DISTORTED whenever the window differed from creation time. That is why sizes looked random, wacky, and squished. NEVER reintroduce ratio-based sizing.
-
-THE RULE: SIZE = absolute pixels (window-independent). POSITION = ratios (`xRatio`/`yRatio`, so items float to the same relative spot on resize).
-- Sticky notes: store `w` (px); always square -> render uses `w` for BOTH width and height. Base 180. (Yellow kawaii note keeps its separate size override — never remove it.)
-- To-do papers: store absolute `w`/`h` (px) from each theme's `todoBase` in themeRegistry.js:
-  kawaii { w: 358, h: 402 }, lofi { w: 358, h: 384 }, steampunk { w: 358, h: 519 }.
-  Shape = the to-do IMAGE's real aspect ratio so the art never squishes. New theme: todoBase = { w: 358, h: 358 * (imgHeight / imgWidth) }. Always derive height from the ART, never the window.
-- Render fallback (heals old saves): `item.w ?? item.wRatio * dimensions.width`.
-- `todoSize` in themeRegistry is LEGACY — no longer drives sizing; kept only for old-save fallback. Do not use it for new logic.
-- Small screens: to-dos shrink via `Math.min(1, (window.width * 0.7) / baseW)` (only triggers under ~510px wide). NOTE: currently spawn-time only — see Queued Bugs.
+## ⭐ Size Model (DO NOT REGRESS)
+SIZE = absolute pixels (window-independent). POSITION = ratios (xRatio/yRatio).
+- Sticky notes: store `w` (px); always square. Base 180px.
+- To-do papers: store absolute `w`/`h` from each theme's `todoBase` in themeRegistry.js.
+- Render fallback: `item.w ?? item.wRatio * dimensions.width`.
+- todoSize in themeRegistry is LEGACY — do not use for new logic.
 
 ## Font Rules
 - UI font: Nunito only, everywhere.
-- Patrick Hand: RETIRED — allowed only as a user-selectable option in note/to-do font pickers. Never in any UI element, any theme.
-- Fredoka One deprecated -> use Fredoka. Steampunk sidebar labels: Cinzel Decorative. Lofi chalk: Caveat.
-- Font-picker options (notes + to-dos): Caveat, Indie Flower, Shadows Into Light, Permanent Marker, Fredoka, Nunito. All loaded in index.html — never add fonts not already imported there.
+- Patrick Hand: RETIRED — allowed only as user-selectable option in note/to-do font pickers.
+- Fredoka One deprecated → use Fredoka. Steampunk sidebar labels: Cinzel Decorative. Lofi chalk: Caveat.
+- Font-picker options: Caveat, Indie Flower, Shadows Into Light, Permanent Marker, Fredoka, Nunito.
 
 ## Sticky Note Rules
-- Default 180x180, locked aspect ratio, all themes (see Size Model).
-- Color picker: 4 swatches only (blue, green, pink, yellow). Never put sticker assets in the picker.
+- Default 180×180px, locked aspect ratio, all themes.
+- Color picker: 4 swatches only (blue, green, pink, yellow).
+- Steampunk notes: all four colors are 703×634px.
+- Steampunk text area: `{ top: '20%', left: '5%', right: '12%', bottom: '22%' }`
 
 ## To-Do List Rules
-- Every theme needs a to-do asset in its own stickynotes/ folder, filename CONTAINING the word `todo` (that's how ReminderPaper.jsx finds it). widgets/ = calendar + clock images only.
-- Fallback asset src/assets/stickynotes/todolist1.png — safety net only, never primary.
-- Sizing/shape: see Size Model (todoBase).
-- Current asset dimensions: kawaii-todo 826x928, lofi 737x790, steampunk(-todo-paper) 943x1368.
+- Every theme needs a todo asset in its stickynotes/ folder, filename containing the word `todo`.
+- Fallback: src/assets/stickynotes/todolist1.png — safety net only.
+- todoBase per theme drives sizing (see themeRegistry.js).
 
 ## Theme System
-All visual config lives in src/themes/themeRegistry.js — never hardcode theme names in components. New theme = add a config entry + assets (incl. todoBase, sidebar --btn-bg/--btn-text/--btn-font). Themes: Cozy Kawaii, Lo-Fi, Steampunk (more planned). cozykawaii.jsx is the main desk renderer for ALL themes — don't rename (import dependencies).
+All visual config lives in src/themes/themeRegistry.js — never hardcode theme names in components.
+- Themes: Cozy Kawaii, Lo-Fi, Steampunk (more planned).
+- cozykawaii.jsx is the main desk renderer for ALL themes — don't rename.
+- New theme = add config entry + assets (incl. todoBase, sidebar --btn-bg/--btn-text/--btn-font).
+- todoBase: kawaii { w:358, h:402 }, lofi { w:358, h:384 }, steampunk { w:358, h:519 }.
 
-## Calendar System (unified, all themes)
-- CalendarSticker.jsx = sticker wrapper. sidebar/MiniCalendar.jsx RENDERS THE ACTUAL GRID — always confirm which file renders before fixing.
-- Per-theme config under theme.calendarTheme (image, baseW, baseH, contentArea, colors, sizeButtons). Sidebar icon = theme.calendarTheme.image.
-- contentArea — DO NOT change without measuring (Preview + math: offset = imagePixels/imageHeight * baseH; available height baseH - top - bottom must be >= 118px; verify grid height in DevTools):
-  kawaii baseH 270, top 62, l/r 18, bottom 58 | lofi baseH 340, top 130, l/r 18, bottom 20 | steampunk baseH 300, top 85, l/r 25, bottom 60.
-- MiniCalendar fixed values: gridAutoRows 17px, gap 0, alignContent start, cell line-height 1.1, frame zIndex 2 / content zIndex 5, event dot bottom 3px.
-- Calendar images: 260x300 PNG, transparent outside frame, opaque inside grid, straight-on. Save to src/themes/[name]/widgets/[name]calendarbase.png. Future themes: decoration at the TOP only.
+## Sticker Grid Rules
+- NEVER show clock, calendar, todo, or stickynote assets in the sticker grid.
+- Filter in src/themes/cozykawaii.jsx: exclude filenames containing 'clock', 'calendar', 'todo', 'stickynote'.
+- Applies to ALL themes.
+
+## Sound Effects System
+- Singleton: src/utils/soundManager.js — mirrors audioManager.js pattern.
+- localStorage key: cozydesk_sfx (boolean, default true).
+- ALWAYS add new sounds to the SOUNDS array in soundManager.js before wiring triggers.
+- SFX toggle renders in BOTH Sidebar.jsx and LofiSidebar.jsx, directly after MusicPlayer.
+- Never duplicate sound logic outside soundManager.js.
+
+### Sound Map
+| Sound | Trigger |
+|---|---|
+| sfx_place_note | Sticky note dropped on desk |
+| sfx_alert_box | Sticker, to-do list, or calendar dropped on desk |
+| sfx_sticker_lift | Sticker dragged off sidebar |
+| sfx_click_button | Save, My Desks, Settings buttons |
+| sfx_save | Save slot |
+| sfx_delete_whoosh | Delete anything |
+| sfx_ping | Check off a reminder (ON only) |
+| sfx_uhoh | Hit calendar or to-do list cap |
+| sfx_timer_start | Pomodoro start |
+| sfx_timer_end | Pomodoro complete |
+| sfx_timer_reset | Pomodoro reset |
+| sfx_undo_redo | Undo / Redo |
+| sfx_clear_screen | Clear All confirmed |
+| sfx_areyousure | Any confirmation popup appears |
 
 ## Music Player — NEVER BREAK
-- MusicPlayer.jsx (UI) + utils/audioManager.js (singleton = single source of truth for all audio; never duplicate audio logic in the component, never touch the manager without approval).
-- Imported in BOTH Sidebar.jsx and LofiSidebar.jsx, right after the logo. NOT in cozykawaii.jsx.
-- Always starts paused (never autoplay). Theme switch: 1.5s fade out -> load tracks -> 1.5s fade in (don't change without approval). localStorage key cozydesk_music.
-- Styling: kawaii pink (rgba(245,168,184,0.25) bg, #6b4b3a text); lofi/steampunk dark (rgba(0,0,0,0.18) bg, white text).
-- 9 tracks in src/assets/music/ (3 per theme, Pixabay, commercial-free). NEVER rename — original filenames are the commercial-use paper trail.
+- MusicPlayer.jsx (UI) + utils/audioManager.js (singleton).
+- Imported in BOTH Sidebar.jsx and LofiSidebar.jsx, right after the logo.
+- Always starts paused. localStorage key: cozydesk_music.
+- 9 tracks in src/assets/music/ (Pixabay, commercial-free). NEVER rename.
 
 ## Logo Rules — NEVER BREAK
-- src/assets/cozydesk-logo.png, width 180px, centered, zIndex 1. Renders in BOTH Sidebar.jsx and LofiSidebar.jsx. The h1.sb-logo-title text is retired — never restore. Subtitle "YOUR COZY WORKSPACE ✦" stays below the logo in both.
+- src/assets/cozydesk-logo.png, width 180px, centered, zIndex 1.
+- Renders in BOTH Sidebar.jsx and LofiSidebar.jsx.
 
 ## Sidebar Rules — CRITICAL
-- Never change sidebar fonts, icons, or colors unless explicitly asked. Never touch the steampunk animated gears or the lofi sidebar icon images.
-- Buttons use CSS vars --btn-bg, --btn-text, --btn-font (use !important). Every new theme defines these three.
-- Any sidebar UI change (logo, music, etc.) must be applied to BOTH Sidebar.jsx and LofiSidebar.jsx.
+- Never change sidebar fonts, icons, or colors unless explicitly asked.
+- Never touch steampunk animated gears or lofi sidebar icon images.
+- Buttons use CSS vars --btn-bg, --btn-text, --btn-font (use !important).
+- Any sidebar UI change must be applied to BOTH Sidebar.jsx and LofiSidebar.jsx.
 
-## File Structure
-src/
-  components/ — CalendarSticker, sidebar/MiniCalendar, MusicPlayer, StickyNote*, Reminders*, ReminderPaper*  (* do not touch internals unless fixing that item's bugs)
-  themes/ — themeRegistry.js (single source of config), ThemeContext.jsx, cozykawaii.jsx (main renderer, all themes), [theme]/widgets/ (calendar+clock), [theme]/stickynotes/ (notes + todo asset)
-  hooks/useDeskState.js — all desk state, CRUD, undo/redo, persistence
-  utils/audioManager.js — audio singleton
-  assets/ — backgrounds/, music/, stickynotes/ (legacy fallback; keep todolist1.png), cozydesk-logo.png
+## Calendar System
+- CalendarSticker.jsx = sticker wrapper. sidebar/MiniCalendar.jsx renders the grid.
+- Per-theme config under theme.calendarTheme. Sidebar icon = theme.calendarTheme.image.
+- contentArea — DO NOT change without measuring (DevTools + math).
+- MiniCalendar fixed values: gridAutoRows 17px, gap 0, alignContent start, event dot bottom 3px.
 
 ## Save Slot Data Shape — Do Not Break
 - Slots store: notes, stickers, papers, clocks, calendars, calendarEvents, reminders, remindersLayer, themeMode, remindersVisible, remindersPos.
-- Per-item: notes/papers carry absolute `w` (+`h` for papers) and `xRatio`/`yRatio`; legacy items may still have `wRatio`/`hRatio` (handled by render fallback).
-- noteId = Date.now() — never regenerate on load. Keys: cozydesk_state_{theme} (auto-save), cozydesk_saved_{theme}_slot_{n} (named slots).
+- noteId = Date.now() — never regenerate on load.
+- Keys: cozydesk_state_{theme} (auto-save), cozydesk_saved_{theme}_slot_{n} (named slots).
 
 ## Known Bugs — Queued
-1. Live small-screen shrink — to-do clamp is spawn-time only; move to render-time so SAVED desks (not just new items) fit phones/tablets. Do before launch.
-2. Steampunk note text position — stickyNoteTextArea for steampunk reuses kawaii's %s; steampunk images have heavier padding so text sits off. Fix: per-theme text-area offsets in themeRegistry, read in StickyNote.jsx.
-3. Steampunk blue note asset — blue PNG (705x634) has less transparent padding than the others (1024x1024), so it looks larger in the identical box. Real fix = re-export blue at matching padding (asset-side, not code).
-4. Launch maximized — PWA manifest to open maximized.
-5. Resize warning popup — neutral once-per-session popup when resizing below a threshold (sessionStorage flag).
-6. Theme-switch carry-over — optional "bring my notes with me" when switching themes.
+1. Live small-screen clamp — to-do clamp is spawn-time only; move to render-time so saved desks fit phones. Do before launch.
+2. Launch maximized — PWA manifest to open maximized.
+3. Resize warning popup — once-per-session popup when resizing below threshold.
+4. Theme-switch carry-over — optional "bring my notes with me" when switching themes.
+6. Theme carry-over — popup and carry not working reliably
 
-## Pre-Launch Checklist (not blocking feature work)
-1. Warn users desks save locally (clearing browser data erases them). 2. Graceful handling if localStorage corrupts. 3. Test Safari/Firefox/mobile/Windows. 4. Run /securityreview in Claude Code. 5. Beta test with 3-5 users. 6. Handle the 5MB localStorage limit.
+Popup sometimes doesn't appear and to-do lists don't carry when switching themes.
+Suspected root cause: ThemesSection falls back to useTheme().setTheme directly
+instead of the wrapped version in cozykawaii.jsx. This means currentThemeName
+arrives as undefined in ThemeContext.setTheme, causing
+localStorage.getItem('cozydesk_state_undefined') to return null, hasContent=false,
+and a silent switch with no popup and no carry.
+Last attempted fix (NOT YET CONFIRMED): added fallback in ThemeContext.jsx:
+const sourceTheme = currentThemeName || themeName;
+const raw = localStorage.getItem(`cozydesk_state_${sourceTheme}`);
+Also added themeName to setTheme useCallback deps: }, [themeName]);
+Must verify fix works before closing this bug.
+Secondary issue during testing: old corrupted data in cozydesk_state_steampunk
+caused ghost to-do lists. Test pollution, not a real bug — clean localStorage
+before every carry-over test.
+
+## Intentionally Removed Features — Do Not Restore
+- Calendar ↔ sticky note reverse sync popup (deleting calendar event prompting to delete from note) — removed intentionally. Do not restore or reference as a bug.
+- Sticky notes do NOT carry over on theme switch — intentional. They are visual assets tied to each theme's aesthetic. Only to-do lists and calendar events travel.
+
+## Key Learnings
+- NEVER use localStorage.clear() in dev — it breaks Vite HMR and causes black screen.
+  Safe clear command (run as one line in console):
+  `Object.keys(localStorage).filter(k=>k.startsWith('cozydesk')).forEach(k=>localStorage.removeItem(k)); location.reload()`
+- Before testing carry-over, always check and clear the pref key:
+  `localStorage.getItem('cozydesk_carryover_pref')` — if 'yes' or 'no', remove it first
+  or the popup will never show.
+- The `rising client:438` error in DevTools is Vite HMR websocket noise. Harmless in dev,
+  absent in production. Ignore it.
+- Theme carry-over test sequence:
+  1. Clear localStorage with safe command above
+  2. Verify pref is null
+  3. Kawaii: add to-do item + calendar event
+  4. Switch to Lo-Fi → popup must appear
+  5. Yes → to-do and calendar arrive on Lo-Fi
+  6. Switch to Steampunk → popup again
+  7. No → Steampunk clean
+  8. Test Remember my choice for both Yes and No
+  9. If popup doesn't show: add console.log in ThemeContext.setTheme to check what
+     currentThemeName and sourceTheme resolve to — confirms if prop chain is broken.
+
+## Pre-Launch Checklist
+1. Warn users desks save locally (clearing browser data erases them).
+2. Graceful handling if localStorage corrupts.
+3. Test Safari/Firefox/mobile/Windows.
+4. Run /securityreview in Claude Code.
+5. Beta test with 3-5 users.
+6. Handle the 5MB localStorage limit.
 
 ## Changelog
-- May 30 2026 — Fixed the long-standing sizing bug: notes and to-do papers switched from window-ratio sizing to absolute pixels (size) + ratio (position); added todoBase per theme; art-matched to-do shapes; render fallback heals old saves; spawn-time small-screen clamp added; sticker-attach hit-test updated to read absolute note size.
+- May 30 2026 — Fixed sizing bug: notes/papers switched from window-ratio to absolute pixels; added todoBase per theme; render fallback heals old saves.
+- Jun 2 2026 — Sound effects system built (soundManager.js singleton, 14 sounds, SFX toggle in both sidebars). Steampunk sticky note text area fixed: { top:'20%', left:'5%', right:'12%', bottom:'22%' }. All steampunk notes now 703×634px. Sticker grid now filters clock/calendar/todo/stickynote assets across all themes.
+- Jun 2 2026 — Theme carry-over feature built. Popup asks to bring to-do lists and calendar events when switching themes. Sticky notes intentionally excluded (they belong to each theme's world). Calendar events merge with dedup. Papers/reminders merge by id. Pref stored in localStorage key: cozydesk_carryover_pref. Files: ThemeContext.jsx, cozykawaii.jsx, useDeskState.js, ThemesSection.jsx, Sidebar.jsx, LofiSidebar.jsx.

@@ -596,6 +596,65 @@ const updateNote = (id, data) => {
     }));
   };
 
+  // ─── Theme carry-over ─────────────────────────────────────────────
+  const mergeCarryOver = (snapshot) => {
+    if (!snapshot) return;
+
+    // Calculate the current max layer so incoming items appear on top
+    const currentMaxLayer = () => {
+      const s = stateRef.current;
+      const layers = [
+        ...s.notes, ...s.stickers, ...s.papers, ...s.calendars, ...s.clocks,
+      ].map(i => i.layer ?? 0);
+      return layers.length === 0 ? 0 : Math.max(...layers);
+    };
+
+    if (snapshot.papers?.length) {
+      setPapers(prev => {
+        const existingIds = new Set(prev.map(p => p.id));
+        const baseLayer = currentMaxLayer();
+        const incoming = snapshot.papers
+          .filter(p => !existingIds.has(p.id))
+          .map((p, i) => ({ ...p, layer: baseLayer + i + 1 }));
+        return [...prev, ...incoming];
+      });
+    }
+
+    // Calendar widget — respect the one-calendar-per-theme cap: only bring it
+    // over if the destination theme doesn't already have a calendar.
+    if (snapshot.calendars?.length) {
+      setCalendars(prev => {
+        if (prev.length > 0) return prev;
+        const baseLayer = currentMaxLayer();
+        const incoming = snapshot.calendars.slice(0, 1).map((c, i) => ({
+          ...c, layer: baseLayer + i + 1,
+        }));
+        return [...prev, ...incoming];
+      });
+    }
+
+    if (snapshot.reminders?.length) {
+      setReminders(prev => {
+        const existingIds = new Set(prev.map(r => r.id));
+        const incoming = snapshot.reminders.filter(r => !existingIds.has(r.id));
+        return [...prev, ...incoming];
+      });
+    }
+
+    if (snapshot.calendarEvents && Object.keys(snapshot.calendarEvents).length) {
+      setCalendarEvents(prev => {
+        const merged = { ...prev };
+        for (const [dateKey, events] of Object.entries(snapshot.calendarEvents)) {
+          const existing = merged[dateKey] || [];
+          const existingKeys = new Set(existing.map(e => `${e.text}||${dateKey}`));
+          const incoming = events.filter(e => !existingKeys.has(`${e.text}||${dateKey}`));
+          merged[dateKey] = [...existing, ...incoming];
+        }
+        return merged;
+      });
+    }
+  };
+
   const clearDesk = () => {
     pushUndo();
     setNotes([]); setStickers([]); setPapers([]);
@@ -636,5 +695,7 @@ const updateNote = (id, data) => {
     saveToSlot, loadFromSlot,
     // desk-wide
     handleDeskDrop, handleTidyDesk, clearDesk,
+    // carry-over
+    mergeCarryOver,
   };
 }

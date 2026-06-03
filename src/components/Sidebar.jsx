@@ -187,6 +187,7 @@ export default function Sidebar({
   onRedo,
   onSaveSlot,
   onLoadSlot,
+  onSetTheme,
 }) {
   const { themeName, theme } = useTheme();
   const [savedDesksOpen, setSavedDesksOpen] = React.useState(false);
@@ -225,6 +226,7 @@ export default function Sidebar({
         onRedo={onRedo}
         onSaveSlot={onSaveSlot}
         onLoadSlot={onLoadSlot}
+        onSetTheme={onSetTheme}
       />
     );
   }
@@ -257,7 +259,7 @@ export default function Sidebar({
             ═══════════════════════════════════════ */}
         <div className="sb-section">
           <h3 className="sb-section-title">🎨 Themes</h3>
-          <ThemesSection />
+          <ThemesSection onSetTheme={onSetTheme} />
         </div>
 
         <button className="sb-action-btn sb-action-mydesks" onClick={() => { soundManager.play('sfx_click_button'); setSavedDesksOpen(true); }}>

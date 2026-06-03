@@ -23,7 +23,10 @@
       "Bash(grep -n \"saveToSlot\\\\|loadFromSlot\" /Users/andysimac/Desktop/Desktop/Work/AppDesignJourney/cozydesk/src/hooks/*.js)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(mkdir -p ~/Developer)",
+      "Read(//Users/andysimac/**)",
+      "Bash(rsync *)"
     ]
   }
 }

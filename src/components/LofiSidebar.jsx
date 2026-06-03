@@ -196,6 +196,7 @@ export default function LofiSidebar({
   onRedo,
   onSaveSlot,
   onLoadSlot,
+  onSetTheme,
 }) {
   const { themeStickyNotes, themeName } = useTheme();
   const [savedDesksOpen, setSavedDesksOpen] = React.useState(false);
@@ -257,7 +258,7 @@ export default function LofiSidebar({
       {/* ── Theme ── */}
       <div className="lofi-section-block">
         <div className="lofi-section-label">THEMES</div>
-        <ThemesSection />
+        <ThemesSection onSetTheme={onSetTheme} />
       </div>
 
       <button className="lofi-settings-full-btn" onClick={() => { soundManager.play('sfx_click_button'); setSavedDesksOpen(true); }}>
