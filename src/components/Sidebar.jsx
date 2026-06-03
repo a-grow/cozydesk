@@ -189,7 +189,8 @@ export default function Sidebar({
   onLoadSlot,
   onSetTheme,
 }) {
-  const { themeName, theme } = useTheme();
+  const { themeName, theme, themeStickyNotes } = useTheme();
+  const todoImg = themeStickyNotes.find(a => a.name.includes('todo'))?.src || sidebarTodoListIcon;
   const [savedDesksOpen, setSavedDesksOpen] = React.useState(false);
   const [savePopupOpen, setSavePopupOpen]   = React.useState(false);
   const [currentDesk, setCurrentDesk]       = React.useState(null);
@@ -282,7 +283,7 @@ export default function Sidebar({
                 style={{ position: 'relative' }}
               >
                 <img
-                  src={sidebarTodoListIcon}
+                  src={todoImg}
                   alt="To-Do List"
                   className="sb-todo-icon-img"
                   draggable

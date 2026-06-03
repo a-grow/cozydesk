@@ -135,7 +135,7 @@ const THEME_CONFIGS = {
     brandFont: "'Cinzel Decorative', serif",
     defaultNoteFont: "'Nunito', sans-serif",
     stickyNoteTextArea: { top: '20%', left: '5%', right: '12%', bottom: '22%' },
-    todoTextArea: { top: '18%', left: '32%', right: '6%', bottom: '6%' },
+    todoTextArea: { top: '18%', left: '26%', right: '6%', bottom: '6%' },
     todoSize: { wRatio: 0.18, hRatio: 0.261 },
     todoBase: { w: 358, h: 519 },
     showTape: true,

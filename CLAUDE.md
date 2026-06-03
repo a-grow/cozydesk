@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Jun 2 2026. Read fully before touching any code.
+Last updated: Jun 3 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -23,10 +23,10 @@ Communication: Direct and honest. Admit mistakes immediately without self-abasem
 - This chat = planning, diagnosis, small fixes. Claude Code = multi-file changes only.
 - Paste the full CLAUDE.md at the start of every Claude Code session.
 - Applying changes: Andrew pastes into VS Code (Cmd+A -> Cmd+V -> Cmd+S), then hard-refreshes (Cmd+Shift+R).
-- Backups: `cp -r cozydesk cozydesk_backup_MMDD` from AppDesignJourney directory before changes.
+- Backups: `cp -r cozydesk cozydesk_backup_MMDD` from the ~/Developer directory before changes.
 
 ## Project Info
-- App: ~/Desktop/Desktop/Work/AppDesignJourney/cozydesk
+- App: ~/Developer/cozydesk (moved off iCloud Desktop — see "Environment — CRITICAL")
 - Dev server: npm run dev (check terminal for port).
 - GitHub Pages, repo a-grow/cozydesk. dev = active development, main = landing page only. Domain: cozydesk.app
 - Stack: Vite + React (PWA). UI font: Nunito everywhere.
@@ -139,22 +139,8 @@ All visual config lives in src/themes/themeRegistry.js — never hardcode theme 
 2. Launch maximized — PWA manifest to open maximized.
 3. Resize warning popup — once-per-session popup when resizing below threshold.
 4. Theme-switch carry-over — optional "bring my notes with me" when switching themes.
-6. Theme carry-over — popup and carry not working reliably
-
-Popup sometimes doesn't appear and to-do lists don't carry when switching themes.
-Suspected root cause: ThemesSection falls back to useTheme().setTheme directly
-instead of the wrapped version in cozykawaii.jsx. This means currentThemeName
-arrives as undefined in ThemeContext.setTheme, causing
-localStorage.getItem('cozydesk_state_undefined') to return null, hasContent=false,
-and a silent switch with no popup and no carry.
-Last attempted fix (NOT YET CONFIRMED): added fallback in ThemeContext.jsx:
-const sourceTheme = currentThemeName || themeName;
-const raw = localStorage.getItem(`cozydesk_state_${sourceTheme}`);
-Also added themeName to setTheme useCallback deps: }, [themeName]);
-Must verify fix works before closing this bug.
-Secondary issue during testing: old corrupted data in cozydesk_state_steampunk
-caused ghost to-do lists. Test pollution, not a real bug — clean localStorage
-before every carry-over test.
+6. RESOLVED Jun 3 2026 — Theme carry-over was never broken in code. The real cause was a
+   stale PWA service worker serving old code on localhost. Carry-over confirmed working.
 
 ## Stale PWA / Service Worker — KNOWN GREMLIN (added Jun 3 2026)
 - CozyDesk is a PWA; the browser registers a service worker that aggressively caches the
@@ -162,8 +148,9 @@ before every carry-over test.
   images, "rising client:438" errors, fixes don't show.
 - Manual fix: DevTools > Application > Service workers > Unregister + tick "Bypass for
   network"; then Application > Storage > Clear site data; then close the tab and reopen.
-- PERMANENT FIX (still TODO): disable the PWA service worker in DEV mode only. Production
-  behavior must stay unchanged.
+- PERMANENT FIX (DONE Jun 3 2026): service worker now registers in production only. The
+  registration script was moved out of index.html into src/main.jsx, guarded by
+  `if (import.meta.env.PROD)`. Dev no longer registers a worker; production unchanged.
 
 ## Intentionally Removed Features — Do Not Restore
 - Calendar ↔ sticky note reverse sync popup (deleting calendar event prompting to delete from note) — removed intentionally. Do not restore or reference as a bug.
