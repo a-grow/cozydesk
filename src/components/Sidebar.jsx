@@ -171,6 +171,7 @@ import StickyNotesSection from './sidebar/StickyNotesSection';
 import SavedDesksModal from './sidebar/SavedDesksModal';
 import SavePopup from './sidebar/SavePopup';
 import sidebarTodoListIcon from '../assets/stickynotes/todolist1.png';
+import cozyDeskLogo from '../assets/cozydesk-logo.png';
 import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
 import { soundManager } from '../utils/soundManager';
@@ -238,7 +239,7 @@ export default function Sidebar({
       <div className="sb-inner-wrapper">
         <div className="sb-logo">
           <img
-            src="/src/assets/cozydesk-logo.png"
+            src={cozyDeskLogo}
             alt="CozyDesk"
             style={{ width: '180px', display: 'block', margin: '0 auto', position: 'relative', zIndex: 1 }}
           />
