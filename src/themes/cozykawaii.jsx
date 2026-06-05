@@ -114,12 +114,7 @@ export default function Cozykawaii() {
   };
 
   const playToggleSound = () => {
-    try {
-      const soundName = theme.sound || 'default-click';
-      const audio = new Audio(`/src/assets/sounds/${soundName}.mp3`);
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
-    } catch (_) {}
+    soundManager.play('sfx_click_button');
   };
 
   // ─── Keyboard shortcuts ────────────────────────────────────────────
