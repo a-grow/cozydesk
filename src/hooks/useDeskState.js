@@ -22,6 +22,7 @@ export function useDeskState({ dimensions, themeName }) {
   const [calendarEvents, setCalendarEvents]   = useState({});
   const [undoStack, setUndoStack]             = useState([]);
   const [redoStack, setRedoStack]             = useState([]);
+  const [storageFull, setStorageFull]         = useState(false);
   const [remindersVisible, setRemindersVisible] = useState(false);
   const [remindersPos, setRemindersPos]       = useState({ xRatio: 0.35, yRatio: 0.15, wRatio: 0.22, hRatio: 0.55 });
   const [remindersLayer, setRemindersLayer]   = useState(5);
@@ -54,7 +55,9 @@ export function useDeskState({ dimensions, themeName }) {
         themeMode: s.themeMode, remindersVisible: s.remindersVisible,
         remindersPos: s.remindersPos,
       }));
-    } catch (_) {}
+    } catch (_) {
+      setStorageFull(true);
+    }
   };
 
   const loadThemeState = (theme) => {
@@ -538,7 +541,9 @@ const updateNote = (id, data) => {
         themeMode: s.themeMode, remindersVisible: s.remindersVisible,
         remindersPos: s.remindersPos,
       }));
-    } catch (_) {}
+    } catch (_) {
+      setStorageFull(true);
+    }
   };
 
   const loadFromSlot = (slot) => {
@@ -693,6 +698,8 @@ const updateNote = (id, data) => {
     toggleRemindersWidget, updateRemindersPos,
     // saved slots
     saveToSlot, loadFromSlot,
+    // storage warning
+    storageFull, setStorageFull,
     // desk-wide
     handleDeskDrop, handleTidyDesk, clearDesk,
     // carry-over

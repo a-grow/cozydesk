@@ -197,3 +197,54 @@ All visual config lives in src/themes/themeRegistry.js — never hardcode theme 
   (mergeCarryOver has a guarded calendar-merge block).
 - The original carry-over was NEVER broken in code — the "popup doesn't appear" bug was the
   stale service worker serving old code. Confirmed working Jun 3 2026.
+
+  # PART 1 — CLAUDE.md updates
+
+## Changelog (add this entry)
+- **Jun 4 2026** — (a) Steampunk sidebar to-do icon now theme-aware: `Sidebar.jsx` reads the active theme's todo asset from `themeStickyNotes` (filename contains `todo`), falling back to `assets/stickynotes/todolist1.png` — mirrors `ReminderPaper.jsx`. (b) Steampunk to-do text shifted left: `todoTextArea.left` `32% → 26%` in `themeRegistry.js`. (c) Storage-full warning shipped (#1): `useDeskState` exposes `storageFull`/`setStorageFull`; `saveThemeState` and `saveToSlot` now set the flag on a failed write instead of swallowing the error; dismissible popup added in `cozykawaii.jsx`.
+
+## Sidebar Rules (add)
+- The sidebar **to-do icon is theme-aware**: it reads the active theme's todo asset from `themeStickyNotes` (find the one whose filename includes `todo`), fallback `assets/stickynotes/todolist1.png`. Same pattern as `ReminderPaper.jsx`. New themes get the right icon automatically.
+
+## Storage-Full Warning (new system — add)
+- `useDeskState.js` exposes `storageFull` (bool) + `setStorageFull`. `saveThemeState` and `saveToSlot` set it `true` on a failed `localStorage` write. `cozykawaii.jsx` renders a dismissible popup when true (same style as the Clear All / carry-over modals).
+- **KNOWN FOLLOW-UP (not urgent):** the popup can re-fire on every action when storage is genuinely full, and fires immediately in **Safari private mode** (where `setItem` throws). Planned softening: show once per session + private-mode-friendly wording.
+
+## Known Issues (add)
+- **Active theme not persisted across reload.** App always opens on Cozy Kawaii (`ThemeContext.jsx` `themeName` defaults to `'cozykawaii'`, never read from storage). Per-theme *desks* are saved; the *selected theme* is not. Minor launch UX item.
+
+## Architecture / Performance Roadmap (agreed Jun 4 2026 — add as its own section)
+**Order and caveats matter. Do NOT batch these. One at a time, backup + commit each.**
+
+1. **DONE — Storage-full warning (#1).** See above.
+
+2. **LAUNCH-BLOCKER — Production asset paths (#2).** Two SEPARATE jobs, not one find/replace:
+   - **Logo** in `Sidebar.jsx`: `src="/src/assets/cozydesk-logo.png"` → static import (`import logo from '../assets/cozydesk-logo.png'`). Trivial.
+   - **Toggle sounds** in `cozykawaii.jsx` `playToggleSound`: `new Audio('/src/assets/sounds/${name}.mp3')` uses a **dynamic filename** — a naive `new URL(..., import.meta.url)` will NOT reliably bundle it in Vite. Fix by folding the three toggle sounds (`pastel-click`, `lofi-pop`, `gear-shift`) into `soundManager.js`'s `SOUNDS` array and playing via `soundManager`. One sound system, not two.
+   - **Why blocker:** `/src/...` paths only resolve in `npm run dev`. In the GitHub Pages / Tauri build the **logo vanishes** and the toggle sound silently fails.
+
+3. **BEFORE LAUNCH (high value, low risk) — Lighter images / WebP (#6).**
+   - One-time, **hand-checked** conversion of current PNGs. NO blind batch convert.
+   - Quality control: cozy art is gradient/transparency-heavy; lossy WebP can smear gradients — review each asset, preserve alpha.
+   - No new dependency for now (KISS). The asset glob already accepts `.webp`. Add an automated build pipeline only if theme count makes manual conversion a chore.
+
+4. **AFTER LAUNCH / beta — Smoother saving / debounce auto-save (#3).** Medium risk — only safe WITH guardrails:
+   - Debounce ONLY the background auto-save effect. Keep explicit Save-slot and theme-switch saves **immediate**.
+   - Flush on `visibilitychange`/`pagehide`, NOT just `beforeunload` (`beforeunload` is unreliable on mobile PWAs — without this, debounce can *cause* the data loss it's meant to prevent).
+
+5. **ANYTIME (trivial) — Theme-proof clock logic (#4).**
+   - `useDeskState.js` `addStickerAtPosition`: replace `name.includes('cozyclock') || 'loficlock' || 'steampunkclock'` with generic `name.includes('clock')`.
+   - Safe because `clock` is already a reserved filename keyword (sticker-grid filter + documented). Keep it documented.
+
+6. **HOLD — Load art on demand / lazy-load (#5).** NOT a fix — a **project**. Defer until ~10+ themes.
+   - Risks: turns the registry's *synchronous* asset arrays *async* → touches `ReminderPaper`, the sticker grid, the sidebar icon (broad footprint). Worsens the known `StickyNote` asset-timing race. Needs loading placeholders (avoid empty-world flash) + service-worker caching (offline themes). Partial payoff anyway (Tauri loads art from local disk).
+
+7. **MINOR (verify first) — Possibly-unused deps** `react-draggable`, `framer-motion` in `package.json`. Confirm they're truly unused (framer-motion may live in a file not yet reviewed) before removing. Removing trims the bundle.
+
+## On the Horizon (add)
+- **Welcome / splash screen (app "pre-show"):** logo bloom → **theme carousel** (left/right arrows, FREE/price badges, **data-driven from the theme registry** so new themes auto-appear, optional "Coming soon" ghost card) → **first-run legal gate** (local-save warning + AI-art disclosure + Terms; scroll-to-bottom-then-agree; store acceptance + version in a localStorage key like `cozydesk_terms_v1`; skip for returning users). Concept mocked, not built.
+
+## Legal / Pre-Launch Notes (add — NOT legal advice; finalize with a lawyer or Termly/iubenda)
+- **No law requires disclosing that an app was *built* with AI.** AI-disclosure laws target: (a) chatbots telling users they're AI, (b) labeling AI-generated content *shown to users*, (c) training-data transparency for AI *model makers*. CozyDesk has none of these as user-facing AI. Only light touch: theme art is AI-generated → a simple "Artwork created with AI tools" line as goodwill, not obligation.
+- **Documents to prepare:** Terms of Service / EULA; Privacy Policy (even for local-only storage — covers the "Get Early Access" email capture, Pixabay music, hosting); Refund Policy (you sell themes); Disclaimer of warranties + limitation of liability (pair with the local-save warning).
+- **App stores:** if you wrap via Tauri/native, Apple & Google add their own requirements (privacy labels, in-app payment rules). The landing page advertises Desktop/iPhone/Android/iPad — know this before marketing those hard.

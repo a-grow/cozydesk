@@ -445,6 +445,39 @@ export default function Cozykawaii() {
         </div>
       )}
 
+      {/* ── Storage full warning ── */}
+      {desk.storageFull && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10100,
+        }}>
+          <div
+            style={{
+              background: "white", padding: "18px 20px", borderRadius: "16px",
+              maxWidth: "300px", width: "90%", textAlign: "center",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+              fontFamily: "'Nunito', sans-serif",
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "44px", marginBottom: "8px" }}>💾</div>
+            <h3 style={{ margin: "0 0 8px 0", color: "#4b3b2a", fontSize: "1.2rem", fontFamily: "'Nunito', sans-serif", fontWeight: 800 }}>Storage is full</h3>
+            <p style={{ margin: "0 0 16px 0", color: "#6b5b4a", lineHeight: "1.4", fontSize: "0.88rem", fontFamily: "'Nunito', sans-serif" }}>
+              Your browser's storage is full, so recent changes might not be saved. Try removing a few saved desks, or back up your desk before continuing.
+            </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button
+                onClick={() => desk.setStorageFull(false)}
+                style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#d4a373", color: "white", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── To-do list papers ── */}
       {desk.papers.map(paper => (
         <ReminderPaper
