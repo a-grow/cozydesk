@@ -28,6 +28,7 @@ export default function CalendarSticker({
   const preset = CAL_PRESETS[sizePreset] || CAL_PRESETS.md;
   const scale  = preset.w / CAL_BASE_W;
   const [showModal, setShowModal] = useState(false);
+  const [calMonth, setCalMonth] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() });
 
   useEffect(() => {
     if (!showModal) return;
@@ -69,6 +70,7 @@ export default function CalendarSticker({
             onRemoveEvent={onRemoveEvent}
             noPopup={true}
             onDayClick={() => { onSelect(); setShowModal(true); }}
+            onMonthChange={(y, m) => setCalMonth({ year: y, month: m })}
             calendarTheme={theme.calendarTheme}
           />
         </div>
@@ -114,6 +116,8 @@ export default function CalendarSticker({
         onAddEvent={onAddEvent}
         onRemoveEvent={onRemoveEvent}
         onClose={() => setShowModal(false)}
+        initialYear={calMonth.year}
+        initialMonth={calMonth.month}
         stickerCalendarLinks={stickerCalendarLinks}
         onSyncToSticker={onSyncToSticker}
         onUpdateLink={onUpdateLink}

@@ -55,6 +55,7 @@ function inputStyle(mt, extra = {}) {
 
 export default function LargeCalendarModal({
   events, onAddEvent, onRemoveEvent, onClose,
+  initialYear, initialMonth,
   stickerCalendarLinks, onSyncToSticker, onUpdateLink, onRemoveLink,
 }) {
   const { theme } = useTheme();
@@ -62,8 +63,8 @@ export default function LargeCalendarModal({
   const brandFont = theme.brandFont;
 
   const today = new Date();
-  const [year, setYear]   = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear]   = useState(initialYear ?? today.getFullYear());
+  const [month, setMonth] = useState(initialMonth ?? today.getMonth());
   const [addFormDay, setAddFormDay] = useState(null);
   const [editing, setEditing] = useState(null);
   const editInputRef = useRef(null);

@@ -9,6 +9,7 @@ export default function MiniCalendar({
   onRemoveEvent,
   noPopup = false,
   onDayClick,
+  onMonthChange,
   calendarTheme,
 }) {
   const today = new Date();
@@ -30,6 +31,10 @@ export default function MiniCalendar({
     popupText: '#4b3b2a', addBtn: '#d4a373', contentBg: 'white',
   };
   const image = calendarTheme?.image;
+
+  useEffect(() => {
+    onMonthChange?.(year, month);
+  }, [year, month]);
 
   useEffect(() => {
     if (selectedDay == null) return;
@@ -121,15 +126,15 @@ export default function MiniCalendar({
         }}>
           <button className="cal-nav" onClick={prevMonth} style={{
             background: 'transparent', border: 'none', padding: '0 4px',
-            fontSize: '20px', cursor: 'pointer', color: colors.navBtn, lineHeight: 1,
+            fontSize: calendarTheme?.navFontSize || '20px', cursor: 'pointer', color: colors.navBtn, lineHeight: 1,
           }}>‹</button>
           <span className="cal-month-label" style={{
-            fontSize: '13px', fontWeight: 'bold', color: colors.accent,
+            fontSize: '10px', fontWeight: 'bold', color: colors.accent,
             textTransform: 'uppercase', letterSpacing: '0.05em',
           }}>{monthName} {year}</span>
           <button className="cal-nav" onClick={nextMonth} style={{
             background: 'transparent', border: 'none', padding: '0 4px',
-            fontSize: '20px', cursor: 'pointer', color: colors.navBtn, lineHeight: 1,
+            fontSize: calendarTheme?.navFontSize || '20px', cursor: 'pointer', color: colors.navBtn, lineHeight: 1,
           }}>›</button>
         </div>
 
@@ -137,7 +142,7 @@ export default function MiniCalendar({
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
           gap: '0px', alignContent: 'start',
-          gridAutoRows: '17px',
+          gridAutoRows: calendarTheme?.gridAutoRows || '17px',
         }}>
           {DAYS.map(d => (
             <div key={d} className="cal-day-label" style={{
