@@ -73,7 +73,12 @@ export const ThemeProvider = ({ children }) => {
 
     const pref = localStorage.getItem(CARRY_PREF_KEY);
 
-    if (!hasContent) {
+    // Carry-over only fills a theme the FIRST time it's opened. If the
+    // destination theme already has its own saved desk, never inject — this
+    // is what stops deleted items from reappearing when you switch back.
+    const destHasDesk = !!localStorage.getItem(`cozydesk_state_${name}`);
+
+    if (!hasContent || destHasDesk) {
       setCarryOverPending({ targetTheme: name, snapshot: null, confirmed: false });
       setThemeName(name);
     } else if (pref === 'yes') {
