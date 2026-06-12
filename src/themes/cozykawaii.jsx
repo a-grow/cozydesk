@@ -59,6 +59,14 @@ export default function Cozykawaii() {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [carryRemember, setCarryRemember] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [calendarShared, setCalendarShared] = useState(() => localStorage.getItem('cozydesk_calendar_shared') === 'on');
+
+  // Keep the Settings toggle's On/Off label correct each time the panel opens
+  useEffect(() => {
+    if (activeMenu === 'settings') {
+      setCalendarShared(localStorage.getItem('cozydesk_calendar_shared') === 'on');
+    }
+  }, [activeMenu]);
 
   // All desk state + operations
   const desk = useDeskState({ dimensions, themeName });
@@ -316,6 +324,16 @@ export default function Cozykawaii() {
             onClick={desk.handleTidyDesk}
           >
             🧹 Tidy Notes
+          </button>
+          <button
+            style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#d6e4f0", color: "#2a3b4b", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}
+            onClick={() => {
+              soundManager.play('sfx_click_button');
+              if (calendarShared) { desk.disableCalendarSharing(); setCalendarShared(false); }
+              else { desk.enableCalendarSharing(); setCalendarShared(true); }
+            }}
+          >
+            📅 Calendar events shared in every theme · {calendarShared ? "On" : "Off"}
           </button>
           <button
             style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#ffe0e0", color: "#c00", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}

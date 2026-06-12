@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { getThemeConfig } from "../themes/themeRegistry";
+import { getThemeConfig, THEME_CONFIGS } from "../themes/themeRegistry";
 import { soundManager } from '../utils/soundManager';
 
 const ITEMS_PER_PAPER = 6;
@@ -658,6 +658,33 @@ const updateNote = (id, data) => {
     setCalendarEvents(merged);
   }, []);
 
+  // Turn calendar sharing OFF — copy the shared events into every theme so nothing is lost
+  const disableCalendarSharing = useCallback(() => {
+    let sharedEvents = {};
+    try {
+      const raw = localStorage.getItem('cozydesk_shared_calendar_events');
+      if (raw) sharedEvents = JSON.parse(raw);
+    } catch (_) {}
+
+    for (const name of Object.keys(THEME_CONFIGS)) {
+      const key = `cozydesk_state_${name}`;
+      let parsed = {};
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) parsed = JSON.parse(raw);
+      } catch (_) { parsed = {}; }
+      parsed.calendarEvents = sharedEvents;
+      try { localStorage.setItem(key, JSON.stringify(parsed)); } catch (_) {}
+    }
+
+    try {
+      localStorage.setItem('cozydesk_calendar_shared', 'off');
+      localStorage.removeItem('cozydesk_shared_calendar_events');
+    } catch (_) {}
+
+    setCalendarEvents(sharedEvents);
+  }, []);
+
   const clearDesk = () => {
     pushUndo();
     setNotes([]); setStickers([]); setPapers([]);
@@ -702,5 +729,6 @@ const updateNote = (id, data) => {
     handleDeskDrop, handleTidyDesk, clearDesk,
     // shared calendar
     enableCalendarSharing,
+    disableCalendarSharing,
   };
 }
