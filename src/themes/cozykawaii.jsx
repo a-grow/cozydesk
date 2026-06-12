@@ -77,7 +77,7 @@ export default function Cozykawaii() {
     prevCarryRef.current = carryOverPending;
     if (carryOverPending.confirmed === true) {
       const t = setTimeout(() => {
-        desk.mergeCarryOver(carryOverPending.snapshot);
+        desk.enableCalendarSharing();
         clearCarryOver();
       }, 100);
       return () => clearTimeout(t);
@@ -366,26 +366,26 @@ export default function Cozykawaii() {
             }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ fontSize: "44px", marginBottom: "8px" }}>🎒</div>
+            <div style={{ fontSize: "44px", marginBottom: "8px" }}>📅</div>
             <h3 style={{ margin: "0 0 8px 0", color: "#4b3b2a", fontSize: "1.2rem", fontFamily: "'Nunito', sans-serif", fontWeight: 800 }}>
-              Switching themes!
+              One calendar everywhere?
             </h3>
             <p style={{ margin: "0 0 16px 0", color: "#6b5b4a", lineHeight: "1.5", fontSize: "0.88rem", fontFamily: "'Nunito', sans-serif" }}>
-              Your to-do lists and calendar events can travel with you.<br/>
-              <span style={{ color: "#a07850", fontSize: "0.82rem" }}>Sticky notes stay behind — they belong to each theme's world.</span>
+              Want your calendar events to show up in all your themes?<br/>
+              <span style={{ color: "#a07850", fontSize: "0.82rem" }}>You can change this anytime in Settings.</span>
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginBottom: "14px" }}>
               <button
                 onClick={() => { resolveCarryOver(true, carryRemember); setCarryRemember(false); }}
                 style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#d4a373", color: "white", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
               >
-                Yes, bring them!
+                Yes, share
               </button>
               <button
                 onClick={() => { resolveCarryOver(false, carryRemember); setCarryRemember(false); }}
                 style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#eee", color: "#4b3b2a", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
               >
-                No thanks
+                No, keep separate
               </button>
             </div>
             <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", cursor: "pointer", fontSize: "0.85rem", color: "#8b7b6a", fontFamily: "'Nunito', sans-serif" }}>

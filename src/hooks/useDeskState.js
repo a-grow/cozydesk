@@ -48,13 +48,18 @@ export function useDeskState({ dimensions, themeName }) {
   const saveThemeState = (theme) => {
     try {
       const s = stateRef.current;
+      const sharingOn = localStorage.getItem('cozydesk_calendar_shared') === 'on';
       localStorage.setItem(storageKey(theme), JSON.stringify({
         notes: s.notes, stickers: s.stickers, papers: s.papers,
-        clocks: s.clocks, calendars: s.calendars, calendarEvents: s.calendarEvents,
+        clocks: s.clocks, calendars: s.calendars,
+        calendarEvents: sharingOn ? {} : s.calendarEvents,
         reminders: s.reminders, remindersLayer: s.remindersLayer,
         themeMode: s.themeMode, remindersVisible: s.remindersVisible,
         remindersPos: s.remindersPos,
       }));
+      if (sharingOn) {
+        localStorage.setItem('cozydesk_shared_calendar_events', JSON.stringify(s.calendarEvents));
+      }
     } catch (_) {
       setStorageFull(true);
     }
@@ -63,7 +68,16 @@ export function useDeskState({ dimensions, themeName }) {
   const loadThemeState = (theme) => {
     try {
       const saved = localStorage.getItem(storageKey(theme));
-      if (!saved) return;
+      if (!saved) {
+        // Brand-new theme (no saved desk): still load the shared calendar so events show everywhere
+        if (localStorage.getItem('cozydesk_calendar_shared') === 'on') {
+          try {
+            const sharedRaw = localStorage.getItem('cozydesk_shared_calendar_events');
+            setCalendarEvents(sharedRaw ? JSON.parse(sharedRaw) : {});
+          } catch (_) { setCalendarEvents({}); }
+        }
+        return;
+      }
       const {
         notes: sN, stickers: sS, papers: sP, reminders: sR, themeMode: sT,
         clocks: sCL, calendars: sCAL, calendarEvents: sCE,
@@ -82,7 +96,14 @@ export function useDeskState({ dimensions, themeName }) {
       setReminders(sR       || []);
       setClocks(mCL.length  ? mCL : []);
       setCalendars(mCAL.length ? mCAL : []);
-      setCalendarEvents(sCE || {});
+      if (localStorage.getItem('cozydesk_calendar_shared') === 'on') {
+        try {
+          const sharedRaw = localStorage.getItem('cozydesk_shared_calendar_events');
+          setCalendarEvents(sharedRaw ? JSON.parse(sharedRaw) : {});
+        } catch (_) { setCalendarEvents({}); }
+      } else {
+        setCalendarEvents(sCE || {});
+      }
       if (sT)          setThemeMode(sT);
       if (sRV != null) setRemindersVisible(sRV);
       if (sRP)         setRemindersPos(sRP);
@@ -601,64 +622,41 @@ const updateNote = (id, data) => {
     }));
   };
 
-  // ─── Theme carry-over ─────────────────────────────────────────────
-  const mergeCarryOver = (snapshot) => {
-    if (!snapshot) return;
+  // ─── Shared calendar events ───────────────────────────────────────
+  const enableCalendarSharing = useCallback(() => {
+    const merged = {};
 
-    // Calculate the current max layer so incoming items appear on top
-    const currentMaxLayer = () => {
-      const s = stateRef.current;
-      const layers = [
-        ...s.notes, ...s.stickers, ...s.papers, ...s.calendars, ...s.clocks,
-      ].map(i => i.layer ?? 0);
-      return layers.length === 0 ? 0 : Math.max(...layers);
-    };
-
-    if (snapshot.papers?.length) {
-      setPapers(prev => {
-        const existingIds = new Set(prev.map(p => p.id));
-        const baseLayer = currentMaxLayer();
-        const incoming = snapshot.papers
-          .filter(p => !existingIds.has(p.id))
-          .map((p, i) => ({ ...p, layer: baseLayer + i + 1 }));
-        return [...prev, ...incoming];
-      });
-    }
-
-    // Calendar widget — respect the one-calendar-per-theme cap: only bring it
-    // over if the destination theme doesn't already have a calendar.
-    if (snapshot.calendars?.length) {
-      setCalendars(prev => {
-        if (prev.length > 0) return prev;
-        const baseLayer = currentMaxLayer();
-        const incoming = snapshot.calendars.slice(0, 1).map((c, i) => ({
-          ...c, layer: baseLayer + i + 1,
-        }));
-        return [...prev, ...incoming];
-      });
-    }
-
-    if (snapshot.reminders?.length) {
-      setReminders(prev => {
-        const existingIds = new Set(prev.map(r => r.id));
-        const incoming = snapshot.reminders.filter(r => !existingIds.has(r.id));
-        return [...prev, ...incoming];
-      });
-    }
-
-    if (snapshot.calendarEvents && Object.keys(snapshot.calendarEvents).length) {
-      setCalendarEvents(prev => {
-        const merged = { ...prev };
-        for (const [dateKey, events] of Object.entries(snapshot.calendarEvents)) {
+    // Gather calendarEvents from every cozydesk_state_* theme save
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith('cozydesk_state_')) continue;
+      try {
+        const parsed = JSON.parse(localStorage.getItem(key));
+        if (!parsed?.calendarEvents) continue;
+        for (const [dateKey, events] of Object.entries(parsed.calendarEvents)) {
           const existing = merged[dateKey] || [];
           const existingKeys = new Set(existing.map(e => `${e.text}||${dateKey}`));
           const incoming = events.filter(e => !existingKeys.has(`${e.text}||${dateKey}`));
           merged[dateKey] = [...existing, ...incoming];
         }
-        return merged;
-      });
+      } catch (_) {}
     }
-  };
+
+    // Also merge the live in-memory events (may not have been flushed yet)
+    for (const [dateKey, events] of Object.entries(stateRef.current.calendarEvents)) {
+      const existing = merged[dateKey] || [];
+      const existingKeys = new Set(existing.map(e => `${e.text}||${dateKey}`));
+      const incoming = events.filter(e => !existingKeys.has(`${e.text}||${dateKey}`));
+      merged[dateKey] = [...existing, ...incoming];
+    }
+
+    try {
+      localStorage.setItem('cozydesk_shared_calendar_events', JSON.stringify(merged));
+      localStorage.setItem('cozydesk_calendar_shared', 'on');
+    } catch (_) {}
+
+    setCalendarEvents(merged);
+  }, []);
 
   const clearDesk = () => {
     pushUndo();
@@ -702,7 +700,7 @@ const updateNote = (id, data) => {
     storageFull, setStorageFull,
     // desk-wide
     handleDeskDrop, handleTidyDesk, clearDesk,
-    // carry-over
-    mergeCarryOver,
+    // shared calendar
+    enableCalendarSharing,
   };
 }

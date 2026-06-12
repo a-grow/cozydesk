@@ -7,7 +7,7 @@ import {
   THEME_CONFIGS,
 } from './themeRegistry';
 
-const CARRY_PREF_KEY = 'cozydesk_carryover_pref';
+const CALENDAR_SHARED_KEY = 'cozydesk_calendar_shared';
 
 const ThemeContext = createContext({
   theme: getThemeConfig('cozykawaii'),
@@ -32,8 +32,10 @@ export const ThemeProvider = ({ children }) => {
     if (!carryOverPending) return;
     const { targetTheme } = carryOverPending;
 
-    if (remember) {
-      localStorage.setItem(CARRY_PREF_KEY, doCarry ? 'yes' : 'no');
+    // YES path: enableCalendarSharing() in useDeskState sets 'on' — nothing to do here.
+    // NO path: if Remember is checked, persist the 'off' decision.
+    if (!doCarry && remember) {
+      localStorage.setItem(CALENDAR_SHARED_KEY, 'off');
     }
 
     setCarryOverPending(prev => ({ ...prev, confirmed: doCarry }));
@@ -49,46 +51,33 @@ export const ThemeProvider = ({ children }) => {
   const setTheme = useCallback((name, _getSnapshot, currentThemeName) => {
     if (!THEME_CONFIGS[name] && !availableThemeNames.includes(name)) return;
 
-    // Read snapshot from localStorage — always fresh, no stale ref risk
+    const sharingPref = localStorage.getItem(CALENDAR_SHARED_KEY);
+
+    // If sharing preference is already set, switch silently — no popup needed.
+    if (sharingPref === 'on' || sharingPref === 'off') {
+      setCarryOverPending({ targetTheme: name, snapshot: null, confirmed: false });
+      setThemeName(name);
+      return;
+    }
+
+    // Sharing is unset — check if the current theme has any calendar events.
     const sourceTheme = currentThemeName || themeName;
-    let snapshot = null;
+    let hasCalendarEvents = false;
     try {
       const raw = localStorage.getItem(`cozydesk_state_${sourceTheme}`);
       if (raw) {
         const parsed = JSON.parse(raw);
-        snapshot = {
-          papers: parsed.papers || [],
-          reminders: parsed.reminders || [],
-          calendarEvents: parsed.calendarEvents || {},
-          calendars: parsed.calendars || [],
-        };
+        hasCalendarEvents = !!(parsed.calendarEvents && Object.keys(parsed.calendarEvents).length > 0);
       }
     } catch (_) {}
 
-    const hasContent = (
-      (snapshot?.papers?.length > 0) ||
-      (snapshot?.reminders?.length > 0) ||
-      (snapshot?.calendarEvents && Object.keys(snapshot.calendarEvents).length > 0)
-    );
-
-    const pref = localStorage.getItem(CARRY_PREF_KEY);
-
-    // Carry-over only fills a theme the FIRST time it's opened. If the
-    // destination theme already has its own saved desk, never inject — this
-    // is what stops deleted items from reappearing when you switch back.
-    const destHasDesk = !!localStorage.getItem(`cozydesk_state_${name}`);
-
-    if (!hasContent || destHasDesk) {
-      setCarryOverPending({ targetTheme: name, snapshot: null, confirmed: false });
-      setThemeName(name);
-    } else if (pref === 'yes') {
-      setCarryOverPending({ targetTheme: name, snapshot, confirmed: true });
-      setThemeName(name);
-    } else if (pref === 'no') {
-      setCarryOverPending({ targetTheme: name, snapshot: null, confirmed: false });
-      setThemeName(name);
+    if (hasCalendarEvents) {
+      // Show the sharing popup — theme switch is deferred until user answers.
+      setCarryOverPending({ targetTheme: name, snapshot: null, confirmed: null });
     } else {
-      setCarryOverPending({ targetTheme: name, snapshot, confirmed: null });
+      // No events to share — switch immediately.
+      setCarryOverPending({ targetTheme: name, snapshot: null, confirmed: false });
+      setThemeName(name);
     }
   }, [themeName]);
 
