@@ -60,6 +60,7 @@ export default function Cozykawaii() {
   const [carryRemember, setCarryRemember] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [calendarShared, setCalendarShared] = useState(() => localStorage.getItem('cozydesk_calendar_shared') === 'on');
+  const [calHintDismissed, setCalHintDismissed] = useState(false);
 
   // Keep the Settings toggle's On/Off label correct each time the panel opens
   useEffect(() => {
@@ -67,6 +68,11 @@ export default function Cozykawaii() {
       setCalendarShared(localStorage.getItem('cozydesk_calendar_shared') === 'on');
     }
   }, [activeMenu]);
+
+  // Reset the "drag a calendar" hint dismissal whenever the theme changes
+  useEffect(() => {
+    setCalHintDismissed(false);
+  }, [themeName]);
 
   // All desk state + operations
   const desk = useDeskState({ dimensions, themeName });
@@ -252,6 +258,9 @@ export default function Cozykawaii() {
     return { backgroundColor: bg };
   };
 
+  const hasCalendarEvents = Object.values(desk.calendarEvents).some(arr => Array.isArray(arr) && arr.length > 0);
+  const showCalendarHint = hasCalendarEvents && desk.calendars.length === 0 && !calHintDismissed;
+
   if (!desk.mounted) return null;
 
   return (
@@ -344,6 +353,35 @@ export default function Cozykawaii() {
           <p style={{ margin: "8px 0 0 0", color: "#a07850", fontSize: "13px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>
             CozyDesk v1.0 · Your cozy productivity hub 🌸
           </p>
+        </div>
+      )}
+
+      {/* ── "Drag a calendar" hint (events exist but no calendar on the desk) ── */}
+      {showCalendarHint && (
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            position: "absolute", top: "20px", left: "50%", transform: "translateX(-50%)",
+            zIndex: 50, maxWidth: "360px",
+            background: "rgba(255,253,248,0.95)", backdropFilter: "blur(5px)",
+            border: "1px solid rgba(224,212,200,0.7)", borderRadius: "14px",
+            boxShadow: "0 6px 24px rgba(0,0,0,0.12)",
+            padding: "12px 14px", display: "flex", alignItems: "center", gap: "10px",
+            fontFamily: "'Nunito', sans-serif",
+          }}
+        >
+          <span style={{ fontSize: "22px" }}>📅</span>
+          <span style={{ color: "#4b3b2a", fontSize: "0.9rem", fontWeight: 600, lineHeight: 1.35 }}>
+            You've got calendar events here! Drag a calendar from the sidebar to see them.
+          </span>
+          <button
+            onClick={() => setCalHintDismissed(true)}
+            aria-label="Dismiss"
+            style={{
+              border: "none", background: "transparent", cursor: "pointer",
+              color: "#a07850", fontSize: "18px", lineHeight: 1, padding: "0 2px",
+            }}
+          >×</button>
         </div>
       )}
 
