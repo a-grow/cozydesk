@@ -1934,3 +1934,104 @@
 .sfx-toggle-btn.sfx-off {
   opacity: 0.4;
 }
+
+/* ════════════════════════════════════════════════
+   Café Morning Sidebar
+   Warm plaster walls, dark oak, hunter green
+   ════════════════════════════════════════════════ */
+
+.cozy-sidebar[data-theme="cafe"] {
+  background: linear-gradient(180deg, #2c1a0e 0%, #1e1008 55%, #150b05 100%);
+  border-right: 2px solid #3d2010;
+  box-shadow:
+    inset 3px 0 20px rgba(0,0,0,0.45),
+    2px 0 22px rgba(0,0,0,0.55);
+  --sb-bg: #2c1a0e;
+  --sb-text: #f5f0e8;
+  --sb-accent: #2d5a27;
+  --sb-accent-secondary: #3d7a35;
+  --sb-accent-light: #1e3d1a;
+  --sb-border: #3d2010;
+  --sb-card: #3a2010;
+  --sb-heading: #f5f0e8;
+  --sb-subtext: #c4a882;
+  --sb-input-bg: #3a2010;
+  --sb-input-border: #4a2e18;
+  --sb-btn-primary: #2d5a27;
+  --sb-btn-primary-hover: #1e3d1a;
+  --sb-btn-secondary: #3d7a35;
+  --sb-btn-secondary-text: #f5f0e8;
+  --sb-shadow: rgba(0,0,0,0.4);
+  --sb-clock-text: #f5f0e8;
+  --sb-pomo-circle: #1e3d1a;
+  --sb-pomo-work: #2d5a27;
+  --sb-pomo-break: #3d7a35;
+  --btn-bg: #2d5a27;
+  --btn-text: #f5f0e8;
+  --btn-font: 'Nunito', sans-serif;
+}
+
+.cozy-sidebar[data-theme="cafe"] .sb-logo-subtitle {
+  color: #c4a882;
+}
+
+.cozy-sidebar[data-theme="cafe"] .sb-divider {
+  border-top-color: rgba(45,90,39,0.4);
+}
+
+.cozy-sidebar[data-theme="cafe"] .sb-section {
+  border-top-color: rgba(45,90,39,0.25);
+}
+
+.cozy-sidebar[data-theme="cafe"] .sb-section-title {
+  color: #c4a882;
+}
+
+.cozy-sidebar[data-theme="cafe"] .sb-action-btn {
+  border-radius: 8px;
+}
+
+.cozy-sidebar[data-theme="cafe"] .sticker-thumb-cell {
+  background: rgba(45,90,39,0.06);
+  border-color: rgba(45,90,39,0.2);
+}
+
+.cozy-sidebar[data-theme="cafe"] .sticker-thumb-cell:hover {
+  background: rgba(45,90,39,0.18);
+  border-color: rgba(45,90,39,0.55);
+}
+
+.cozy-sidebar[data-theme="cafe"] .sb-todo-container:hover {
+  border-color: rgba(45,90,39,0.55);
+  background: rgba(45,90,39,0.15);
+}
+
+.cozy-sidebar[data-theme="cafe"] .theme-dropdown {
+  background: #3a2010;
+  border-color: #2d5a27;
+  color: #f5f0e8;
+}
+
+.cozy-sidebar[data-theme="cafe"] .pomo-widget {
+  background: #3a2010;
+  border-color: #3d2010;
+}
+
+.cozy-sidebar[data-theme="cafe"] .pomo-widget:hover {
+  background: #4a2818;
+  box-shadow: 0 0 14px rgba(45,90,39,0.3);
+}
+
+/* Café timer buttons — café never got the per-theme override steampunk has, so the
+   buttons inherited a near-white default with cream text on top (invisible). Give them
+   a café-brown surface, readable cream text, and a green edge to define the button. */
+.cozy-sidebar[data-theme="cafe"] .pomo-btn,
+.cozy-sidebar[data-theme="cafe"] .pomo-main-btn {
+  background: #4a2818;
+  color: #f5f0e8;
+  border-color: #2d5a27;
+}
+.cozy-sidebar[data-theme="cafe"] .pomo-btn:hover,
+.cozy-sidebar[data-theme="cafe"] .pomo-main-btn:hover {
+  background: var(--sb-accent-light);
+}
