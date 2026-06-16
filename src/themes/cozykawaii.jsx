@@ -588,6 +588,10 @@ export default function Cozykawaii() {
           isBackdrop
           isAttached={!!sticker.attachedTo}
           onContextMenu={(e) => handleContextMenu(e, 'sticker', sticker.id)}
+          flippedX={sticker.flippedX || false}
+          flippedY={sticker.flippedY || false}
+          rotation={sticker.rotation || 0}
+          onTransformChange={(t) => desk.updateStickerTransform(sticker.id, t)}
         />
       ))}
 
@@ -624,6 +628,10 @@ export default function Cozykawaii() {
           deskH={dimensions.height}
           isAttached={!!sticker.attachedTo}
           onContextMenu={(e) => handleContextMenu(e, 'sticker', sticker.id)}
+          flippedX={sticker.flippedX || false}
+          flippedY={sticker.flippedY || false}
+          rotation={sticker.rotation || 0}
+          onTransformChange={(t) => desk.updateStickerTransform(sticker.id, t)}
         />
       ))}
 

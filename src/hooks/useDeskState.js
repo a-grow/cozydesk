@@ -347,7 +347,7 @@ const updateNote = (id, data) => {
   const addStickerAtPosition = useCallback((sticker, xRatio, yRatio) => {
     soundManager.play('sfx_alert_box');
     pushUndo();
-    if (sticker.name.includes("cozyclock") || sticker.name.includes("loficlock") || sticker.name.includes("steampunkclock")) {
+    if (sticker.name.includes('clock')) {
       setClocks(prev => [...prev, { id: Date.now(), xRatio, yRatio, sizePreset: 'md', layer: getNextLayer() }]);
       return;
     }
@@ -378,6 +378,15 @@ const updateNote = (id, data) => {
       yRatio: data.y      / dimensions.height,
       wRatio: data.width  / dimensions.width,
       hRatio: data.height / dimensions.height,
+    } : s));
+  };
+
+  const updateStickerTransform = (id, transform) => {
+    setStickers(prev => prev.map(s => s.id === id ? {
+      ...s,
+      flippedX: transform.flippedX,
+      flippedY: transform.flippedY,
+      rotation: transform.rotation,
     } : s));
   };
 
@@ -708,7 +717,7 @@ const updateNote = (id, data) => {
     // notes
     addNote, addNoteAtPosition, removeNote, updateNote,
     // stickers
-    addStickerAtPosition, removeSticker, updateSticker,
+    addStickerAtPosition, removeSticker, updateSticker, updateStickerTransform,
     attachSticker, detachSticker, moveAttachedStickers, setAttachedStickersToParent, resizeAttachedStickers,
     // calendars
     addCalendarAtPosition, removeCalendar, updateCalendar, changeCalendarSize,

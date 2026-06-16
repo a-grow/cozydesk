@@ -40,10 +40,14 @@ const Sticker = ({
   deskW = window.innerWidth, deskH = window.innerHeight,
   isBackdrop = false, layer, onContextMenu,
   isAttached = false, onDragMove, onResizeMove,
+  flippedX: initFlippedX = false,
+  flippedY: initFlippedY = false,
+  rotation: initRotation = 0,
+  onTransformChange,
 }) => {
-  const [flippedX, setFlippedX] = useState(false);
-  const [flippedY, setFlippedY] = useState(false);
-  const [rotation, setRotation] = useState(0);
+  const [flippedX, setFlippedX] = useState(initFlippedX);
+  const [flippedY, setFlippedY] = useState(initFlippedY);
+  const [rotation, setRotation] = useState(initRotation);
 
   const handleRotate = (e) => {
     e.stopPropagation();
@@ -61,6 +65,7 @@ const Sticker = ({
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
+      onTransformChange?.({ flippedX, flippedY, rotation });
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
@@ -78,6 +83,7 @@ const Sticker = ({
       size={{ width, height }}
       position={{ x, y }}
       bounds={undefined}
+      lockAspectRatio={true}
       disableDragging={isAttached}
       enableResizing={isSelected && !isAttached ? {
         top: false, right: false, bottom: false, left: false,
@@ -171,7 +177,7 @@ const Sticker = ({
                     top: "50%",
                     transform: "translateY(-50%)",
                   }}
-                  onClick={(e) => { e.stopPropagation(); setFlippedX(v => !v); }}
+                  onClick={(e) => { e.stopPropagation(); const next = !flippedX; setFlippedX(next); onTransformChange?.({ flippedX: next, flippedY, rotation }); }}
                 >
                   ⇋
                 </button>
@@ -185,7 +191,7 @@ const Sticker = ({
                     top: "50%",
                     transform: "translateY(-50%)",
                   }}
-                  onClick={(e) => { e.stopPropagation(); setFlippedX(v => !v); }}
+                  onClick={(e) => { e.stopPropagation(); const next = !flippedX; setFlippedX(next); onTransformChange?.({ flippedX: next, flippedY, rotation }); }}
                 >
                   ⇋
                 </button>
@@ -199,7 +205,7 @@ const Sticker = ({
                     left: "calc(50% + 16px)",
                     transform: "translateX(-50%)",
                   }}
-                  onClick={(e) => { e.stopPropagation(); setFlippedY(v => !v); }}
+                  onClick={(e) => { e.stopPropagation(); const next = !flippedY; setFlippedY(next); onTransformChange?.({ flippedX, flippedY: next, rotation }); }}
                 >
                   ⇅
                 </button>
@@ -213,7 +219,7 @@ const Sticker = ({
                     left: "50%",
                     transform: "translateX(-50%)",
                   }}
-                  onClick={(e) => { e.stopPropagation(); setFlippedY(v => !v); }}
+                  onClick={(e) => { e.stopPropagation(); const next = !flippedY; setFlippedY(next); onTransformChange?.({ flippedX, flippedY: next, rotation }); }}
                 >
                   ⇅
                 </button>
