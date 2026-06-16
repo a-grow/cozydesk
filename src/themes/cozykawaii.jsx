@@ -6,6 +6,7 @@ import ReminderPaper from "../components/ReminderPaper";
 import ClockSticker from "../components/ClockSticker";
 import LofiClockSticker from "../components/LofiClockSticker";
 import SteampunkClockSticker from "../components/SteampunkClockSticker";
+import DigitalClockSticker from "../components/DigitalClockSticker";
 import Sidebar from "../components/Sidebar";
 import Reminders from "../components/Reminders";
 import CalendarSticker from "../components/CalendarSticker";
@@ -687,6 +688,8 @@ export default function Cozykawaii() {
             onDelete={() => { desk.removeClock(clock.id); setSelectedId(null); }}
             onChangeSize={preset => desk.changeClockSize(clock.id, preset)}
             onContextMenu={(e) => handleContextMenu(e, 'clock', clock.id)}
+            clockTheme={theme.clockTheme || {}}
+            showFlip={!theme.clockTheme?.hideFlip}
           />
         );
       })}

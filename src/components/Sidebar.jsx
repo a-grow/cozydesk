@@ -174,6 +174,7 @@ import sidebarTodoListIcon from '../assets/stickynotes/todolist1.png';
 import cozyDeskLogo from '../assets/cozydesk-logo.png';
 import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
+import cafeClockIcon from '../themes/cafe/widgets/cafe-clock.png';
 import { soundManager } from '../utils/soundManager';
 
 export default function Sidebar({
@@ -354,6 +355,20 @@ export default function Sidebar({
                       ghost.style.cssText = 'position:absolute;top:-9999px;width:60px;opacity:0.5';
                       document.body.appendChild(ghost);
                       e.dataTransfer.setDragImage(ghost, 30, 40);
+                      setTimeout(() => document.body.removeChild(ghost), 0);
+                    }}
+                  />
+                ) : themeName === 'cafe' ? (
+                  <LiveClockIcon
+                    src={cafeClockIcon}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('application/json', JSON.stringify({ name: 'cafe-clock.png', src: cafeClockIcon }));
+                      e.dataTransfer.effectAllowed = 'copy';
+                      const ghost = document.createElement('img');
+                      ghost.src = cafeClockIcon;
+                      ghost.style.cssText = 'position:absolute;top:-9999px;width:80px;opacity:0.5';
+                      document.body.appendChild(ghost);
+                      e.dataTransfer.setDragImage(ghost, 40, 20);
                       setTimeout(() => document.body.removeChild(ghost), 0);
                     }}
                   />
