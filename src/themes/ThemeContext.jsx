@@ -22,7 +22,13 @@ const ThemeContext = createContext({
 });
 
 export const ThemeProvider = ({ children }) => {
-  const [themeName, setThemeName] = useState('cozykawaii');
+  const [themeName, setThemeName] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cozydesk_active_theme');
+      if (saved && (THEME_CONFIGS[saved] || availableThemeNames.includes(saved))) return saved;
+    } catch (_) {}
+    return 'cozykawaii';
+  });
 
   // { targetTheme, snapshot, confirmed } — set when a switch is intercepted
   const [carryOverPending, setCarryOverPending] = useState(null);
@@ -84,6 +90,7 @@ export const ThemeProvider = ({ children }) => {
   const theme = getThemeConfig(themeName);
 
   useEffect(() => {
+    try { localStorage.setItem('cozydesk_active_theme', themeName); } catch (_) {}
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', theme.themeColor || '#e6cba8');
   }, [themeName]);
