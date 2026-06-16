@@ -1,19 +1,39 @@
+// ── Music tracks ──────────────────────────────────────────────────────────
+// Loaded via static imports so they survive the production (GitHub Pages /
+// Tauri) build. Literal '/src/...' string paths only work in `npm run dev`
+// and silently vanish once built — see the Asset Path Rule in CLAUDE.md.
+// Filenames are kept exactly as-is (the Pixabay original names are the
+// commercial-use paper trail) — never rename them.
+
+// Cozy Kawaii
+import kawaii1 from '../assets/music/kawaii-cavnai-Mossy Tea Picnic.mp3';
+import kawaii2 from '../assets/music/kawaii-bluelike_u-5-strawberry-mousse-cute-bgm-274668.mp3';
+import kawaii3 from '../assets/music/kawaii-ruminamusic-magical-burger-town-cute-fantasy-pop-background-music-386974.mp3';
+import kawaii4 from '../assets/music/kawaii-cavnai-Mochi Tea Party.mp3';
+
+// Lo-Fi
+import lofi1 from '../assets/music/lofi_library-coffee-458900.mp3';
+import lofi2 from '../assets/music/lofi-lemonmusiclab-499264.mp3';
+import lofi3 from '../assets/music/lofi-lofi-production-522875.mp3';
+import lofi4 from '../assets/music/lofi-alex-morgan-peaceful-cafe-jazz-relaxing-coffee-shop-541031.mp3';
+
+// Steampunk
+import steampunk1 from '../assets/music/steampunk-cavnai-Tea at Baker Street.mp3';
+import steampunk2 from '../assets/music/steampunk-luis_humanoide-clockwork-adventure-288524.mp3';
+import steampunk3 from '../assets/music/steampunk-pardeeppatel-under-the-london-fog-v1-inspired-by-sherlock-holmes-270425.mp3';
+import steampunk4 from '../assets/music/steampunk-alex-morgan-string-quartet-elegance-537464.mp3';
+
+// Café Morning
+import cafe1 from '../assets/music/cafe-cocosmusic-golden-era-groove-293634.mp3';
+import cafe2 from '../assets/music/cafe-soundore-jazz-cafe-379564.mp3';
+import cafe3 from '../assets/music/cafe-tunetank-cafe-music-349477.mp3';
+import cafe4 from '../assets/music/cafe-tunetank-calm-lounge-cafe-music-347401.mp3';
+
 const THEME_TRACKS = {
-  cozykawaii: [
-    '/src/assets/music/kawaii-cavnai-Mossy Tea Picnic.mp3',
-    '/src/assets/music/kawaii-bluelike_u-5-strawberry-mousse-cute-bgm-274668.mp3',
-    '/src/assets/music/kawaii-ruminamusic-magical-burger-town-cute-fantasy-pop-background-music-386974.mp3',
-  ],
-  lofi: [
-    '/src/assets/music/lofi_library-coffee-458900.mp3',
-    '/src/assets/music/lofi-lemonmusiclab-499264.mp3',
-    '/src/assets/music/lofi-lofi-production-522875.mp3',
-  ],
-  steampunk: [
-    '/src/assets/music/steampunk-cavnai-Tea at Baker Street.mp3',
-    '/src/assets/music/steampunk-luis_humanoide-clockwork-adventure-288524.mp3',
-    '/src/assets/music/steampunk-pardeeppatel-under-the-london-fog-v1-inspired-by-sherlock-holmes-270425.mp3',
-  ],
+  cozykawaii: [kawaii1, kawaii2, kawaii3, kawaii4],
+  lofi:       [lofi1, lofi2, lofi3, lofi4],
+  steampunk:  [steampunk1, steampunk2, steampunk3, steampunk4],
+  cafe:       [cafe1, cafe2, cafe3, cafe4],
 };
 
 const LS_KEY = 'cozydesk_music';
