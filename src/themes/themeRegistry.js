@@ -15,6 +15,11 @@ import kawaiiCalendarBase from './cozykawaii/widgets/cozycalendarbase.png';
 import lofiCalendarBase from './lofi/widgets/loficalendarbase.png';
 import steampunkCalendarBase from './steampunk/widgets/stmpnkcalendarbase.png';
 
+import noteYellow from '../assets/stickynotes/note-yellow.png';
+import notePink   from '../assets/stickynotes/note-pink.png';
+import noteBlue   from '../assets/stickynotes/note-blue.png';
+import noteGreen  from '../assets/stickynotes/note-green.png';
+
 const allThemeStickers = import.meta.glob(
   './*/stickers/*.{png,jpg,jpeg,webp,gif}',
   { eager: true }
@@ -269,8 +274,20 @@ export function getThemeStickers(name) {
   return stickersByTheme[name] || [];
 }
 
+const universalNotes = [
+  { name: 'note-yellow.png', src: noteYellow },
+  { name: 'note-pink.png',   src: notePink },
+  { name: 'note-blue.png',   src: noteBlue },
+  { name: 'note-green.png',  src: noteGreen },
+];
+
 export function getThemeStickyNotes(name) {
-  return stickyNotesByTheme[name] || [];
+  const own = stickyNotesByTheme[name] || [];
+  const ownNotes = own.filter(a => !a.name.includes('todo'));
+  const ownTodo  = own.filter(a =>  a.name.includes('todo'));
+  // No own color notes → use the universal set. Theme keeps its own to-do paper.
+  const notes = ownNotes.length ? ownNotes : universalNotes;
+  return [...notes, ...ownTodo];
 }
 
 export { THEME_CONFIGS, availableThemeNames, stickersByTheme, stickyNotesByTheme };
