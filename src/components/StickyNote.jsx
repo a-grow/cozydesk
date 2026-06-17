@@ -92,7 +92,7 @@ const StickyNote = ({
         bottomRight: "sticker-corner-handle nwse",
       }}
       style={{
-        zIndex: layer != null ? layer : (isPinned ? 100 : 5),
+        zIndex: isPinned ? 450 : (layer != null ? layer : 5),
         borderRadius: "8px",
         border: "none"
       }}
@@ -158,7 +158,7 @@ const StickyNote = ({
           setIsPinned(!isPinned);
           onUpdate({ x, y, width, height, pinned: !isPinned });
         }}
-        title="Pin to Top"
+        title={isPinned ? "Unpin this note" : "Pin to keep it in front"}
         >
           {isPinned ? "📌" : "📍"}
         </div>
