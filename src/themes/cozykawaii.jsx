@@ -223,14 +223,28 @@ export default function Cozykawaii() {
 
     const allItems = getAllItems();
     const withLayers = allItems.map((item, i) => ({ ...item, layer: item.layer != null ? item.layer : i }));
+
+    // Move Forward / Backward: swap with the immediate neighbor in the stack.
+    // (A fixed nudge fails when layer numbers have gaps; swapping always crosses exactly one item.)
+    if (action === 'moveForward' || action === 'moveBackward') {
+      const ordered = [...withLayers].sort((a, b) => a.layer - b.layer); // back → front
+      const idx = ordered.findIndex(it => it._type === itemType && it.id === itemId);
+      if (idx === -1) return;
+      const swapWith = action === 'moveForward' ? idx + 1 : idx - 1;
+      if (swapWith < 0 || swapWith >= ordered.length) return; // already at front/back
+      [ordered[idx], ordered[swapWith]] = [ordered[swapWith], ordered[idx]];
+      const normalized = ordered.map((item, i) => ({ ...item, layer: i }));
+      desk.applyNormalizedLayers(normalized);
+      return;
+    }
+
+    // Bring to Front / Send to Back: jump past everything (these already worked).
     const updated = withLayers.map(item => {
       if (item._type !== itemType || item.id !== itemId) return item;
       const layers = withLayers.map(i => i.layer);
       switch (action) {
         case 'bringToFront': return { ...item, layer: Math.max(...layers) + 1 };
         case 'sendToBack':   return { ...item, layer: Math.min(...layers) - 1 };
-        case 'moveForward':  return { ...item, layer: item.layer + 1.5 };
-        case 'moveBackward': return { ...item, layer: item.layer - 1.5 };
         default: return item;
       }
     });
