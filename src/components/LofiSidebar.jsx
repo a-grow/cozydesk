@@ -12,7 +12,7 @@ import lofiStickyNoteImg from '../themes/lofi/stickynotes/lofistickynoteblue.png
 import lofiCalendarImg from '../themes/lofi/widgets/loficalendarbase.png';
 import { useTheme } from '../themes/ThemeContext';
 import { soundManager } from '../utils/soundManager';
-
+import cozyDeskLogo from '../assets/cozydesk-logo.png';
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 
 function IconTodo() {
@@ -239,7 +239,7 @@ export default function LofiSidebar({
       {/* ── Logo ── */}
       <div className="sb-logo">
   <img
-    src="/src/assets/cozydesk-logo.png"
+    src={cozyDeskLogo}
     alt="CozyDesk"
     style={{ width: '180px', display: 'block', margin: '0 auto', position: 'relative', zIndex: 1 }}
   />
