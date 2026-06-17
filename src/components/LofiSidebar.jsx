@@ -8,7 +8,6 @@ import SavedDesksModal from './sidebar/SavedDesksModal';
 import SavePopup from './sidebar/SavePopup';
 import clockIcon from '../themes/lofi/stickers/loficlock.png';
 import lofiTodoImg from '../themes/lofi/stickynotes/lofotodolist.png';
-import lofiStickyNoteImg from '../themes/lofi/stickynotes/lofistickynoteblue.png';
 import lofiCalendarImg from '../themes/lofi/widgets/loficalendarbase.png';
 import { useTheme } from '../themes/ThemeContext';
 import { soundManager } from '../utils/soundManager';
@@ -283,7 +282,7 @@ export default function LofiSidebar({
             'Sticky Note',
           )}
         >
-          <img src={lofiStickyNoteImg} alt="Sticky Notes" style={{ width: '100%', maxWidth: '130px', height: 'auto', objectFit: 'contain', pointerEvents: 'none', userSelect: 'none' }} />
+          <img src={lofiNoteIcon?.src} alt="Sticky Notes" style={{ width: '100%', maxWidth: '130px', height: 'auto', objectFit: 'contain', pointerEvents: 'none', userSelect: 'none' }} />
         </BigCard>
 
         <BigCard

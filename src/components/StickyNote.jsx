@@ -171,10 +171,10 @@ const StickyNote = ({
           data-placeholder="Write a note..."
           style={{
             position: "absolute",
-            top: theme.stickyNoteTextArea?.top ?? '28%',
-            left: theme.stickyNoteTextArea?.left ?? '10%',
-            right: theme.stickyNoteTextArea?.right ?? '8%',
-            bottom: theme.stickyNoteTextArea?.bottom ?? '12%',
+            top: theme.stickyNoteTextArea?.top ?? '20%',
+            left: theme.stickyNoteTextArea?.left ?? '19%',
+            right: theme.stickyNoteTextArea?.right ?? '19%',
+            bottom: theme.stickyNoteTextArea?.bottom ?? '22%',
             outline: "none",
             fontSize: `${Math.max(12, Math.min(24, width * fontSizeRatio))}px`,
             fontFamily: fontFamily,
