@@ -175,6 +175,56 @@ import cozyDeskLogo from '../assets/cozydesk-logo.png';
 import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
 import cafeClockIcon from '../themes/cafe/widgets/cafe-clock.png';
+
+// ── Live clock overlay for the café clock sidebar icon ────────────────────────
+function LiveCafeClockIcon({ onDragStart }) {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  let h = time.getHours();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  const m = String(time.getMinutes()).padStart(2, '0');
+  const dateStr = time.toLocaleDateString([], { month: 'numeric', day: 'numeric' });
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-block', width: '100%', maxWidth: '140px' }}>
+      <img
+        src={cafeClockIcon}
+        alt="Café Clock"
+        className="sb-todo-icon-img"
+        draggable
+        onDragStart={onDragStart}
+        style={{ display: 'block', width: '100%' }}
+      />
+      <div style={{
+        position: 'absolute',
+        top: '15%', left: '10%', right: '10%', bottom: '38%',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', alignItems: 'center',
+        textAlign: 'center', pointerEvents: 'none', userSelect: 'none',
+      }}>
+        <div style={{
+          fontSize: '19px', fontWeight: 700,
+          fontFamily: "'Nunito', sans-serif",
+          color: '#f6b73c',
+          letterSpacing: '0.05em', lineHeight: 1.05,
+          whiteSpace: 'nowrap',
+        }}>{h}:{m} <span style={{ fontSize: '11px' }}>{ampm}</span></div>
+        <div style={{
+          fontSize: '12px', fontWeight: 600,
+          fontFamily: "'Nunito', sans-serif",
+          color: '#f6b73c', opacity: 0.9,
+          letterSpacing: '0.04em', lineHeight: 1.1,
+          marginTop: '1px',
+        }}>{dateStr}</div>
+      </div>
+    </div>
+  );
+}
 import { soundManager } from '../utils/soundManager';
 
 export default function Sidebar({
@@ -359,8 +409,7 @@ export default function Sidebar({
                     }}
                   />
                 ) : themeName === 'cafe' ? (
-                  <LiveClockIcon
-                    src={cafeClockIcon}
+                  <LiveCafeClockIcon
                     onDragStart={(e) => {
                       e.dataTransfer.setData('application/json', JSON.stringify({ name: 'cafe-clock.png', src: cafeClockIcon }));
                       e.dataTransfer.effectAllowed = 'copy';
