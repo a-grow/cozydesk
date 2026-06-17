@@ -173,6 +173,11 @@ export default function Cozykawaii() {
     if (!contextMenu) return;
     const { itemType, itemId } = contextMenu;
 
+    if (action === 'unpin') {
+      if (itemType === 'note') desk.updateNote(itemId, { pinned: false });
+      return;
+    }
+
     if (action === 'detach') {
       if (itemType === 'sticker') desk.detachSticker(itemId);
       return;
@@ -234,7 +239,7 @@ export default function Cozykawaii() {
     desk.applyNormalizedLayers(normalized);
   }, [contextMenu, desk.notes, desk.stickers, desk.papers, desk.calendars,
       desk.clocks, desk.remindersVisible, desk.remindersLayer, desk.applyNormalizedLayers,
-      desk.attachSticker, desk.detachSticker]);
+      desk.attachSticker, desk.detachSticker, desk.updateNote]);
 
   // ─── Background ────────────────────────────────────────────────────
   // Each theme supplies its own background. cozykawaii uses the photo background
@@ -735,6 +740,10 @@ export default function Cozykawaii() {
             y={contextMenu.y}
             onAction={handleLayerAction}
             onClose={() => setContextMenu(null)}
+            isPinned={
+              contextMenu.itemType === 'note' &&
+              !!desk.notes.find(n => n.id === contextMenu.itemId)?.pinned
+            }
             isAttached={
               contextMenu.itemType === 'sticker' &&
               !!desk.stickers.find(s => s.id === contextMenu.itemId)?.attachedTo

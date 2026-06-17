@@ -34,8 +34,9 @@ const ACTIONS = [
 
 const ATTACH_ACTION = { key: "attach", label: "Attach to Back Layer", icon: "📎" };
 const DETACH_ACTION = { key: "detach", label: "Detach",               icon: "✂️" };
+const UNPIN_ACTION  = { key: "unpin",  label: "Unpin",                 icon: "📌" };
 
-export default function ContextMenu({ x, y, onAction, onClose, isAttached, canAttach }) {
+export default function ContextMenu({ x, y, onAction, onClose, isAttached, canAttach, isPinned }) {
   const ref = useRef(null);
 
   // Close on Escape key
@@ -57,11 +58,13 @@ export default function ContextMenu({ x, y, onAction, onClose, isAttached, canAt
     }
   }, [x, y]);
 
-  const actions = isAttached
-    ? [DETACH_ACTION]
-    : canAttach
-      ? [...ACTIONS, ATTACH_ACTION]
-      : ACTIONS;
+  const actions = isPinned
+    ? [UNPIN_ACTION]
+    : isAttached
+      ? [DETACH_ACTION]
+      : canAttach
+        ? [...ACTIONS, ATTACH_ACTION]
+        : ACTIONS;
 
   return (
     <div

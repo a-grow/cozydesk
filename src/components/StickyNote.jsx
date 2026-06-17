@@ -46,6 +46,9 @@ const StickyNote = ({
     }
   }, [initialText]);
 
+  // Keep local pin state in sync when changed externally (e.g. right-click "Unpin")
+  useEffect(() => { setIsPinned(pinned); }, [pinned]);
+
   const handleRotate = (e) => {
     e.stopPropagation();
     e.preventDefault();
