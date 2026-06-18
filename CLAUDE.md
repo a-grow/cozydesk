@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Jun 16, 2026. Read fully before touching any code.
+Last updated: Jun 18, 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -11,8 +11,8 @@ Communication: Direct and honest. Admit mistakes immediately without self-abasem
 
 ## How Claude Solves Problems
 1. Root cause, never symptom.
-2. Read the real code first — never work from memory.
-3. Measure, don't guess. Use DevTools for real pixel values on the LIVE rendered element — not estimates from a source image.
+2. Read the real code first — never work from memory. And don't stop at the relevant line: TRACE it. Follow the actual values and execution path. A line can look correct and still never run (see Key Learnings — the pin bug).
+3. Measure, don't guess. Use DevTools for real pixel values on the LIVE rendered element — not estimates from a source image. When a behavior is reported broken, get a quick live test before asserting it's fine (see Key Learnings — the Move Backward bug).
 4. One surgical change at a time. Give exact file path + exact find/replace. Tune ONE variable/axis at a time.
 5. Minimum footprint. Touch only what's asked. No refactors unless asked.
 6. Don't break neighbors. Search for every reader before changing a stored field.
@@ -26,12 +26,28 @@ Communication: Direct and honest. Admit mistakes immediately without self-abasem
 - Security check (run after each feature): review the new code for security best practices — no secrets in the frontend, no exploitable holes.
 - Learning walkthrough (on request): explain what was just built, step by step, like a senior engineer teaching.
 
+## Claude Code Prompt Rules — REQUIRED PREAMBLE
+This chat = planning, diagnosis, small single-file fixes (give those as exact find/replace for VS Code). Claude Code = multi-file changes only.
+
+Andrew commits, tests, and pushes — Claude Code NEVER does. Every Claude Code prompt MUST begin with the HARD RULES block below. (Evidence: the one prompt this session that omitted it committed and pushed after being told not to, started a dev server, tried to install Playwright, and created stray files. Every prompt that included it behaved perfectly.)
+
+    ## HARD RULES — READ FIRST, NO EXCEPTIONS
+    - Do NOT run git add, git commit, or git push. Andrew commits himself AFTER he tests.
+    - Do NOT install any package or run browser automation (no playwright, puppeteer, npm install).
+    - Do NOT start a dev server. Andrew tests manually.
+    - Do NOT create, modify, or write to any file not explicitly named in this prompt
+      (no AGENTS.md, no tasks/todo.md, no settings files).
+    - Make ONLY the edits listed. When done, STOP and report exactly what changed, then wait.
+
+Also when writing Claude Code prompts:
+- Give EXACT find/replace (you've already read the file). Never vague "create an array / rewrite the function" steps — that's where small errors sneak in.
+- Do NOT include a fake "@claude.ai/claude-code" header. Claude Code reads CLAUDE.md from the repo automatically — Andrew does not need to paste it (it auto-loads), and you never instruct Claude Code to "paste it to itself."
+
 ## Workflow
-- This chat = planning, diagnosis, small fixes. Claude Code = multi-file changes only.
-- Paste the full CLAUDE.md at the start of every Claude Code session (it has no memory). A new claude.ai chat inside this Project does NOT need a re-paste — it inherits these instructions and shared history. (Keep this Project's instructions and the repo CLAUDE.md identical.)
+- Paste the full CLAUDE.md at the start of every Claude Code session only if it isn't auto-loaded; a new claude.ai chat inside this Project does NOT need a re-paste — it inherits these instructions and shared history. (Keep this Project's instructions and the repo CLAUDE.md identical.)
 - Applying changes: Andrew pastes into VS Code (Cmd+A -> Cmd+V -> Cmd+S), then hard-refreshes (Cmd+Shift+R).
-- Backups: `cp -r cozydesk cozydesk_backup_MMDD` from the ~/Developer directory before changes.
-- One fix per commit. Stage only the files for that fix; commit and push before starting the next. Never `git add .` blindly.
+- Backups: from the ~/Developer directory (NOT inside cozydesk — backing up into the folder you're copying is a disaster), run `cd ~/Developer` then `cp -r cozydesk cozydesk_backup_MMDD`, then `cd cozydesk`. (Or one line from anywhere: `cp -r ~/Developer/cozydesk ~/Developer/cozydesk_backup_MMDD`.)
+- One fix per commit. Stage only the files for that fix by name; commit and push before starting the next. Never `git add .` blindly. Every git command anchored to `cd ~/Developer/cozydesk` (the parent ~/Developer has no .git).
 
 ## Project Info
 - App: ~/Developer/cozydesk (moved off iCloud Desktop — see "Environment — CRITICAL")
@@ -47,20 +63,19 @@ Communication: Direct and honest. Admit mistakes immediately without self-abasem
 
 ## File Structure
 src/
-  components/ — CalendarSticker, sidebar/MiniCalendar, LargeCalendarModal, MusicPlayer, StickyNote*, Reminders*, ReminderPaper* (* do not touch internals unless fixing that item's bugs)
-  themes/ — themeRegistry.js (single source of config), ThemeContext.jsx, cozykawaii.jsx (main renderer ALL themes — in src/themes/ NOT src/themes/cozykawaii/), [theme]/widgets/ (calendar+clock), [theme]/stickynotes/ (notes + todo asset)
+  components/ — Sticker, StickyNote, CalendarSticker, sidebar/MiniCalendar, LargeCalendarModal, MusicPlayer, ContextMenu, Reminders*, ReminderPaper* (* do not touch internals unless fixing that item's bugs)
+  themes/ — themeRegistry.js (single source of config), ThemeContext.jsx, cozykawaii.jsx (main renderer ALL themes — in src/themes/ NOT src/themes/cozykawaii/), [theme]/widgets/ (calendar+clock), [theme]/stickynotes/ (to-do asset only — see Sticky Note Rules)
   hooks/useDeskState.js — all desk state, CRUD, undo/redo, persistence
   utils/audioManager.js — music audio singleton
   utils/soundManager.js — SFX singleton
-  assets/ — backgrounds/, music/, sounds/, stickynotes/ (legacy fallback), cozydesk-logo.png
+  assets/ — backgrounds/, music/, sounds/, stickynotes/ (universal notes + legacy fallback), cozydesk-logo.png
 
 ## Asset Path Rule — CRITICAL (production builds)
 - NEVER reference assets with a literal `/src/...` path in code (e.g. `src="/src/assets/..."`
   or `new Audio('/src/assets/...')`). Those resolve ONLY in `npm run dev`; in the GitHub Pages
   / Tauri build the asset silently vanishes.
 - Images: use a static import (`import logo from '../assets/cozydesk-logo.png'`).
-- Sounds: route through soundManager (see Sound Effects System) — never `new Audio()` on a `/src/` path.
-- Music: static-import each track in audioManager.js and reference it from THEME_TRACKS — never a `/src/` string.
+- Sounds: route through soundManager. Music: static-import each track in audioManager.js and reference from THEME_TRACKS — never a `/src/` string.
 
 ## Size Model (DO NOT REGRESS)
 SIZE = absolute pixels (window-independent). POSITION = ratios (xRatio/yRatio).
@@ -71,20 +86,43 @@ SIZE = absolute pixels (window-independent). POSITION = ratios (xRatio/yRatio).
 
 ## Font Rules
 - UI font: Nunito only, everywhere.
-- Patrick Hand: RETIRED — allowed only as user-selectable option in note/to-do font pickers.
+- Patrick Hand: RETIRED — allowed only as a user-selectable option in note/to-do font pickers.
+- KNOWN VIOLATION (queued fix): ContextMenu.jsx still sets `fontFamily: 'Patrick Hand'`. The right-click menu is UI chrome and should be Nunito. One-line fix, its own commit.
 - Fredoka One deprecated → use Fredoka. Steampunk sidebar labels: Cinzel Decorative. Lofi chalk: Caveat.
 - Font-picker options: Caveat, Indie Flower, Shadows Into Light, Permanent Marker, Fredoka, Nunito.
 
-## Sticky Note Rules
-- Default 180×180px, locked aspect ratio, all themes.
-- Color picker: 4 swatches only (blue, green, pink, yellow). No sticker assets ever.
-- Steampunk notes: all four colors are 703×634px.
-- Steampunk text area: `{ top: '20%', left: '5%', right: '12%', bottom: '22%' }`
+## Sticky Note Rules — UNIVERSAL (changed Jun 17)
+- One universal note set shared by ALL themes: src/assets/stickynotes/note-{yellow,pink,blue,green}.png
+  (1024×1024 transparent PNG, soft pastel paper, one curled bottom-right corner, NO baked shadow —
+  the component adds its own drop-shadow). Colors match the picker swatch hexes.
+- Resolution: getThemeStickyNotes(name) in themeRegistry.js returns a theme's OWN color notes if its
+  folder has any (filename not containing 'todo'); otherwise it returns the universal four. Every theme
+  always keeps its OWN to-do paper appended. Today no theme overrides — all four use the universal set.
+- To change the note look for ALL themes: replace those 4 PNGs. For consistency, make ONE master note,
+  then recolor it (don't generate each color separately — they won't match). New worlds inherit the
+  universal notes automatically — they need NO note art, only a to-do paper.
+- ONE shared text area, defined as the default in StickyNote.jsx: `top 20% / left 19% / right 19% / bottom 22%`
+  (measured against the universal note). There are NO per-theme `stickyNoteTextArea` overrides anymore.
+  (The component still supports `theme.stickyNoteTextArea` via `??` if a future theme ever needs one.)
+- Default 180×180px, locked aspect ratio. Color picker: 4 swatches (blue, green, pink, yellow); the swatch
+  color is derived from the filename keyword. No sticker assets ever.
+- Pin to front: the 📍/📌 pin on a selected note keeps it above all DESK items. zIndex = `isPinned ? 450
+  : (layer ?? 5)`. 450 sits above desk layers but below the sidebar (500) and modals (~10000), so a pinned
+  note never covers the UI. A pinned note's right-click menu shows "Unpin" INSTEAD of the layer options
+  (layer actions can't beat a pinned note, so showing them would be dead buttons). The note's local pin
+  state syncs from the `pinned` prop via a useEffect, so unpinning from the menu reflects visually.
 
 ## To-Do List Rules
 - Every theme needs a todo asset in its stickynotes/ folder, filename containing the word `todo`.
 - Fallback: src/assets/stickynotes/todolist1.png — safety net only.
 - todoBase per theme drives sizing (see themeRegistry.js).
+- PER-THEME ITEM CAP (added Jun 18): each theme sets `maxItems` in themeRegistry.js — how many rows
+  the board can show before the "add item" input hides. kawaii 6, lofi 4, steampunk 6, café 5. Read by
+  ReminderPaper.jsx (`theme.maxItems ?? 6`) and useDeskState.js (`getThemeConfig(themeName).maxItems`,
+  with DEFAULT_ITEMS_PER_PAPER = 6 fallback). The cap is per-theme because boards differ in height — a
+  single global ITEMS_PER_PAPER was wrong for lofi (short) and café. At the cap the input vanishes and
+  the list holds still (the correct "full" state — no overflow, no popup needed).
+- Checked items show a small ✕ ("delete completed item") at the end of the row → calls deleteReminder.
 
 ## Calendar ↔ Sticky Note Sync Rules
 - Sticky notes link to calendar via noteId. Preserve noteId through ALL edit/move/drag operations — never regenerate it.
@@ -97,33 +135,37 @@ All visual config lives in src/themes/themeRegistry.js — never hardcode theme 
 - Themes: Cozy Kawaii, Lo-Fi, Steampunk, Café Morning (in progress; more planned).
 - Day-cycle concept: Café (morning) → Kawaii (midday) → Steampunk (sunset) → Lo-Fi (night).
 - cozykawaii.jsx is the main desk renderer for ALL themes — don't rename.
-- New theme = add config entry + assets (incl. todoBase, sidebar --btn-bg/--btn-text/--btn-font).
+- New theme = add config entry + assets (incl. todoBase, sidebar --btn-bg/--btn-text/--btn-font). It inherits the universal sticky notes — no note art needed.
 - todoBase: kawaii { w:358, h:402 }, lofi { w:358, h:384 }, steampunk { w:358, h:519 },
-  cafe { w:358, h:402 } ← PLACEHOLDER copied from kawaii; café to-do paper not yet created/measured.
+  cafe { w:358, h:353 } ← real, measured Jun 18 from the 997×982 cafe-todolist.png (was a kawaii placeholder).
 - Clock system: kawaii/lofi/steampunk use per-theme clock components (ClockSticker,
-  LofiClockSticker, SteampunkClockSticker). Café uses the new shared DigitalClockSticker
-  (src/components/DigitalClockSticker.jsx) — registry-driven via clockTheme block, same pattern
-  as calendarTheme. New themes should use DigitalClockSticker going forward.
+  LofiClockSticker, SteampunkClockSticker). Café uses the shared DigitalClockSticker
+  (src/components/DigitalClockSticker.jsx) — registry-driven via clockTheme block. New themes use it.
 - clockTheme fields: image, aspect (h/w ratio), screen ({left,right,top,bottom} % strings),
-  numberColor, numberFont, activeBtn, inactiveBtn, hideFlip (bool — set true if clock image
-  has text baked in that would mirror when flipped, e.g. café's "Coffee Time" sign).
+  numberColor, numberFont, activeBtn, inactiveBtn, hideFlip (bool — true if the clock image has text
+  baked in that would mirror when flipped, e.g. café's "Coffee Time" sign).
 
 ## How to Add a New World (checklist)
-Consolidates every per-theme requirement scattered through this file. Follow in order; if you skip one, the world renders broken in just that one spot.
-1. Folder: create src/themes/[name]/ with widgets/ (calendar + clock) and stickynotes/ (4 note colors + one to-do asset whose filename contains `todo`). NOTE: props/ and wallart/ subfolders are NOT used by any theme — don't create them.
-2. Assets: background → src/assets/backgrounds/ (1920×1080). Sticky notes → 1024×1024 transparent PNG, 4 colors. Calendar/clock stickers ~400×400 (calendar PNG can be larger, e.g. 1024×1024 — what matters is baseW/baseH + contentArea in the registry).
-3. Registry: add a config entry in src/themes/themeRegistry.js — must include todoBase { w, h }, calendarTheme (with its sidebar icon image), and the three sidebar button CSS vars (--btn-bg / --btn-text / --btn-font).
-4. **Sidebar:** no code change needed for to-do icon, sticker-grid filter, and button styling —
-  all read from registry automatically. Exception: a distinct label font (like Steampunk's Cinzel
-  Decorative) is set per theme. Clock icon IS theme-aware in Sidebar.jsx: steampunk gets
-  LiveSteampunkClockIcon, café gets LiveCafeClockIcon, all others get LiveClockIcon (kawaii).
-  Adding a new theme with a custom clock image requires adding a new LiveXxxClockIcon component
-  and a branch in Sidebar.jsx.
-5. **Audio:** any NEW sound effect goes in the SOUNDS array in soundManager.js before wiring (see
-  Sound Effects System). For music, add a per-theme entry to THEME_TRACKS in audioManager.js
-  (static-import each track) — without it the new world silently borrows kawaii's playlist.
-6. Pricing: decide free or paid and note the price for the store gallery. (The in-app store isn't built yet — see "On the Horizon.")
-7. Test before commit: drop a note, to-do, calendar, and clock; switch into and out of the theme; confirm the calendar-sharing popup behaves; reload a saved desk to confirm it heals. If the clock/calendar widget doesn't appear automatically, its component wiring in themeRegistry.js needs a look.
+Follow in order; skip one and the world renders broken in just that spot.
+1. Folder: create src/themes/[name]/ with widgets/ (calendar + clock) and stickynotes/ (ONE to-do asset
+   whose filename contains `todo`). NO note-color art needed — the world inherits the universal notes.
+   (props/ and wallart/ subfolders are NOT used — don't create them.)
+2. Assets: background → src/assets/backgrounds/ (1920×1080). Calendar/clock stickers (~400×400; calendar PNG
+   can be larger — what matters is baseW/baseH + contentArea in the registry). To-do paper → measure it and
+   set a real todoBase { w, h }.
+3. Registry: add a config entry — must include todoBase { w, h }, calendarTheme (with its sidebar icon image),
+   and the three sidebar button CSS vars (--btn-bg / --btn-text / --btn-font).
+4. Sidebar: no code change for the to-do icon, sticker-grid filter, button styling, or the sticky-note icon
+   (it reads the universal yellow from themeStickyNotes automatically). Exception: a distinct label font (like
+   Steampunk's Cinzel Decorative) is set per theme. Clock icon IS theme-aware in Sidebar.jsx: steampunk gets
+   LiveSteampunkClockIcon, café gets LiveCafeClockIcon, others get LiveClockIcon (kawaii). A new theme with a
+   custom clock image needs a new LiveXxxClockIcon component + a branch in Sidebar.jsx.
+5. Audio: any NEW sound effect goes in the SOUNDS array in soundManager.js before wiring. For music, add a
+   per-theme entry to THEME_TRACKS in audioManager.js (static-import each track) — without it the new world
+   silently borrows kawaii's playlist.
+6. Pricing: decide free or paid and note the price for the store gallery (store not built yet).
+7. Test before commit: drop a note, to-do, calendar, and clock; switch into and out of the theme; confirm
+   the calendar-sharing popup behaves; reload a saved desk to confirm it heals.
 
 ## Sticker Grid Rules
 - NEVER show clock, calendar, todo, or stickynote assets in the sticker grid.
@@ -136,7 +178,6 @@ Consolidates every per-theme requirement scattered through this file. Follow in 
 - ALWAYS add new sounds to the SOUNDS array in soundManager.js before wiring triggers.
 - Play via `soundManager.play('sfx_name')`. Never `new Audio()` outside soundManager.
 - SFX toggle renders in BOTH Sidebar.jsx and LofiSidebar.jsx, directly after MusicPlayer.
-- Never duplicate sound logic outside soundManager.js.
 
 ### Sound Map
 | Sound | Trigger |
@@ -161,60 +202,69 @@ Consolidates every per-theme requirement scattered through this file. Follow in 
 - Imported in BOTH Sidebar.jsx and LofiSidebar.jsx, right after the logo.
 - Always starts paused. localStorage key: cozydesk_music.
 - Tracks live in src/assets/music/ (Pixabay, commercial-free). NEVER rename — original filenames are the paper trail.
-- Per-theme playlists live in the THEME_TRACKS map in audioManager.js — 4 tracks each for cozykawaii, lofi, steampunk, cafe. switchTheme falls back to kawaii for an unknown key.
-- Each track is a STATIC IMPORT (not a `/src/...` string — see Asset Path Rule), so music survives the production build. The list is hand-maintained: dropping a file in src/assets/music/ does NOTHING until it's imported and added to THEME_TRACKS. (Not auto-discovered.)
+- Per-theme playlists in THEME_TRACKS in audioManager.js — 4 tracks each for cozykawaii, lofi, steampunk, cafe.
+  switchTheme falls back to kawaii for an unknown key. Each track is a STATIC IMPORT; the list is hand-maintained
+  (dropping a file in src/assets/music/ does nothing until it's imported and added to THEME_TRACKS).
 
 ## Logo Rules — NEVER BREAK
 - src/assets/cozydesk-logo.png, width 180px, centered, zIndex 1.
-- Referenced via static import (NOT a `/src/...` string — see Asset Path Rule).
-- Renders in BOTH Sidebar.jsx and LofiSidebar.jsx.
+- Referenced via static import (NOT a `/src/...` string). Both Sidebar.jsx and LofiSidebar.jsx.
+  (Lofi's was a literal `/src/` path — fixed Jun 17 to a static import.)
 
 ## Sidebar Rules — CRITICAL
 - Never change sidebar fonts, icons, or colors unless explicitly asked.
 - Never touch steampunk animated gears or lofi sidebar icon images.
 - Buttons use CSS vars --btn-bg, --btn-text, --btn-font (use !important).
 - Any sidebar UI change must be applied to BOTH Sidebar.jsx and LofiSidebar.jsx.
-- To-do icon is theme-aware: Sidebar.jsx reads the active theme's todo asset from
-  themeStickyNotes (filename contains `todo`), fallback assets/stickynotes/todolist1.png.
-  Same pattern as ReminderPaper.jsx. New themes get the right icon automatically.
+- To-do icon and sticky-note icon are theme-aware: both read from themeStickyNotes (todo asset = filename
+  contains `todo`; note icon = the 'yellow' note, now the universal yellow). New themes get the right icons
+  automatically.
 
 ## Calendar System
 - CalendarSticker.jsx = sticker wrapper. sidebar/MiniCalendar.jsx renders the grid.
   LargeCalendarModal.jsx = the full-screen modal (opens on double-click OR a single day-click).
 - Per-theme config under theme.calendarTheme. Sidebar icon = theme.calendarTheme.image.
-- contentArea — DO NOT change without measuring the LIVE rendered widget in DevTools.
-  Do NOT estimate offsets from the source PNG's proportions: the widget scales and the deckled
-  paper edges aren't at predictable ratios, so source-image math is unreliable (see Key Learnings).
-- MiniCalendar values — per-theme overridable via calendarTheme (DEFAULTS in parentheses):
-  gridAutoRows (17px), navFontSize (20px), monthFontSize (13px). Café overrides these to fit its
-  taller header + 6-row months (15px / 16px / 11px, set in the registry — not here).
+- contentArea — DO NOT change without measuring the LIVE rendered widget in DevTools. Don't estimate from the
+  source PNG's proportions (see Key Learnings).
+- MiniCalendar values — per-theme overridable via calendarTheme (DEFAULTS in parens): gridAutoRows (17px),
+  navFontSize (20px), monthFontSize (13px). Café overrides to 15px / 16px / 11px.
 - Truly fixed in MiniCalendar: gap 0, alignContent start, event dot bottom 3px.
+
+## Layering System (notes, stickers, papers, calendars, clocks, reminders)
+- ONE shared `layer` number across every item type drives stacking; each item renders with zIndex = its layer.
+  (Exception: a PINNED note renders at zIndex 450, overriding its layer — see Sticky Note Rules.)
+- Right-click menu actions live in handleLayerAction (cozykawaii.jsx) → applyNormalizedLayers (useDeskState.js):
+  - Bring to Front / Send to Back: jump the item's layer past everything (max+1 / min-1).
+  - Move Forward / Backward: SWAP the item with its immediate neighbor in the sorted stack (fixed Jun 17).
+    Do NOT revert to the old "+/- 1.5 nudge" — that silently failed whenever layer numbers had gaps.
+- Corkboard is a "backdrop" sticker (isCorkboard → layer 0, rendered first). Items can still be sent behind it.
 
 ## Save Slot Data Shape — Do Not Break
 - Slots store: notes, stickers, papers, clocks, calendars, calendarEvents, reminders, remindersLayer, themeMode, remindersVisible, remindersPos.
-- noteId = Date.now() — never regenerate on load.
+- noteId / item id = Date.now() — never regenerate on load.
+- Notes also persist: src, w, layer, text, `pinned`. Stickers persist flippedX/flippedY/rotation and attach fields (attachedTo/attachOffset/attachRelative).
 - calendarEvents shape: { "YYYY-MM-DD": [{ text, category, noteId, ... }] }.
 - Keys: cozydesk_state_{theme} (auto-save), cozydesk_saved_{theme}_slot_{n} (named slots).
 
 ## Features Already Built — Do Not Rebuild
+- Universal sticky notes across all four themes (one set, one text area).
+- Per-theme to-do item cap (maxItems in themeRegistry) + delete-completed-item ✕ on checked rows.
+- Settings panel renders at zIndex 600 — above all desk items AND pinned notes (450), below modals (10100).
+- Working Pin-to-front (📍/📌) + "Unpin" in the right-click menu for pinned notes.
 - Clock flip (↔) on the size-buttons row; XS/S/M/L/XL size buttons on clock and calendar.
-- Attach-to-back-layer / detach system.
+- Attach-to-back-layer / detach system (STICKERS only — notes can't attach yet; see On the Horizon).
 - Save / My Desks (10 slots per theme).
-- Lofi sidebar icons (real lofi sticker images); steampunk animated brass gears + mahogany sidebar background.
-- Per-theme theme-color meta tag (updates dynamically).
-- Aspect-ratio locking on sticky notes and to-do lists.
-- Sidebar buttons via --btn-bg / --btn-text / --btn-font.
-- Music: 4 tracks per theme (kawaii, lofi, steampunk, cafe), static-imported in audioManager.js.
+- Lofi sidebar icons; steampunk animated brass gears + mahogany sidebar background.
+- Per-theme theme-color meta tag. Aspect-ratio locking on notes and to-do lists.
+- Music: 4 tracks per theme, static-imported in audioManager.js.
 
 ## Completed Behaviors — Do Not Restore or Re-break
-- Calendar ↔ sticky note reverse-sync popup (deleting a calendar event prompting to delete from the note): removed intentionally. Not a bug.
-- Calendar modal opens at the month the widget is currently SHOWING — not always today. Chained through
-  MiniCalendar.jsx (`onMonthChange` callback) → CalendarSticker.jsx (`calMonth` state) →
-  LargeCalendarModal.jsx (`initialYear`/`initialMonth` props, seeded with `??`). Applies to ALL themes.
-  Do not revert the modal to defaulting to today's month.
-- Sticky notes AND to-do lists are strictly per-theme — they're tied to each theme's look and are saved/loaded with that theme's own desk (`cozydesk_state_{theme}`). Neither is ever carried over or shared on a theme switch. The ONLY popup on a theme switch is the calendar-events sharing opt-in ("One calendar everywhere?" — see Calendar Sharing below). There is NO `cozydesk_carryover_pref` key; that was an older design that has been removed (its leftover `snapshot` field and unused `_getSnapshot` argument in ThemeContext.jsx are inert — left in place intentionally, not a bug). To force the sharing popup to appear again: `localStorage.removeItem('cozydesk_calendar_shared')` then reload (it reappears only when the current theme has calendar events).
-- Storage-full warning: useDeskState.js exposes `storageFull`/`setStorageFull` (set true on a failed localStorage write); cozykawaii.jsx shows a dismissible popup. Follow-up (not urgent): show once per session + Safari-private-mode-friendly wording (setItem throws there).
-- Service worker: registers in PRODUCTION ONLY (guarded by `if (import.meta.env.PROD)` in src/main.jsx). Never register unconditionally.
+- Move Forward/Backward swap with the neighbor (not a fixed nudge). Pin overrides layer (zIndex 450). Pinned notes show "Unpin," not layer options.
+- Calendar ↔ sticky note reverse-sync popup: removed intentionally. Not a bug.
+- Calendar modal opens at the month the widget is currently SHOWING — not always today (MiniCalendar onMonthChange → CalendarSticker calMonth → LargeCalendarModal initial props). Applies to ALL themes.
+- Sticky notes AND to-do lists are strictly per-theme (saved with cozydesk_state_{theme}); never carried over on a theme switch. The ONLY theme-switch popup is the calendar-events sharing opt-in (see Calendar Sharing). There is NO cozydesk_carryover_pref key (older design, removed; the inert `snapshot`/`_getSnapshot` leftovers in ThemeContext.jsx are intentional, not a bug). Force the sharing popup again: `localStorage.removeItem('cozydesk_calendar_shared')` then reload (only reappears when the current theme has events).
+- Storage-full warning: useDeskState.js exposes storageFull/setStorageFull; cozykawaii.jsx shows a dismissible popup.
+- Service worker: registers in PRODUCTION ONLY (guarded by `if (import.meta.env.PROD)` in src/main.jsx). Never unconditionally.
 
 ## Service Worker / Stale Build — PWA Gremlin (troubleshooting)
 - Symptoms: old version sticks, hard-refresh doesn't help, broken images, "rising client:438" noise, fixes don't show.
@@ -223,33 +273,25 @@ Consolidates every per-theme requirement scattered through this file. Follow in 
 
 ## Key Learnings
 - NEVER use localStorage.clear() in dev — it breaks Vite HMR and causes a black screen.
-  Safe clear (run as one line in console):
+  Safe clear (one line in console):
   `Object.keys(localStorage).filter(k=>k.startsWith('cozydesk')).forEach(k=>localStorage.removeItem(k)); location.reload()`
-- The `rising client:438` error in DevTools is Vite HMR websocket noise. Harmless in dev, absent in production. Ignore it.
-- Calendar contentArea tuning (Jun 9): measure the LIVE rendered widget in DevTools — do NOT estimate
-  offsets from the source PNG's proportions. Repeatedly guessing café's `top` from the image was off by
-  ~30px until measured against the real widget. AND tune one axis at a time — changing horizontal padding
-  while fixing vertical overflow introduced fresh overflow on the other edge.
-- When VS Code find/replace fails on a paste, it's almost always an indentation/whitespace mismatch.
-  Don't keep retrying — either include the exact leading whitespace, or edit the line directly. Faster, clearer.
-- A feature that's visually appealing can still be wrong for the product. Wall art (large scenic
-  stickers) was abandoned because it forced manual stretch/reposition — that breaks CozyDesk's
-  "drop and forget" feel. Test UX fit early, not just aesthetics.
-- A code change that imports NEW asset files must commit those assets in the SAME commit. Run
-  `git status` first and confirm every file the new code references is already tracked or staged —
-  committing the code alone points the production build at files that aren't in the repo and breaks it.
-  (Hit this wiring the music: the new .mp3s were untracked; staging only audioManager.js would have
-  shipped a broken build.)
-- The doc drifts from the code. When CLAUDE.md and the real files disagree, the code wins — verify
-  claims against the actual files, then fix the note. (The carry-over popup description was stale until
-  read against ThemeContext.jsx.)
-- Sidebar clock icon overlays can't be fully specified without seeing them rendered at sidebar
-  scale. Always build with placeholder coords and plan for one live tuning pass. The `bottom`
-  value especially needs to account for any sign/text hanging below the clock frame.
-- When a CSS override doesn't take, check the full DevTools cascade before patching. A correct
-  rule in Sidebar.css can be beaten by a higher-specificity global reset in index.css (this is
-  exactly what happened with café's Pomodoro buttons — the fix was adding the class to the
-  exclusion list in index.css, not changing Sidebar.css).
+- The `rising client:438` error is Vite HMR websocket noise. Harmless in dev, absent in production. Ignore it.
+- Calendar contentArea: measure the LIVE rendered widget in DevTools — don't estimate from the source PNG. Tune one axis at a time.
+- When VS Code find/replace fails on a paste, it's almost always an indentation/whitespace mismatch. Don't retry — match the exact leading whitespace or edit the line directly.
+- A visually appealing feature can still be wrong for the product (wall art was abandoned — manual stretch/reposition broke the "drop and forget" feel). Test UX fit early.
+- A code change importing NEW asset files must commit those assets in the SAME commit. Run `git status` first; a code-only commit pointing at untracked assets ships a broken build.
+- The doc drifts from the code. When CLAUDE.md and the files disagree, the code wins — verify, then fix the note.
+- LAYOUT-AFFECTING CAPS MUST BE PER-THEME (Jun 18). One global ITEMS_PER_PAPER = 6 looked fine but was wrong:
+  lofi's short board overflows at 4, café at 5, while steampunk/kawaii hold 6. Measure each board's real row
+  capacity from a live screenshot; don't assume one number fits every theme.
+- DON'T BUILD FOR A STATE THE CODE CAN'T REACH (Jun 18). Started designing a scroll/fade button for "too many
+  to-do items" — but the item cap meant that state was unreachable. Caught it by re-reading the cap before
+  coding. Verify the problem is real and reachable before designing a fix for it.
+- Sidebar clock/icon overlays can't be fully specified without seeing them rendered at sidebar scale. Build with placeholder coords and plan one live tuning pass.
+- When a CSS override doesn't take, check the full DevTools cascade — a correct rule can be beaten by a higher-specificity global reset in another file (café Pomodoro buttons: fix was the index.css exclusion list, not Sidebar.css).
+- READ AND TRACE, don't just read (Jun 17). Told Andrew the pin "raises z-index to 100 and keeps it on top." It didn't: every note always has a `layer`, so `layer != null ? layer : (isPinned ? 100 : 5)` always used `layer` and the pinned branch was dead. The line looked right; tracing the actual values showed it never ran. Fix: `isPinned ? 450 : (layer ?? 5)`.
+- GET A LIVE TEST BEFORE CALLING SOMETHING "FINE" (Jun 17). Leaned "Move Backward is working as designed, just one step." A 10-second test showed Send to Back worked but Move Backward didn't — a real bug: the fixed +/-1.5 nudge can't cross a neighbor when layer numbers have gaps. Fix: swap with the neighbor in the sorted stack.
+- CLAUDE CODE OVERSTEPS WITHOUT EXPLICIT GUARDRAILS (Jun 17). It committed and pushed after being told "do not commit," started a dev server, tried to install Playwright, and created stray files (AGENTS.md, tasks/todo.md). The reliable fix: lead EVERY Claude Code prompt with the HARD RULES block (see Claude Code Prompt Rules). Andrew commits — Claude Code never does. Prompts that included the block behaved perfectly.
 
 ## Known Bugs — Queued
 1. Live small-screen clamp — to-do clamp is spawn-time only; move to render-time so saved desks fit phones. Do before launch.
@@ -257,78 +299,61 @@ Consolidates every per-theme requirement scattered through this file. Follow in 
 3. Resize warning popup — once-per-session popup when resizing below threshold.
 
 ## Known Issues
-- Active theme persists across reload. ThemeContext.jsx reads/writes `cozydesk_active_theme`
-  in localStorage. Falls back to `'cozykawaii'` if the key is missing or invalid.
+- Active theme persists across reload. ThemeContext.jsx reads/writes `cozydesk_active_theme`; falls back to 'cozykawaii' if missing/invalid.
 
-## Roadmap (one at a time — backup + commit each; do NOT batch)
-- WebP / lighter images (#6) — BEFORE LAUNCH, high value / low risk. One-time, hand-checked,
-  per-asset conversion. NO blind batch convert — cozy art is gradient/transparency-heavy and
-  lossy WebP can smear gradients; review each, preserve alpha. No new dependency yet (the asset
-  glob already accepts .webp); add a pipeline only if theme count makes manual a chore.
-- Debounce auto-save (#3) — AFTER LAUNCH / beta, medium risk. Debounce ONLY the background
-  auto-save effect; keep explicit Save-slot and theme-switch saves immediate. Flush on
-  visibilitychange/pagehide, NOT just beforeunload (unreliable on mobile PWAs — skipping this
-  can CAUSE the data loss it's meant to prevent).
-- Theme-proof clock logic (#4) — DONE. useDeskState.js addStickerAtPosition now uses generic
-  `name.includes('clock')`. Safe — `clock` is already a reserved filename keyword.
-- Lazy-load art (#5) — HOLD. A project, not a fix. Defer until ~10+ themes. Turns the registry's
-  synchronous asset arrays async (touches ReminderPaper, sticker grid, sidebar icon), worsens the
-  StickyNote asset-timing race, needs loading placeholders + SW caching, and the payoff is partial
-  (Tauri loads art from local disk anyway).
-- Unused deps — framer-motion only (verify before removing). react-draggable IS used
-  (CalendarSticker.jsx and others import Draggable) — do NOT remove it.
+## Roadmap / Cleanups (one at a time — backup + commit each; do NOT batch)
+- Folder rename: src/themes/[theme]/stickynotes/ → todo/ (the folders only hold the to-do paper now). git mv per theme, update the glob path in themeRegistry.js, grep for stray "stickynotes" refs, sync this doc. Optional cleanup.
+- ContextMenu.jsx font: 'Patrick Hand' → Nunito (one line, its own commit). See Font Rules.
+- .claude/settings.local.json: consider gitignoring so it stops appearing in every git status.
+- WebP / lighter images — BEFORE LAUNCH. One-time, hand-checked, per-asset conversion. NO blind batch convert (lossy WebP smears the gradient/transparency art); preserve alpha. The asset glob already accepts .webp.
+- Debounce auto-save — AFTER LAUNCH / beta. Debounce ONLY the background auto-save; keep Save-slot and theme-switch saves immediate. Flush on visibilitychange/pagehide, NOT just beforeunload (unreliable on mobile).
+- Lazy-load art — HOLD. A project, not a fix. Defer until ~10+ themes.
+- Unused deps — framer-motion only (verify before removing). react-draggable IS used — do NOT remove it.
 
 ## On the Horizon
-**Build new worlds first.** Worlds are the product and the main revenue lever; the entry/store below stays parked until the shelf is fuller.
+**Build new worlds first.** Worlds are the product and the main revenue lever; the entry/store stays parked until the shelf is fuller.
 
-Café Morning (active build — remaining): 4 sticky-note colors (borderless), to-do paper (create →
-measure → set real cafe todoBase, replacing the kawaii placeholder). Background, clock, calendar
-widget, sidebar clock icon, and the 4-track café playlist are done. Calendar text is dark espresso
-(#2a1a0a) on cream and fits all month lengths.
+Note-attach feature (parked for pre-launch): let a sticky NOTE attach to and ride the sticker it sits on
+(e.g. a corkboard), the way stickers already attach. The sticker attach system exists in full — the trigger
+is the `'attach'` case in handleLayerAction (cozykawaii.jsx): it finds the lower-layer item the child overlaps,
+computes offsets, and calls attachSticker; parents move their children via moveAttachedStickers /
+resizeAttachedStickers in their onUpdate/onDrag. To extend to notes: allow itemType 'note' in that menu logic,
+add attachNote/detachNote in useDeskState (mirroring the sticker versions but on setNotes), and have every
+parent's drag also move attached NOTES (not just stickers). Touches useDeskState.js + cozykawaii.jsx + ContextMenu.jsx.
 
-Welcome / entry flow (designed Jun 8 2026, not built):
-- Soft splash on every launch — brief, tap-to-skip, doubles as the load screen (shows while the
-  desk loads, vanishes the instant it's ready). Brand logo featured. "Warm minimalism" — cozy, not cold.
-- First launch ONLY: a one-time "pick your world" screen (worlds shown as tiles with free / price /
-  "coming soon"), plus a MANDATORY Terms & Privacy gate the user must agree to before proceeding.
-  Fold in the local-save warning and a light "artwork made with AI tools" goodwill line. Store
-  acceptance + version in localStorage `cozydesk_terms_v1`.
-- Returning users: splash → straight to their last theme (needs the "theme not persisted" fix above).
+Café Morning: COMPLETE as of Jun 18. To-do paper exists, todoBase measured (358×353), text area + chalk-white
+input color tuned, cap set to 5. Background, clock, calendar widget, sidebar clock icon, 4-track playlist all done.
 
-Store / theme discovery (the project AFTER the welcome screen):
-- Turn the sidebar Themes dropdown from a text list into a small visual gallery — each world a
-  thumbnail + name; locked worlds get a lock + price ($1.99). Quiet, always one glance away when
-  switching vibe. Tempting, never naggy.
-- Surface the $10.99 all-access at the BUY moment (when they tap a locked world), not everywhere.
-  Word it "all current and future worlds, one payment" — never "forever."
+Welcome / entry flow (designed, not built): soft splash on every launch (tap-to-skip, doubles as load screen);
+first-launch-only "pick your world" + mandatory Terms & Privacy gate + local-save warning + "artwork made with AI
+tools" line, stored in localStorage cozydesk_terms_v1; returning users go straight to their last theme.
+
+Store / theme discovery (after the welcome screen): turn the sidebar Themes dropdown into a small visual gallery
+(thumbnail + name; locked worlds get a lock + $1.99). Surface the $10.99 all-access only at the BUY moment;
+word it "all current and future worlds, one payment" — never "forever."
 
 ## Pre-Launch Checklist
 1. Warn users desks save locally (clearing browser data erases them).
 2. Graceful handling if localStorage corrupts.
-3. Test Safari/Firefox/mobile/Windows.
+3. Test Safari/Firefox/mobile/Windows — INCLUDING: does the right-click layer menu work on touch (long-press)?
+   If not, layering is inaccessible on mobile and the tappable pin matters even more. Verify before launch.
 4. Run /securityreview in Claude Code.
 5. Beta test with 3-5 users.
 6. Handle the 5MB localStorage limit.
 
 ## Legal / Pre-Launch Notes (NOT legal advice; finalize with a lawyer or Termly/iubenda)
-- No law requires disclosing that an app was BUILT with AI. AI-disclosure laws target:
-  (a) chatbots telling users they're AI, (b) labeling AI-generated content SHOWN to users,
-  (c) training-data transparency for model makers. CozyDesk has none as user-facing AI.
-  Light touch only: theme art is AI-generated → a simple "Artwork created with AI tools" line
-  as goodwill, not obligation. Confirm you hold commercial rights to AI-generated images (you sell themes).
-- Documents to prepare: Terms of Service / EULA; Privacy Policy (even for local-only storage —
-  covers the email capture, Pixabay music, hosting); Refund Policy (you sell themes); Disclaimer
-  of warranties + limitation of liability (pair with the local-save warning).
-- App stores: a Tauri/native wrap adds Apple & Google requirements (privacy labels, in-app payment
-  rules). The landing page advertises Desktop/iPhone/Android/iPad — know this before marketing them hard.
+- No law requires disclosing an app was BUILT with AI. Light touch only: a simple "Artwork created with AI tools"
+  line as goodwill. Confirm you hold commercial rights to the AI-generated images (you sell themes).
+- Documents to prepare: Terms of Service / EULA; Privacy Policy (even for local-only storage — covers email
+  capture, Pixabay music, hosting); Refund Policy; Disclaimer of warranties + limitation of liability.
+- App stores: a Tauri/native wrap adds Apple & Google requirements (privacy labels, in-app payment rules).
 
 ## Calendar Sharing (Pass 1 — DONE, shipped to dev)
 One global calendar-events list, optionally shared across all themes. Calendar WIDGET placement stays per-theme; only EVENTS are shared.
-- Keys: cozydesk_calendar_shared ('on'/'off'/unset) and cozydesk_shared_calendar_events (shared events object; exists only when ON).
-- ON: per-theme cozydesk_state_* keys store calendarEvents: {}; real events live in the shared blob; every theme reads from it. OFF: each theme stores its own calendarEvents; no shared blob.
-- Engine (useDeskState.js): enableCalendarSharing() merges every theme's events into the shared blob + sets flag 'on'. disableCalendarSharing() copies the shared events into EVERY theme in THEME_CONFIGS, sets flag 'off', removes the blob.
-- Opt-in popup ("One calendar everywhere?") shows only when the flag is unset AND the source theme has events (ThemeContext.jsx). Settings toggle: "📅 Calendar events shared in every theme · On/Off" (cozykawaii.jsx).
-- "Drag a calendar" hint (cozykawaii.jsx): top-center card shown when a theme has events but no calendar widget; × dismiss resets per theme; vanishes when a calendar is dropped.
-- DO NOT RE-BREAK (Step 1 fix): loadThemeState must load the shared calendar even when a theme has NO saved per-theme desk. Removing that branch reintroduces the bug where new themes show no events AND an empty auto-save wipes the shared blob.
-- Known issue (parked): "Clear All" while sharing is ON blanks the SHARED calendar — all themes lose events (clearDesk sets calendarEvents:{}, which the ON-mode auto-save writes to the shared blob). Possible fix: keep the confirm box + an unchecked-by-default "also erase to-do lists & calendar events (affects all themes when sharing on)" checkbox. Calendar side clean; to-do side needs separate handling (reminders live in the reminders system).
+- Keys: cozydesk_calendar_shared ('on'/'off'/unset) and cozydesk_shared_calendar_events (exists only when ON).
+- ON: per-theme cozydesk_state_* keys store calendarEvents:{}; real events live in the shared blob. OFF: each theme stores its own.
+- Engine (useDeskState.js): enableCalendarSharing() merges every theme's events into the shared blob + flag 'on'. disableCalendarSharing() copies shared events into EVERY theme, flag 'off', removes the blob.
+- Opt-in popup ("One calendar everywhere?") shows only when the flag is unset AND the source theme has events (ThemeContext.jsx). Settings toggle in cozykawaii.jsx.
+- DO NOT RE-BREAK: loadThemeState must load the shared calendar even when a theme has NO saved per-theme desk. Removing that branch reintroduces the bug where new themes show no events AND an empty auto-save wipes the shared blob.
+- Known issue (parked): "Clear All" while sharing is ON blanks the shared calendar (all themes lose events).
 - Pass 2 (future): shared to-do lists.
