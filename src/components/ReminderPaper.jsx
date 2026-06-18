@@ -4,7 +4,6 @@ import paperImg from "../assets/stickynotes/todolist1.png";
 import { useTheme } from "../themes/ThemeContext";
 import { soundManager } from '../utils/soundManager';
 
-const ITEMS_PER_PAPER = 6;
 const SPARKLE_EMOJIS = ["✨", "⭐", "🌟", "💫", "🎉"];
 
 /* ── Handle dot base (corner resize, rotate) ── */
@@ -21,7 +20,7 @@ const handleDot = {
 };
 
 // Individual reminder row with cozy checkbox + sparkle animation
-function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, theme }) {
+function ReminderRow({ rem, onToggle, onDelete, width, fontSizeRatio, fontFamily, theme }) {
   const [showSparkle, setShowSparkle] = useState(false);
   const [animKey, setAnimKey] = useState(0);
 
@@ -101,6 +100,17 @@ function ReminderRow({ rem, onToggle, width, fontSizeRatio, fontFamily, theme })
         {rem.emoji && <span style={{ marginRight: "3px" }}>{rem.emoji}</span>}
         {rem.text}
       </span>
+      {rem.done && (
+        <button
+          onClick={(e) => { e.stopPropagation(); soundManager.play('sfx_delete_whoosh'); onDelete?.(rem.id); }}
+          title="Delete completed item"
+          style={{
+            border: "none", background: "transparent", cursor: "pointer",
+            color: theme.todoInputColor ? "rgba(255,255,255,0.7)" : "#b5977a",
+            fontSize: "13px", lineHeight: 1, padding: "0 2px", flexShrink: 0,
+          }}
+        >✕</button>
+      )}
     </div>
   );
 }
@@ -114,11 +124,13 @@ const ReminderPaper = ({
   onUpdate,
   onDelete,
   onToggleReminder,
+  onDeleteReminder,
   onAddInlineReminder,
   layer,
   onContextMenu,
 }) => {
   const { themeStickyNotes, themeName, theme } = useTheme();
+  const ITEMS_PER_PAPER = theme.maxItems ?? 6;
   const todoImg = themeStickyNotes.find(a => a.name.includes('todo'))?.src || paperImg;
   const [newText, setNewText] = useState("");
   const [rotation, setRotation] = useState(0);
@@ -250,6 +262,7 @@ const ReminderPaper = ({
             key={rem.id}
             rem={rem}
             onToggle={onToggleReminder}
+            onDelete={onDeleteReminder}
             width={width}
             fontSizeRatio={fontSizeRatio}
             fontFamily={fontFamily}

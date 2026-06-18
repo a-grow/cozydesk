@@ -54,6 +54,7 @@ const THEME_CONFIGS = {
     clockComponent: ClockSticker,
     calendarComponent: CalendarSticker,
     stickyNoteSize: 180,
+    maxItems: 6,
     calendarTheme: {
       image: kawaiiCalendarBase,
       baseW: 260,
@@ -102,6 +103,7 @@ const THEME_CONFIGS = {
     clockComponent: LofiClockSticker,
     calendarComponent: CalendarSticker,
     stickyNoteSize: 180,
+    maxItems: 4,
     calendarTheme: {
       image: lofiCalendarBase,
       baseW: 260,
@@ -150,6 +152,7 @@ const THEME_CONFIGS = {
     clockComponent: SteampunkClockSticker,
     calendarComponent: CalendarSticker,
     stickyNoteSize: 180,
+    maxItems: 6,
     calendarTheme: {
       image: steampunkCalendarBase,
       baseW: 260,
@@ -189,11 +192,11 @@ const THEME_CONFIGS = {
   modalTheme: { bg: '#3d1a20', border: '#5a2d35', text: '#f5f0e8', accent: '#2d5a27', headerBg: '#4a2028', subtext: '#c4a882', inputBg: '#4a2028' },
   brandFont: "'Nunito', sans-serif",
   defaultNoteFont: "'Nunito', sans-serif",
-  todoTextArea: { top: '30%', left: '12%', right: '6%', bottom: '8%' },
+  todoTextArea: { top: '25%', left: '22%', right: '14%', bottom: '28%' },
   todoSize: { wRatio: 0.18, hRatio: 0.202 },
-  todoBase: { w: 358, h: 402 },
+  todoBase: { w: 358, h: 353 },
   showTape: true,
-  todoInputColor: undefined,
+  todoInputColor: '#f0ece3',
   checkboxBorder: '2px solid #2d5a27',
   clockComponent: DigitalClockSticker,
   clockTheme: {
@@ -208,6 +211,7 @@ const THEME_CONFIGS = {
   },
   calendarComponent: CalendarSticker,
   stickyNoteSize: 180,
+  maxItems: 5,
   calendarTheme: {
     image: cafeCalendarBase,
     baseW: 240,

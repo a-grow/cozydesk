@@ -23,7 +23,7 @@ const overlayStyle = {
   position: "absolute", left: "270px", top: "50px",
   background: "rgba(255,253,248,0.92)", backdropFilter: "blur(5px)",
   borderRadius: "16px", boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-  padding: "24px", zIndex: 15, display: "flex", gap: "20px",
+  padding: "24px", zIndex: 600, display: "flex", gap: "20px",
   border: "1px solid rgba(224,212,200,0.6)",
 };
 
@@ -569,6 +569,7 @@ export default function Cozykawaii() {
           }}
           onDelete={() => { desk.removePaper(paper.id); setSelectedId(null); }}
           onToggleReminder={desk.toggleReminder}
+          onDeleteReminder={desk.deleteReminder}
           onAddInlineReminder={(rem) => desk.addInlineReminder(rem, paper.id)}
           onContextMenu={(e) => handleContextMenu(e, 'paper', paper.id)}
         />

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { getThemeConfig, THEME_CONFIGS } from "../themes/themeRegistry";
 import { soundManager } from '../utils/soundManager';
 
-const ITEMS_PER_PAPER = 6;
+const DEFAULT_ITEMS_PER_PAPER = 6;
 
 /**
  * All desk state, CRUD operations, undo/redo, and localStorage persistence
@@ -494,7 +494,8 @@ const updateNote = (id, data) => {
   };
 
   const sendReminderToDeskPaper = (reminder) => {
-    const existing = papers.find(p => p.reminderIds.length < ITEMS_PER_PAPER);
+    const maxItems = getThemeConfig(themeName).maxItems ?? DEFAULT_ITEMS_PER_PAPER;
+    const existing = papers.find(p => p.reminderIds.length < maxItems);
     if (existing) {
       setPapers(prev => prev.map(p => p.id === existing.id
         ? { ...p, reminderIds: [...p.reminderIds, reminder.id] } : p));
