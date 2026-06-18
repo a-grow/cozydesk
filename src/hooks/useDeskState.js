@@ -200,6 +200,38 @@ export function useDeskState({ dimensions, themeName }) {
     } : s));
   }, [pushUndo]);
 
+  // ─── Note attachment (mirrors sticker attach; a note rides its parent but never scales) ───
+  const attachNote = useCallback((childId, parentType, parentId, dxRatio, dyRatio, attachRelative) => {
+    pushUndo();
+    setNotes(prev => prev.map(n => n.id === childId ? {
+      ...n,
+      attachedTo: { type: parentType, id: parentId },
+      attachOffset: { dxRatio, dyRatio },
+      attachRelative: attachRelative ?? null,
+    } : n));
+  }, [pushUndo]);
+
+  const detachNote = useCallback((childId) => {
+    pushUndo();
+    setNotes(prev => prev.map(n => n.id === childId ? {
+      ...n,
+      attachedTo: null,
+      attachOffset: null,
+    } : n));
+  }, [pushUndo]);
+
+  // Move notes attached to parentId by a ratio delta (used by non-sticker parents: papers, clocks, calendars, notes)
+  const moveAttachedNotes = useCallback((parentId, dxRatio, dyRatio) => {
+    setNotes(prev => {
+      if (!prev.some(n => n.attachedTo?.id === parentId)) return prev;
+      return prev.map(n => n.attachedTo?.id === parentId ? {
+        ...n,
+        xRatio: n.xRatio + dxRatio,
+        yRatio: n.yRatio + dyRatio,
+      } : n);
+    });
+  }, []);
+
   // Move all stickers attached to parentId by a ratio delta (no undo push — used for non-sticker parents)
   const moveAttachedStickers = useCallback((parentId, dxRatio, dyRatio) => {
     setStickers(prev => {
@@ -247,6 +279,25 @@ export function useDeskState({ dimensions, themeName }) {
           ...s,
           xRatio: parentXRatio + (s.attachOffset?.dxRatio ?? 0),
           yRatio: parentYRatio + (s.attachOffset?.dyRatio ?? 0),
+        };
+      });
+    });
+    // Notes attached to this sticker ride along too — position only, NEVER scale (notes are fixed-px).
+    setNotes(prev => {
+      if (!prev.some(n => n.attachedTo?.id === parentId)) return prev;
+      return prev.map(n => {
+        if (n.attachedTo?.id !== parentId) return n;
+        if (n.attachRelative) {
+          return {
+            ...n,
+            xRatio: parentXRatio + n.attachRelative.relX * parentWRatio,
+            yRatio: parentYRatio + n.attachRelative.relY * parentHRatio,
+          };
+        }
+        return {
+          ...n,
+          xRatio: parentXRatio + (n.attachOffset?.dxRatio ?? 0),
+          yRatio: parentYRatio + (n.attachOffset?.dyRatio ?? 0),
         };
       });
     });
@@ -718,6 +769,7 @@ const updateNote = (id, data) => {
     stateRef, applyNormalizedLayers,
     // notes
     addNote, addNoteAtPosition, removeNote, updateNote,
+    attachNote, detachNote, moveAttachedNotes,
     // stickers
     addStickerAtPosition, removeSticker, updateSticker, updateStickerTransform,
     attachSticker, detachSticker, moveAttachedStickers, setAttachedStickersToParent, resizeAttachedStickers,

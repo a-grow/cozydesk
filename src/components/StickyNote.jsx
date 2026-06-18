@@ -21,6 +21,7 @@ const StickyNote = ({
   x, y, width, height,
   src = defaultNoteImg,
   pinned = false,
+  isAttached = false,
   initialText = "",
   isSelected,
   onSelect,
@@ -84,7 +85,8 @@ const StickyNote = ({
       bounds="parent"
       cancel=".nodrag"
       lockAspectRatio={true}
-      enableResizing={isSelected ? {
+      disableDragging={isAttached}
+      enableResizing={isSelected && !isAttached ? {
         top: true, right: true, bottom: true, left: true,
         topRight: true, bottomRight: true, bottomLeft: true, topLeft: true
       } : false}

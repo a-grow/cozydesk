@@ -181,23 +181,40 @@ export default function Cozykawaii() {
 
     if (action === 'detach') {
       if (itemType === 'sticker') desk.detachSticker(itemId);
+      else if (itemType === 'note') desk.detachNote(itemId);
       return;
     }
 
     if (action === 'attach') {
-      if (itemType !== 'sticker') return;
-      const childSticker = desk.stickers.find(s => s.id === itemId);
-      if (!childSticker) return;
-      const cx = childSticker.xRatio + childSticker.wRatio / 2;
-      const cy = childSticker.yRatio + childSticker.hRatio / 2;
-      const childLayer = childSticker.layer ?? 0;
+      if (itemType !== 'sticker' && itemType !== 'note') return;
+
+      // Resolve the child's geometry as ratios (notes store w in px and are square)
+      let child;
+      if (itemType === 'sticker') {
+        const s = desk.stickers.find(s => s.id === itemId);
+        if (!s) return;
+        child = { xRatio: s.xRatio, yRatio: s.yRatio, wRatio: s.wRatio, hRatio: s.hRatio, layer: s.layer ?? 0 };
+      } else {
+        const n = desk.notes.find(n => n.id === itemId);
+        if (!n) return;
+        child = {
+          xRatio: n.xRatio, yRatio: n.yRatio,
+          wRatio: n.w != null ? n.w / dimensions.width  : n.wRatio,
+          hRatio: n.w != null ? n.w / dimensions.height : n.hRatio,
+          layer: n.layer ?? 0,
+        };
+      }
+
+      const cx = child.xRatio + child.wRatio / 2;
+      const cy = child.yRatio + child.hRatio / 2;
+      const childLayer = child.layer;
       const candidates = [
-        ...desk.notes.map(n    => ({
+        ...desk.notes.filter(n => !(itemType === 'note' && n.id === itemId)).map(n => ({
           ...n, _type: 'note',
           wRatio: n.w != null ? n.w / dimensions.width  : n.wRatio,
           hRatio: n.w != null ? n.w / dimensions.height : n.hRatio,
         })),
-        ...desk.stickers.filter(s => s.id !== itemId).map(s => ({ ...s, _type: 'sticker' })),
+        ...desk.stickers.filter(s => !(itemType === 'sticker' && s.id === itemId)).map(s => ({ ...s, _type: 'sticker' })),
         ...desk.papers.map(p   => ({ ...p, _type: 'paper'   })),
       ].filter(item =>
         item.wRatio != null && item.hRatio != null &&
@@ -208,16 +225,18 @@ export default function Cozykawaii() {
       if (candidates.length === 0) return;
       candidates.sort((a, b) => (b.layer ?? 0) - (a.layer ?? 0));
       const parent = candidates[0];
-      desk.attachSticker(
+      const attachRelative = {
+        relX: parent.wRatio > 0 ? (child.xRatio - parent.xRatio) / parent.wRatio : 0,
+        relY: parent.hRatio > 0 ? (child.yRatio - parent.yRatio) / parent.hRatio : 0,
+        relW: parent.wRatio > 0 ? child.wRatio / parent.wRatio : 1,
+        relH: parent.hRatio > 0 ? child.hRatio / parent.hRatio : 1,
+      };
+      const attachFn = itemType === 'sticker' ? desk.attachSticker : desk.attachNote;
+      attachFn(
         itemId, parent._type, parent.id,
-        childSticker.xRatio - parent.xRatio,
-        childSticker.yRatio - parent.yRatio,
-        {
-          relX: parent.wRatio > 0 ? (childSticker.xRatio - parent.xRatio) / parent.wRatio : 0,
-          relY: parent.hRatio > 0 ? (childSticker.yRatio - parent.yRatio) / parent.hRatio : 0,
-          relW: parent.wRatio > 0 ? childSticker.wRatio / parent.wRatio : 1,
-          relH: parent.hRatio > 0 ? childSticker.hRatio / parent.hRatio : 1,
-        },
+        child.xRatio - parent.xRatio,
+        child.yRatio - parent.yRatio,
+        attachRelative,
       );
       return;
     }
@@ -254,7 +273,7 @@ export default function Cozykawaii() {
     desk.applyNormalizedLayers(normalized);
   }, [contextMenu, desk.notes, desk.stickers, desk.papers, desk.calendars,
       desk.clocks, desk.remindersVisible, desk.remindersLayer, desk.applyNormalizedLayers,
-      desk.attachSticker, desk.detachSticker, desk.updateNote]);
+      desk.attachSticker, desk.detachSticker, desk.attachNote, desk.detachNote, desk.updateNote]);
 
   // ─── Background ────────────────────────────────────────────────────
   // Each theme supplies its own background. cozykawaii uses the photo background
@@ -580,6 +599,7 @@ export default function Cozykawaii() {
             const dyRatio = data.y / dimensions.height - paper.yRatio;
             desk.updatePaper(paper.id, data);
             desk.moveAttachedStickers(paper.id, dxRatio, dyRatio);
+            desk.moveAttachedNotes(paper.id, dxRatio, dyRatio);
           }}
           onDelete={() => { desk.removePaper(paper.id); setSelectedId(null); }}
           onToggleReminder={desk.toggleReminder}
@@ -680,6 +700,7 @@ export default function Cozykawaii() {
           height={note.w ?? note.wRatio * dimensions.width}
           src={note.src}
           pinned={note.pinned}
+          isAttached={!!note.attachedTo}
           layer={note.layer}
           initialText={note.text}
           isSelected={selectedId?.type === "note" && selectedId?.id === note.id}
@@ -688,6 +709,11 @@ export default function Cozykawaii() {
             desk.updateNote(note.id, data);
             if (data.x !== undefined) {
               desk.moveAttachedStickers(
+                note.id,
+                data.x / dimensions.width - note.xRatio,
+                data.y / dimensions.height - note.yRatio,
+              );
+              desk.moveAttachedNotes(
                 note.id,
                 data.x / dimensions.width - note.xRatio,
                 data.y / dimensions.height - note.yRatio,
@@ -716,6 +742,7 @@ export default function Cozykawaii() {
               const dyRatio = data.y / dimensions.height - clock.yRatio;
               desk.updateClock(clock.id, data);
               desk.moveAttachedStickers(clock.id, dxRatio, dyRatio);
+              desk.moveAttachedNotes(clock.id, dxRatio, dyRatio);
             }}
             flipped={clock.flipped || false}
             onFlip={() => desk.changeClockFlip(clock.id)}
@@ -745,6 +772,7 @@ export default function Cozykawaii() {
               const dyRatio = data.y / dimensions.height - cal.yRatio;
               desk.updateCalendar(cal.id, data);
               desk.moveAttachedStickers(cal.id, dxRatio, dyRatio);
+              desk.moveAttachedNotes(cal.id, dxRatio, dyRatio);
             }}
             onDelete={() => { desk.removeCalendar(cal.id); setSelectedId(null); }}
             onChangeSize={preset => desk.changeCalendarSize(cal.id, preset)}
@@ -774,12 +802,16 @@ export default function Cozykawaii() {
               !!desk.notes.find(n => n.id === contextMenu.itemId)?.pinned
             }
             isAttached={
-              contextMenu.itemType === 'sticker' &&
-              !!desk.stickers.find(s => s.id === contextMenu.itemId)?.attachedTo
+              (contextMenu.itemType === 'sticker' &&
+                !!desk.stickers.find(s => s.id === contextMenu.itemId)?.attachedTo) ||
+              (contextMenu.itemType === 'note' &&
+                !!desk.notes.find(n => n.id === contextMenu.itemId)?.attachedTo)
             }
             canAttach={
-              contextMenu.itemType === 'sticker' &&
-              !desk.stickers.find(s => s.id === contextMenu.itemId)?.attachedTo
+              (contextMenu.itemType === 'sticker' &&
+                !desk.stickers.find(s => s.id === contextMenu.itemId)?.attachedTo) ||
+              (contextMenu.itemType === 'note' &&
+                !desk.notes.find(n => n.id === contextMenu.itemId)?.attachedTo)
             }
           />
         </>
