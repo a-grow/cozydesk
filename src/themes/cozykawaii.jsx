@@ -62,6 +62,7 @@ export default function Cozykawaii() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [calendarShared, setCalendarShared] = useState(() => localStorage.getItem('cozydesk_calendar_shared') === 'on');
   const [calHintDismissed, setCalHintDismissed] = useState(false);
+  const [clearAlsoCalendar, setClearAlsoCalendar] = useState(false);
 
   // Keep the Settings toggle's On/Off label correct each time the panel opens
   useEffect(() => {
@@ -496,17 +497,30 @@ export default function Cozykawaii() {
             <div style={{ fontSize: "44px", marginBottom: "8px" }}>⚠️</div>
             <h3 style={{ margin: "0 0 8px 0", color: "#4b3b2a", fontSize: "1.2rem", fontFamily: "'Nunito', sans-serif", fontWeight: 800 }}>Are you sure?</h3>
             <p style={{ margin: "0 0 16px 0", color: "#6b5b4a", lineHeight: "1.4", fontSize: "0.88rem", fontFamily: "'Nunito', sans-serif" }}>
-              Everything including your reminders, To Do List, and Calendar will all be erased.
+              {calendarShared
+                ? "Everything on this desk will be erased."
+                : "Everything including your reminders, To Do List, and Calendar will all be erased."}
             </p>
+            {calendarShared && (
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", cursor: "pointer", fontSize: "0.85rem", color: "#8b7b6a", fontFamily: "'Nunito', sans-serif", marginBottom: "14px" }}>
+                <input
+                  type="checkbox"
+                  checked={clearAlsoCalendar}
+                  onChange={e => setClearAlsoCalendar(e.target.checked)}
+                  style={{ width: "15px", height: "15px", cursor: "pointer" }}
+                />
+                Also erase shared calendar events (used in all themes)
+              </label>
+            )}
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button
-                onClick={() => { soundManager.play('sfx_clear_screen'); desk.clearDesk(); setShowClearConfirm(false); setActiveMenu(null); }}
+                onClick={() => { soundManager.play('sfx_clear_screen'); desk.clearDesk({ clearCalendar: !calendarShared || clearAlsoCalendar }); setClearAlsoCalendar(false); setShowClearConfirm(false); setActiveMenu(null); }}
                 style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#ff7675", color: "white", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
               >
                 Proceed
               </button>
               <button
-                onClick={() => setShowClearConfirm(false)}
+                onClick={() => { setClearAlsoCalendar(false); setShowClearConfirm(false); }}
                 style={{ padding: "9px 20px", borderRadius: "10px", border: "none", background: "#eee", color: "#4b3b2a", fontWeight: "bold", cursor: "pointer", fontFamily: "'Nunito', sans-serif", fontSize: "0.9rem" }}
               >
                 Cancel

@@ -695,10 +695,11 @@ const updateNote = (id, data) => {
     setCalendarEvents(sharedEvents);
   }, []);
 
-  const clearDesk = () => {
+  const clearDesk = ({ clearCalendar = true } = {}) => {
     pushUndo();
     setNotes([]); setStickers([]); setPapers([]);
-    setReminders([]); setClocks([]); setCalendars([]); setCalendarEvents({});
+    setReminders([]); setClocks([]); setCalendars([]);
+    if (clearCalendar) setCalendarEvents({});
     try { localStorage.removeItem(storageKey(themeName)); } catch (_) {}
   };
 
