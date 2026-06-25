@@ -408,8 +408,8 @@ const updateNote = (id, data) => {
       name: sticker.name, src: sticker.src, xRatio, yRatio,
       wRatio: isCorkboard ? 0.38 : 0.11,
       hRatio: isCorkboard ? 0.52 : 0.14,
-      backdrop: isCorkboard,
-      layer: isCorkboard ? 0 : getNextLayer(),
+      backdrop: false,
+      layer: getNextLayer(),
     }]);
   }, [pushUndo]);
 
