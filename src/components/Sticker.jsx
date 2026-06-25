@@ -49,6 +49,16 @@ const Sticker = ({
   const [flippedY, setFlippedY] = useState(initFlippedY);
   const [rotation, setRotation] = useState(initRotation);
 
+  // Live rotation, readable at gesture-end. The state variable is frozen inside
+  // handleRotate's closure, so onUp must read the latest angle from this ref.
+  const rotationRef = React.useRef(initRotation);
+
+  // Make the sticker's box match its picture's true shape so the handles hug the
+  // art and overlapping stickers stop stealing each other's clicks. Display-only:
+  // it never changes how sizes are saved. Backdrops (corkboard) are left as-is.
+  const [imgAspect, setImgAspect] = useState(null);
+  const boxHeight = (!isBackdrop && imgAspect) ? width / imgAspect : height;
+
   const handleRotate = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -59,13 +69,15 @@ const Sticker = ({
     const startRot = rotation;
     const onMove = (ev) => {
       const angle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * (180 / Math.PI);
-      setRotation(startRot + (angle - startAngle));
+      const next = startRot + (angle - startAngle);
+      rotationRef.current = next;
+      setRotation(next);
     };
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
-      onTransformChange?.({ flippedX, flippedY, rotation });
+      onTransformChange?.({ flippedX, flippedY, rotation: rotationRef.current });
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
@@ -80,7 +92,7 @@ const Sticker = ({
 
   return (
     <Rnd
-      size={{ width, height }}
+      size={{ width, height: boxHeight }}
       position={{ x, y }}
       bounds={undefined}
       lockAspectRatio={true}
@@ -120,6 +132,11 @@ const Sticker = ({
         <img
           src={src}
           alt={alt}
+          onLoad={(e) => {
+            const w = e.currentTarget.naturalWidth;
+            const h = e.currentTarget.naturalHeight;
+            if (w && h) setImgAspect(w / h);
+          }}
           style={{
             width: "100%",
             height: "100%",
