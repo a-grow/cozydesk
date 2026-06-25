@@ -250,9 +250,44 @@ export default function Cozykawaii() {
       const ordered = [...withLayers].sort((a, b) => a.layer - b.layer); // back → front
       const idx = ordered.findIndex(it => it._type === itemType && it.id === itemId);
       if (idx === -1) return;
-      const swapWith = action === 'moveForward' ? idx + 1 : idx - 1;
-      if (swapWith < 0 || swapWith >= ordered.length) return; // already at front/back
-      [ordered[idx], ordered[swapWith]] = [ordered[swapWith], ordered[idx]];
+      const clicked = ordered[idx];
+
+      // Bounding box in ratio space. Clocks/calendars/reminders don't store a size
+      // here, so bbox returns null and they're treated as "always overlapping" —
+      // you can still cross them, it may just cost an extra click.
+      const bbox = (it) => {
+        switch (it._type) {
+          case 'note':    return { x: it.xRatio, y: it.yRatio, w: (it.w ?? 0) / dimensions.width, h: (it.w ?? 0) / dimensions.height };
+          case 'sticker': return { x: it.xRatio, y: it.yRatio, w: it.wRatio ?? 0, h: it.hRatio ?? 0 };
+          case 'paper': {
+            const w = it.w != null ? it.w / dimensions.width  : (it.wRatio ?? 0);
+            const h = it.h != null ? it.h / dimensions.height : (it.hRatio ?? 0);
+            return { x: it.xRatio, y: it.yRatio, w, h };
+          }
+          default: return null;
+        }
+      };
+      const overlaps = (a, b) => {
+        const A = bbox(a), B = bbox(b);
+        if (!A || !B) return true; // unknown size → assume overlap (safe)
+        return A.x < B.x + B.w && A.x + A.w > B.x && A.y < B.y + B.h && A.y + A.h > B.y;
+      };
+
+      // Re-seat the clicked item just past the nearest item it ACTUALLY overlaps,
+      // skipping non-overlapping items so every click makes a visible change.
+      if (action === 'moveBackward') {
+        let j = -1;
+        for (let i = idx - 1; i >= 0; i--) { if (overlaps(clicked, ordered[i])) { j = i; break; } }
+        if (j === -1) return; // nothing it overlaps sits behind it
+        ordered.splice(idx, 1);
+        ordered.splice(j, 0, clicked);
+      } else {
+        let k = -1;
+        for (let i = idx + 1; i < ordered.length; i++) { if (overlaps(clicked, ordered[i])) { k = i; break; } }
+        if (k === -1) return; // nothing it overlaps sits in front of it
+        ordered.splice(idx, 1);
+        ordered.splice(k, 0, clicked);
+      }
       const normalized = ordered.map((item, i) => ({ ...item, layer: i }));
       desk.applyNormalizedLayers(normalized);
       return;
@@ -271,7 +306,7 @@ export default function Cozykawaii() {
     const sorted     = [...updated].sort((a, b) => a.layer - b.layer);
     const normalized = sorted.map((item, i) => ({ ...item, layer: i }));
     desk.applyNormalizedLayers(normalized);
-  }, [contextMenu, desk.notes, desk.stickers, desk.papers, desk.calendars,
+  }, [dimensions, contextMenu, desk.notes, desk.stickers, desk.papers, desk.calendars,
       desk.clocks, desk.remindersVisible, desk.remindersLayer, desk.applyNormalizedLayers,
       desk.attachSticker, desk.detachSticker, desk.attachNote, desk.detachNote, desk.updateNote]);
 
