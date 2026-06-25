@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Jun 18, 2026. Read fully before touching any code.
+Last updated: Jun 23, 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -171,6 +171,7 @@ Follow in order; skip one and the world renders broken in just that spot.
 - NEVER show clock, calendar, todo, or stickynote assets in the sticker grid.
 - Filter in src/themes/cozykawaii.jsx: exclude filenames containing 'clock', 'calendar', 'todo', 'stickynote'.
 - Applies to ALL themes.
+- Decorative sticker PNGs are pre-trimmed to their visible art (alpha>10 bounding box) so the clickable box hugs the art. NEVER trim clock/calendar/todo/stickynote assets — their overlays are positioned as % of the image, so cropping shifts them off. A 0–3% trim is normal for frame-filling art; near-invisible alpha 1–9 edge pixels can inflate a box, so trim by alpha threshold, not by eye.
 
 ## Sound Effects System
 - Singleton: src/utils/soundManager.js — mirrors audioManager.js pattern.
@@ -237,12 +238,12 @@ Follow in order; skip one and the world renders broken in just that spot.
   - Bring to Front / Send to Back: jump the item's layer past everything (max+1 / min-1).
   - Move Forward / Backward: SWAP the item with its immediate neighbor in the sorted stack (fixed Jun 17).
     Do NOT revert to the old "+/- 1.5 nudge" — that silently failed whenever layer numbers had gaps.
-- Corkboard is a "backdrop" sticker (isCorkboard → layer 0, rendered first). Items can still be sent behind it.
+- No backdrop stickers anymore (Jun 23): corkboard now drops as a NORMAL sticker (backdrop:false, layer:getNextLayer) in addStickerAtPosition, so the box fix applies and it rotates/flips/layers like any sticker. It keeps its larger spawn size. backdrop was the only such trigger; a future real backdrop would be a deliberate new feature.
 
 ## Save Slot Data Shape — Do Not Break
 - Slots store: notes, stickers, papers, clocks, calendars, calendarEvents, reminders, remindersLayer, themeMode, remindersVisible, remindersPos.
 - noteId / item id = Date.now() — never regenerate on load.
-- Notes also persist: src, w, layer, text, `pinned`. Stickers persist flippedX/flippedY/rotation and attach fields (attachedTo/attachOffset/attachRelative).
+- Notes also persist: src, w, layer, text, `pinned`, and attach fields (attachedTo/attachOffset/attachRelative). Stickers persist flippedX/flippedY/rotation and the same attach fields.
 - calendarEvents shape: { "YYYY-MM-DD": [{ text, category, noteId, ... }] }.
 - Keys: cozydesk_state_{theme} (auto-save), cozydesk_saved_{theme}_slot_{n} (named slots).
 
@@ -252,14 +253,16 @@ Follow in order; skip one and the world renders broken in just that spot.
 - Settings panel renders at zIndex 600 — above all desk items AND pinned notes (450), below modals (10100).
 - Working Pin-to-front (📍/📌) + "Unpin" in the right-click menu for pinned notes.
 - Clock flip (↔) on the size-buttons row; XS/S/M/L/XL size buttons on clock and calendar.
-- Attach-to-back-layer / detach system (STICKERS only — notes can't attach yet; see On the Horizon).
+- Attach/detach for BOTH stickers and notes. Right-click → Attach glues a child to the item beneath its center that has a lower layer (corkboard/sticker/paper/note); while attached it can't be dragged or resized (right-click → Detach to free it). Notes ride their parent's position but NEVER scale (fixed-px size model); stickers scale with the parent. Impl: attachNote/detachNote/moveAttachedNotes in useDeskState.js, and resizeAttachedStickers ALSO repositions attached notes now (its name under-describes it); the attach/detach cases + canAttach/isAttached props handle 'note' in cozykawaii.jsx; StickyNote.jsx gained an isAttached prop → disableDragging + enableResizing guard. ContextMenu.jsx needed NO change — it's already generic (driven by isPinned/isAttached/canAttach).
 - Save / My Desks (10 slots per theme).
 - Lofi sidebar icons; steampunk animated brass gears + mahogany sidebar background.
 - Per-theme theme-color meta tag. Aspect-ratio locking on notes and to-do lists.
 - Music: 4 tracks per theme, static-imported in audioManager.js.
+- Sticker box hugs its art (Jun 23): Sticker.jsx reads each image's natural aspect ratio on load (imgAspect via onLoad) and sets the Rnd box height to match, so handles hug the art and overlapping stickers stop stealing clicks. Display-only — does NOT change saved sizes, does NOT touch attach. Backdrops excluded. Round art still has small corner gaps (geometry, not a bug).
 
 ## Completed Behaviors — Do Not Restore or Re-break
 - Move Forward/Backward swap with the neighbor (not a fixed nudge). Pin overrides layer (zIndex 450). Pinned notes show "Unpin," not layer options.
+- Sticker rotation persists across refresh (Jun 23): handleRotate keeps the live angle in rotationRef (onMove writes it, onUp reads it). The plain rotation state is stale inside onUp's closure — do NOT revert to reading it there, or rotation saves as its pre-gesture value (0 on a fresh sticker). Flip avoids this by computing next fresh per click. Clock/calendar flip+rotate not yet audited for the same trap.
 - Calendar ↔ sticky note reverse-sync popup: removed intentionally. Not a bug.
 - Calendar modal opens at the month the widget is currently SHOWING — not always today (MiniCalendar onMonthChange → CalendarSticker calMonth → LargeCalendarModal initial props). Applies to ALL themes.
 - Sticky notes AND to-do lists are strictly per-theme (saved with cozydesk_state_{theme}); never carried over on a theme switch. The ONLY theme-switch popup is the calendar-events sharing opt-in (see Calendar Sharing). There is NO cozydesk_carryover_pref key (older design, removed; the inert `snapshot`/`_getSnapshot` leftovers in ThemeContext.jsx are intentional, not a bug). Force the sharing popup again: `localStorage.removeItem('cozydesk_calendar_shared')` then reload (only reappears when the current theme has events).
@@ -312,15 +315,6 @@ Follow in order; skip one and the world renders broken in just that spot.
 
 ## On the Horizon
 **Build new worlds first.** Worlds are the product and the main revenue lever; the entry/store stays parked until the shelf is fuller.
-
-Note-attach feature (parked for pre-launch): let a sticky NOTE attach to and ride the sticker it sits on
-(e.g. a corkboard), the way stickers already attach. The sticker attach system exists in full — the trigger
-is the `'attach'` case in handleLayerAction (cozykawaii.jsx): it finds the lower-layer item the child overlaps,
-computes offsets, and calls attachSticker; parents move their children via moveAttachedStickers /
-resizeAttachedStickers in their onUpdate/onDrag. To extend to notes: allow itemType 'note' in that menu logic,
-add attachNote/detachNote in useDeskState (mirroring the sticker versions but on setNotes), and have every
-parent's drag also move attached NOTES (not just stickers). Touches useDeskState.js + cozykawaii.jsx + ContextMenu.jsx.
-
 Café Morning: COMPLETE as of Jun 18. To-do paper exists, todoBase measured (358×353), text area + chalk-white
 input color tuned, cap set to 5. Background, clock, calendar widget, sidebar clock icon, 4-track playlist all done.
 
@@ -355,5 +349,5 @@ One global calendar-events list, optionally shared across all themes. Calendar W
 - Engine (useDeskState.js): enableCalendarSharing() merges every theme's events into the shared blob + flag 'on'. disableCalendarSharing() copies shared events into EVERY theme, flag 'off', removes the blob.
 - Opt-in popup ("One calendar everywhere?") shows only when the flag is unset AND the source theme has events (ThemeContext.jsx). Settings toggle in cozykawaii.jsx.
 - DO NOT RE-BREAK: loadThemeState must load the shared calendar even when a theme has NO saved per-theme desk. Removing that branch reintroduces the bug where new themes show no events AND an empty auto-save wipes the shared blob.
-- Known issue (parked): "Clear All" while sharing is ON blanks the shared calendar (all themes lose events).
+- "Clear All" while sharing is ON (FIXED Jun 18): the confirm dialog shows an unchecked-by-default checkbox "Also erase shared calendar events (used in all themes)" — only when sharing is on. clearDesk now takes { clearCalendar = true }; unchecked preserves the shared blob, checked wipes it everywhere. Sharing OFF: no checkbox, clears as before. The warning line also switches to "Everything on this desk will be erased" when sharing is on, so it no longer contradicts the checkbox.
 - Pass 2 (future): shared to-do lists.
