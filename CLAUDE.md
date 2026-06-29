@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Jun 23, 2026. Read fully before touching any code.
+Last updated: Jun 29, 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -132,7 +132,7 @@ SIZE = absolute pixels (window-independent). POSITION = ratios (xRatio/yRatio).
 
 ## Theme System
 All visual config lives in src/themes/themeRegistry.js — never hardcode theme names in components.
-- Themes: Cozy Kawaii, Lo-Fi, Steampunk, Café Morning (in progress; more planned).
+- Themes: Cozy Kawaii, Lo-Fi, Steampunk, Café Morning (all four complete; more planned).
 - Day-cycle concept: Café (morning) → Kawaii (midday) → Steampunk (sunset) → Lo-Fi (night).
 - cozykawaii.jsx is the main desk renderer for ALL themes — don't rename.
 - New theme = add config entry + assets (incl. todoBase, sidebar --btn-bg/--btn-text/--btn-font). It inherits the universal sticky notes — no note art needed.
@@ -172,6 +172,7 @@ Follow in order; skip one and the world renders broken in just that spot.
 - Filter in src/themes/cozykawaii.jsx: exclude filenames containing 'clock', 'calendar', 'todo', 'stickynote'.
 - Applies to ALL themes.
 - Decorative sticker PNGs are pre-trimmed to their visible art (alpha>10 bounding box) so the clickable box hugs the art. NEVER trim clock/calendar/todo/stickynote assets — their overlays are positioned as % of the image, so cropping shifts them off. A 0–3% trim is normal for frame-filling art; near-invisible alpha 1–9 edge pixels can inflate a box, so trim by alpha threshold, not by eye.
+- New stickers load via the asset glob: dropping a trimmed PNG into [theme]/stickers/ is enough — NO themeRegistry edit needed (this is why an art-only commit is safe). Deletions are equally safe.
 
 ## Sound Effects System
 - Singleton: src/utils/soundManager.js — mirrors audioManager.js pattern.
@@ -236,14 +237,20 @@ Follow in order; skip one and the world renders broken in just that spot.
   (Exception: a PINNED note renders at zIndex 450, overriding its layer — see Sticky Note Rules.)
 - Right-click menu actions live in handleLayerAction (cozykawaii.jsx) → applyNormalizedLayers (useDeskState.js):
   - Bring to Front / Send to Back: jump the item's layer past everything (max+1 / min-1).
-  - Move Forward / Backward: SWAP the item with its immediate neighbor in the sorted stack (fixed Jun 17).
-    Do NOT revert to the old "+/- 1.5 nudge" — that silently failed whenever layer numbers had gaps.
+  - Move Forward / Backward: re-seat the item just past the nearest item it ACTUALLY OVERLAPS, skipping
+    non-overlapping items (fixed Jun 25). History: the Jun-17 fix swapped with the immediate neighbor in the
+    GLOBAL stack — but that neighbor is often a sticker elsewhere on the desk the item doesn't touch, so the
+    swap is invisible and the action feels dead until you click many times. Now handleLayerAction computes an
+    AABB overlap (bbox in ratio space) and only crosses items that actually overlap, so every click is visible.
+    Items with no stored size (clocks, calendars, reminders widget) return null bbox and are treated as
+    "always overlapping" — you can still cross them, at worst one extra click. Do NOT revert to the global-
+    neighbor swap, and do NOT revert further to the old "+/- 1.5 nudge."
 - No backdrop stickers anymore (Jun 23): corkboard now drops as a NORMAL sticker (backdrop:false, layer:getNextLayer) in addStickerAtPosition, so the box fix applies and it rotates/flips/layers like any sticker. It keeps its larger spawn size. backdrop was the only such trigger; a future real backdrop would be a deliberate new feature.
 
 ## Save Slot Data Shape — Do Not Break
 - Slots store: notes, stickers, papers, clocks, calendars, calendarEvents, reminders, remindersLayer, themeMode, remindersVisible, remindersPos.
 - noteId / item id = Date.now() — never regenerate on load.
-- Notes also persist: src, w, layer, text, `pinned`, and attach fields (attachedTo/attachOffset/attachRelative). Stickers persist flippedX/flippedY/rotation and the same attach fields.
+- Notes also persist: src, w, layer, text, `pinned`, `rotation`, and attach fields (attachedTo/attachOffset/attachRelative). Papers also persist `rotation`. Stickers persist flippedX/flippedY/rotation and the same attach fields.
 - calendarEvents shape: { "YYYY-MM-DD": [{ text, category, noteId, ... }] }.
 - Keys: cozydesk_state_{theme} (auto-save), cozydesk_saved_{theme}_slot_{n} (named slots).
 
@@ -258,11 +265,13 @@ Follow in order; skip one and the world renders broken in just that spot.
 - Lofi sidebar icons; steampunk animated brass gears + mahogany sidebar background.
 - Per-theme theme-color meta tag. Aspect-ratio locking on notes and to-do lists.
 - Music: 4 tracks per theme, static-imported in audioManager.js.
+- Sticker art refresh (Jun 25): large batch of new + re-trimmed sticker PNGs across all four themes, plus new kawaii (cozycornerbg.png) and café (cafe-background.png) backgrounds. New stickers load via the asset glob — dropping a trimmed PNG in [theme]/stickers/ is enough, NO themeRegistry edit (that's why an art-only commit is safe). Deletions are equally safe. Lofi sticker shelf grew (devices, drinks, food, photos, posters, plants); see the lofi sticker ideas list for what's next.
 - Sticker box hugs its art (Jun 23): Sticker.jsx reads each image's natural aspect ratio on load (imgAspect via onLoad) and sets the Rnd box height to match, so handles hug the art and overlapping stickers stop stealing clicks. Display-only — does NOT change saved sizes, does NOT touch attach. Backdrops excluded. Round art still has small corner gaps (geometry, not a bug).
 
 ## Completed Behaviors — Do Not Restore or Re-break
-- Move Forward/Backward swap with the neighbor (not a fixed nudge). Pin overrides layer (zIndex 450). Pinned notes show "Unpin," not layer options.
-- Sticker rotation persists across refresh (Jun 23): handleRotate keeps the live angle in rotationRef (onMove writes it, onUp reads it). The plain rotation state is stale inside onUp's closure — do NOT revert to reading it there, or rotation saves as its pre-gesture value (0 on a fresh sticker). Flip avoids this by computing next fresh per click. Clock/calendar flip+rotate not yet audited for the same trap.
+- Move Forward/Backward cross only items the target ACTUALLY OVERLAPS (fixed Jun 25 — not a global-stack neighbor swap, not a fixed nudge). Pin overrides layer (zIndex 450). Pinned notes show "Unpin," not layer options.
+- Sticker rotation persists across refresh (Jun 23): handleRotate keeps the live angle in rotationRef (onMove writes it, onUp reads it). The plain rotation state is stale inside onUp's closure — do NOT revert to reading it there, or rotation saves as its pre-gesture value (0 on a fresh sticker). Flip avoids this by computing next fresh per click.
+- Sticky-note AND to-do-paper rotation persists across refresh (Jun 29): same rotationRef pattern as stickers — onMove writes rotationRef.current, onUp calls onUpdate({ rotation: rotationRef.current }); an initialRotation prop seeds state on load; addNoteAtPosition/addPaperAtPosition seed rotation:0. CRITICAL: updatePaper now guards x/y/w/h for undefined (mirrors updateNote). A rotation-only update arrives with NO x/y/w/h — without the guards updatePaper recomputed them from undefined → NaN → saved as null → the paper rendered at NaN and VANISHED on reload. Do NOT remove those guards. Clock/calendar flip+rotate still not audited for the same trap.
 - Calendar ↔ sticky note reverse-sync popup: removed intentionally. Not a bug.
 - Calendar modal opens at the month the widget is currently SHOWING — not always today (MiniCalendar onMonthChange → CalendarSticker calMonth → LargeCalendarModal initial props). Applies to ALL themes.
 - Sticky notes AND to-do lists are strictly per-theme (saved with cozydesk_state_{theme}); never carried over on a theme switch. The ONLY theme-switch popup is the calendar-events sharing opt-in (see Calendar Sharing). There is NO cozydesk_carryover_pref key (older design, removed; the inert `snapshot`/`_getSnapshot` leftovers in ThemeContext.jsx are intentional, not a bug). Force the sharing popup again: `localStorage.removeItem('cozydesk_calendar_shared')` then reload (only reappears when the current theme has events).
@@ -294,6 +303,13 @@ Follow in order; skip one and the world renders broken in just that spot.
 - When a CSS override doesn't take, check the full DevTools cascade — a correct rule can be beaten by a higher-specificity global reset in another file (café Pomodoro buttons: fix was the index.css exclusion list, not Sidebar.css).
 - READ AND TRACE, don't just read (Jun 17). Told Andrew the pin "raises z-index to 100 and keeps it on top." It didn't: every note always has a `layer`, so `layer != null ? layer : (isPinned ? 100 : 5)` always used `layer` and the pinned branch was dead. The line looked right; tracing the actual values showed it never ran. Fix: `isPinned ? 450 : (layer ?? 5)`.
 - GET A LIVE TEST BEFORE CALLING SOMETHING "FINE" (Jun 17). Leaned "Move Backward is working as designed, just one step." A 10-second test showed Send to Back worked but Move Backward didn't — a real bug: the fixed +/-1.5 nudge can't cross a neighbor when layer numbers have gaps. Fix: swap with the neighbor in the sorted stack.
+- LOGS BEAT THEORIES; A "FIXED" BEHAVIOR CAN STILL BE WRONG (Jun 25). Move Forward/Backward felt finicky across
+  all themes. First guess (stale-closure on getAllItems) was WRONG — the callback's deps already covered it.
+  Rather than guess twice, dropped a temp console.log of the sorted stack + which item the swap targeted. The
+  logs proved it instantly: the front item swapped with a NON-overlapping sticker, so nothing moved on screen.
+  Lesson: when a behavior is intermittent, print the actual data before theorizing, and don't trust a
+  "fixed Jun X" note as proof — a fix can solve one cause (layer gaps) and leave another (non-overlapping
+  neighbors). Real fix: cross only items the target actually overlaps (AABB).
 - CLAUDE CODE OVERSTEPS WITHOUT EXPLICIT GUARDRAILS (Jun 17). It committed and pushed after being told "do not commit," started a dev server, tried to install Playwright, and created stray files (AGENTS.md, tasks/todo.md). The reliable fix: lead EVERY Claude Code prompt with the HARD RULES block (see Claude Code Prompt Rules). Andrew commits — Claude Code never does. Prompts that included the block behaved perfectly.
 
 ## Known Bugs — Queued
@@ -307,7 +323,7 @@ Follow in order; skip one and the world renders broken in just that spot.
 ## Roadmap / Cleanups (one at a time — backup + commit each; do NOT batch)
 - Folder rename: src/themes/[theme]/stickynotes/ → todo/ (the folders only hold the to-do paper now). git mv per theme, update the glob path in themeRegistry.js, grep for stray "stickynotes" refs, sync this doc. Optional cleanup.
 - ContextMenu.jsx font: 'Patrick Hand' → Nunito (one line, its own commit). See Font Rules.
-- .claude/settings.local.json: consider gitignoring so it stops appearing in every git status.
+- .claude/settings.local.json: gitignored as of Jun 18 (commit 6647a11).
 - WebP / lighter images — BEFORE LAUNCH. One-time, hand-checked, per-asset conversion. NO blind batch convert (lossy WebP smears the gradient/transparency art); preserve alpha. The asset glob already accepts .webp.
 - Debounce auto-save — AFTER LAUNCH / beta. Debounce ONLY the background auto-save; keep Save-slot and theme-switch saves immediate. Flush on visibilitychange/pagehide, NOT just beforeunload (unreliable on mobile).
 - Lazy-load art — HOLD. A project, not a fix. Defer until ~10+ themes.
@@ -317,6 +333,13 @@ Follow in order; skip one and the world renders broken in just that spot.
 **Build new worlds first.** Worlds are the product and the main revenue lever; the entry/store stays parked until the shelf is fuller.
 Café Morning: COMPLETE as of Jun 18. To-do paper exists, todoBase measured (358×353), text area + chalk-white
 input color tuned, cap set to 5. Background, clock, calendar widget, sidebar clock icon, 4-track playlist all done.
+
+Lofi sticker ideas (Jun 25): a fresh batch of new lofi stickers already landed in the art refresh (devices,
+drinks, food, photos, posters, plants). Remaining top picks still wanted: vinyl record, mechanical keyboard,
+lava lamp, scented candle, stacked books, hourglass, pencil cup. (Open list — not yet built.)
+
+Sticker hover-glow (designed, not built): subtle glow on hover, DESKTOP-ONLY (no hover on touch). Agreed as
+polish after the trim pass. Not built.
 
 Welcome / entry flow (designed, not built): soft splash on every launch (tap-to-skip, doubles as load screen);
 first-launch-only "pick your world" + mandatory Terms & Privacy gate + local-save warning + "artwork made with AI
