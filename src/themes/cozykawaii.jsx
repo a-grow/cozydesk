@@ -626,6 +626,7 @@ export default function Cozykawaii() {
           width={paper.w ?? paper.wRatio * dimensions.width}
           height={paper.h ?? paper.hRatio * dimensions.height}
           layer={paper.layer}
+          initialRotation={paper.rotation ?? 0}
           reminders={desk.reminders.filter(r => paper.reminderIds.includes(r.id))}
           isSelected={selectedId?.type === "paper" && selectedId?.id === paper.id}
           onSelect={() => setSelectedId({ type: "paper", id: paper.id })}
@@ -737,6 +738,7 @@ export default function Cozykawaii() {
           pinned={note.pinned}
           isAttached={!!note.attachedTo}
           layer={note.layer}
+          initialRotation={note.rotation ?? 0}
           initialText={note.text}
           isSelected={selectedId?.type === "note" && selectedId?.id === note.id}
           onSelect={() => setSelectedId({ type: "note", id: note.id })}

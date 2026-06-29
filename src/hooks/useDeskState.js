@@ -366,6 +366,7 @@ export function useDeskState({ dimensions, themeName }) {
       id: Date.now(), src, xRatio, yRatio,
       w: 180,
       text: "", pinned: false,
+      rotation: 0,
       layer: getNextLayer(),
     }]);
   };
@@ -515,7 +516,7 @@ const updateNote = (id, data) => {
     setPapers(prev => [...prev, {
       id: Date.now(), xRatio, yRatio,
       w: baseW * scale, h: baseH * scale,
-      reminderIds: [], layer: getNextLayer(),
+      reminderIds: [], rotation: 0, layer: getNextLayer(),
     }]);
   };
 
@@ -536,11 +537,11 @@ const updateNote = (id, data) => {
   const updatePaper = (id, data) => {
     pushUndo();
     setPapers(prev => prev.map(p => p.id === id ? {
-      ...p,
-      xRatio: data.x      / dimensions.width,
-      yRatio: data.y      / dimensions.height,
-      w: data.width,
-      h: data.height,
+      ...p, ...data,
+      xRatio: data.x      !== undefined ? data.x      / dimensions.width  : p.xRatio,
+      yRatio: data.y      !== undefined ? data.y      / dimensions.height : p.yRatio,
+      w:      data.width  !== undefined ? data.width  : p.w,
+      h:      data.height !== undefined ? data.height : p.h,
     } : p));
   };
 
@@ -558,7 +559,7 @@ const updateNote = (id, data) => {
         xRatio: 0.35 + Math.random() * 0.2,
         yRatio: 0.2  + Math.random() * 0.2,
         w: baseW * scale, h: baseH * scale,
-        reminderIds: [reminder.id], layer: getNextLayer(),
+        reminderIds: [reminder.id], rotation: 0, layer: getNextLayer(),
       }]);
     }
   };

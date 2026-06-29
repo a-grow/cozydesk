@@ -23,6 +23,7 @@ const StickyNote = ({
   pinned = false,
   isAttached = false,
   initialText = "",
+  initialRotation = 0,
   isSelected,
   onSelect,
   onUpdate,
@@ -33,7 +34,8 @@ const StickyNote = ({
   const { themeStickyNotes, themeName, theme } = useTheme();
   const stickyNoteAssets = themeStickyNotes.filter(a => !a.name.includes('todo'));
   const [text, setText] = useState(initialText);
-  const [rotation, setRotation] = useState(0);
+  const [rotation, setRotation] = useState(initialRotation);
+  const rotationRef = useRef(initialRotation);
   const [fontFamily, setFontFamily] = useState(theme.defaultNoteFont || "'Nunito', sans-serif");
   const [fontSizeRatio, setFontSizeRatio] = useState(0.055);
   const [isHovered, setIsHovered] = useState(false);
@@ -60,12 +62,15 @@ const StickyNote = ({
     const startRot = rotation;
     const onMove = (ev) => {
       const angle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * (180 / Math.PI);
-      setRotation(startRot + (angle - startAngle));
+      const next = startRot + (angle - startAngle);
+      rotationRef.current = next;
+      setRotation(next);
     };
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
+      onUpdate({ rotation: rotationRef.current });
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
