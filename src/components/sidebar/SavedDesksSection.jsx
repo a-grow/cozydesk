@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { soundManager } from '../../utils/soundManager';
+import { hasBackupData, downloadBackup, restoreFromFile } from '../../utils/backupManager';
 
 const FONT = "'Nunito', sans-serif";
 const slotKey = (theme, slot) => `cozydesk_saved_${theme}_slot_${slot}`;
@@ -37,6 +38,43 @@ export default function SavedDesksSection({ themeName, onLoad }) {
   // rename mini-popup
   const [renamingSlot, setRenamingSlot] = useState(null);
   const [renameVal, setRenameVal]       = useState('');
+
+  // backup / restore
+  const fileInputRef = React.useRef(null);
+  const [restoreMsg, setRestoreMsg]         = useState(null);   // { kind: 'error'|'success', text }
+  const [pendingFile, setPendingFile]       = useState(null);   // file awaiting replace-confirm
+  const canBackup = hasBackupData();
+
+  const handleBackup = () => {
+    if (!canBackup) return;
+    soundManager.play('sfx_save');
+    downloadBackup();
+  };
+
+  const handleRestoreClick = () => {
+    setRestoreMsg(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleFileChosen = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    soundManager.play('sfx_areyousure');
+    setPendingFile(file);   // triggers the replace-confirm popup
+  };
+
+  const doRestore = async () => {
+    const file = pendingFile;
+    setPendingFile(null);
+    const result = await restoreFromFile(file);
+    if (result.ok) {
+      setRestoreMsg({ kind: 'success', text: 'Restored! Reloading…' });
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      setRestoreMsg({ kind: 'error', text: "Hmm, that doesn't look like a CozyDesk backup file." });
+    }
+  };
 
   const slots = Array.from({ length: 10 }, (_, i) => {
     const n = i + 1;
@@ -79,6 +117,38 @@ export default function SavedDesksSection({ themeName, onLoad }) {
 
   return (
     <div data-refresh={refresh}>
+      {/* ── Backup warning + actions ── */}
+      <div style={{ fontFamily: FONT, fontSize: '0.85rem', lineHeight: 1.5, color: 'var(--sb-heading)', marginBottom: '8px' }}>
+        Your desks live on your computer, not in the cloud. If you clear the app's data, they'll be erased —
+        so <strong>save a backup file</strong> to keep them safe.
+      </div>
+      <div style={{ display: 'flex', gap: '5px', marginBottom: '6px' }}>
+        <Btn
+          color="green"
+          onClick={handleBackup}
+          style={{ flex: 1, opacity: canBackup ? 1 : 0.5, cursor: canBackup ? 'pointer' : 'not-allowed' }}
+        >
+          Save a backup file
+        </Btn>
+      </div>
+      <div style={{ display: 'flex', gap: '5px', marginBottom: '12px' }}>
+        <Btn color="load" onClick={handleRestoreClick} style={{ flex: 1 }}>
+          Restore from a backup file
+        </Btn>
+      </div>
+      {restoreMsg && (
+        <div style={{ fontFamily: FONT, fontSize: '0.75rem', lineHeight: 1.4, marginBottom: '10px', color: restoreMsg.kind === 'error' ? COLORS.red : COLORS.green }}>
+          {restoreMsg.text}
+        </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json,.json"
+        style={{ display: 'none' }}
+        onChange={handleFileChosen}
+      />
+
       {slots.map(({ slot, data }) => {
         const isExpanded   = expandedSlot === slot;
         const isConfirming = confirmDelete === slot;
@@ -137,6 +207,28 @@ export default function SavedDesksSection({ themeName, onLoad }) {
           </div>
         );
       })}
+
+      {/* ── RESTORE replace-confirm popup (portal) ── */}
+      {pendingFile !== null && createPortal(
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 10002, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setPendingFile(null)}
+        >
+          <div
+            style={{ background: '#fff', borderRadius: '14px', padding: '22px 24px', boxShadow: '0 8px 28px rgba(0,0,0,0.22)', width: '300px', fontFamily: FONT }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontFamily: FONT, fontSize: '0.9rem', color: '#333', lineHeight: 1.5, marginBottom: '16px' }}>
+              This will replace your current desks with the backup. Continue?
+            </div>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+              <Btn color="green" onClick={doRestore}>Yes, restore</Btn>
+              <Btn color="gray"  onClick={() => setPendingFile(null)}>Cancel</Btn>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* ── RENAME mini-popup (portal) ── */}
       {renamingSlot !== null && createPortal(
