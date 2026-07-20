@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cozydesk-v1';
+const CACHE_NAME = 'cozydesk-v2';
 
 // Core files to cache on install
 const PRECACHE_URLS = [
@@ -27,7 +27,6 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Cache-first for same-origin assets, network-first for everything else
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
@@ -36,8 +35,32 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  // Cache-first strategy for local static assets (JS, CSS, images, fonts, audio)
   if (url.origin === self.location.origin) {
+    // Network-first for the app shell (HTML / navigation / entry point).
+    // This is what lets a new deploy actually reach users instead of
+    // serving a stale cached page forever.
+    const isAppShell =
+      request.mode === 'navigate' ||
+      url.pathname === '/' ||
+      url.pathname === '/index.html' ||
+      url.pathname === '/manifest.json';
+
+    if (isAppShell) {
+      event.respondWith(
+        fetch(request)
+          .then((response) => {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+            return response;
+          })
+          .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
+      );
+      return;
+    }
+
+    // Cache-first for hashed static assets (JS, CSS, images, fonts, audio).
+    // Safe because Vite gives every build new filenames, so a new version
+    // is a new URL that misses the cache and gets fetched fresh.
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
