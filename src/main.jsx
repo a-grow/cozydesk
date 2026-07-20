@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "./themes/ThemeContext.jsx";
 import Cozykawaii from "./themes/cozykawaii.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import './index.css';
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
@@ -12,8 +13,10 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <Cozykawaii />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <Cozykawaii />
+      </ThemeProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
