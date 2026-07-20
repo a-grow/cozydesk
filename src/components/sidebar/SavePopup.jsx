@@ -51,8 +51,17 @@ function Btn({ color, disabled, onClick, children }) {
 }
 
 export default function SavePopup({ themeName, currentDesk, onSave, onClose }) {
-  // Use the currently loaded/saved desk as overwrite target; fall back to most recent save
-  const overwriteTarget = currentDesk || getLastSaved(themeName);
+  // Use the currently loaded/saved desk as overwrite target — but ONLY if it actually
+  // belongs to the CURRENT theme. currentDesk isn't cleared on theme switch, so it can
+  // hold a desk from another theme; validating it against this theme's slots prevents
+  // overwriting the wrong theme's desk. Falls back to the most recent save in this theme.
+  const currentDeskValid =
+    currentDesk &&
+    (() => {
+      const meta = getSlotMeta(themeName, currentDesk.slot);
+      return meta && meta.name === currentDesk.name;
+    })();
+  const overwriteTarget = currentDeskValid ? currentDesk : getLastSaved(themeName);
   const firstEmpty = getFirstEmpty(themeName);
   const hasSaves   = overwriteTarget !== null;
   const allFull    = firstEmpty === null;
