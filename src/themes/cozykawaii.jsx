@@ -15,6 +15,7 @@ import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
 import { soundManager } from '../utils/soundManager';
+import pkg from '../../package.json';
 
 const SIDEBAR_WIDTH = 250;
 
@@ -426,8 +427,15 @@ export default function Cozykawaii() {
             🗑️ Clear All
           </button>
           <p style={{ margin: "8px 0 0 0", color: "#a07850", fontSize: "13px", textAlign: "center", fontFamily: "'Nunito', sans-serif" }}>
-            CozyDesk v1.0 · Your cozy productivity hub 🌸
+            CozyDesk v{pkg.version} · Your cozy productivity hub 🌸
           </p>
+          <a
+            href={`mailto:cozydesksupport@gmail.com?subject=${encodeURIComponent(`CozyDesk Bug Report (v${pkg.version})`)}&body=${encodeURIComponent(`Tell us what happened:\n\n\nWhat did you expect instead?\n\n\nBrowser (Chrome, Safari, etc.):\n\n\n———\nApp version: ${pkg.version}\n(Please keep this version line so we know which build you're on. Thank you! 🌸)`)}`}
+            onClick={e => e.stopPropagation()}
+            style={{ display: "block", margin: "2px 0 0 0", color: "#a07850", fontSize: "13px", textAlign: "center", fontFamily: "'Nunito', sans-serif", textDecoration: "underline", cursor: "pointer" }}
+          >
+            🐛 Report a bug
+          </a>
         </div>
       )}
 
