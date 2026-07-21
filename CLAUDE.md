@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Jul 20, 2026. Read fully before touching any code.
+Last updated: Jul 21, 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -192,12 +192,12 @@ All visual config in `src/themes/themeRegistry.js` — never hardcode theme name
 - Service worker only runs in the production build — a cache/SW fix can't be fully tested in `npm run dev`; verify after deploy.
 
 ## Completed — Do Not Rebuild or Re-break
-Universal sticky notes; per-theme maxItems + delete-completed ✕; settings panel zIndex 600; pin-to-front + Unpin; clock flip + XS/S/M/L/XL sizing; attach/detach for stickers and notes; Save / My Desks (10 slots/theme); lofi sidebar icons; steampunk gears + mahogany sidebar; per-theme theme-color meta; aspect-ratio locking; 4 tracks/theme; sticker box hugs art; storage-full warning; calendar sharing; sticker + note + to-do-paper rotation persistence (rotationRef pattern — onMove writes ref, onUp reads it, dodges stale closure; add fns seed rotation:0; initialRotation prop seeds on load); **cache/app-shell fix; error boundary; backup/restore; cross-theme save-overwrite fix** (all Jul 20).
+Universal sticky notes; per-theme maxItems + delete-completed ✕; settings panel zIndex 600; pin-to-front + Unpin; clock flip + XS/S/M/L/XL sizing; attach/detach for stickers and notes; Save / My Desks (10 slots/theme); lofi sidebar icons; steampunk gears + mahogany sidebar; per-theme theme-color meta; aspect-ratio locking; 4 tracks/theme; sticker box hugs art; storage-full warning; calendar sharing; sticker + note + to-do-paper rotation persistence (rotationRef pattern — onMove writes ref, onUp reads it, dodges stale closure; add fns seed rotation:0; initialRotation prop seeds on load); **cache/app-shell fix; error boundary; backup/restore; cross-theme save-overwrite fix** (all Jul 20). Settings now shows a live version number (read from package.json) plus a 'Report a bug' mailto link to cozydesksupport@gmail.com (Jul 21).
 
 ## Launch Prep — Where We Are
-Done: cache fix, error boundary, backup/restore. Next, in order:
-4. Settings additions — version number (so bug reports name the build) + lightweight "Report a Bug" contact.
-5. Legal docs — Terms/EULA, Privacy, Refund, local-save warning (Claude drafts; review or run through Termly/iubenda). NOT legal advice.
+Done: cache fix, error boundary, backup/restore, Settings version + Report a Bug (Jul 21), all four legal docs drafted (Jul 21). Legal docs live in ~/Documents/CozyDesk Legal/ — NOT yet placed in the app; onboarding places them. Support email: cozydesksupport@gmail.com (forwards to growandygrow). Next, in order:
+✅ 4. Settings additions — version number (so bug reports name the build) + lightweight "Report a Bug" contact.
+✅ 5. Legal docs — Terms/EULA, Privacy, Refund, local-save warning (Claude drafts; review or run through Termly/iubenda). NOT legal advice.
 6. Onboarding — splash + first-launch pick-your-world + Terms/Privacy gate + local-save warning + "Artwork made with AI tools" line; store `cozydesk_terms_v1`; returning users go straight to last theme.
 7. Deploy — app.cozydesk.app (subdomain, keeps Vite base at '/'), GoDaddy DNS CNAME app → GitHub Pages, install button, "how to install (Chrome/Edge/Safari; Firefox can't)" copy.
 8. Smoke-test matrix — fresh install, reinstall, save, load, theme switch, calendar, sticky notes, to-do lists, updates-don't-erase-data; check right-click layer menu on touch (long-press).
@@ -208,6 +208,7 @@ Legal notes: no law requires disclosing the app was BUILT with AI; the AI-art li
 
 ## Parked — After Beta / Growth (NOT launch blockers)
 Build new worlds (standing priority once launch prep is done). "Worlds" rename (Themes → Worlds — its own deliberate session). Positioning/landing copy ("cozy workspace," sell the feeling first). Premium messaging + community roadmap + vote-on-next-world. Analytics (adds a privacy-policy obligation — defer, add the disclosure when it ships). Demo video + screenshots. Sidebar Themes dropdown → visual gallery (thumbnails, lock + $1.99; surface $10.99 all-access only at buy moment, worded "all current and future worlds, one payment" — never "forever"). Hover-glow (desktop-only). Export a single desk to share (distinct from backup). Tauri native wrap (only if beta demands a real installer / folder auto-save).
+New parked (Jul 21): Remove the dead 'Notify Me / Save My Cozy Spot' email box from the landing page BEFORE legal docs go live (a live-looking signup contradicts 'no email collection'; it currently collects nothing). At checkout (store UI task), add a 'unlocks instantly, non-refundable once used (see Refund Policy)' line near the Buy button — this makes the refund waiver bind. Refund stance DECIDED: no automatic refund window, instant-access, final-by-default, case-by-case goodwill.
 
 ## Queued Cleanups (one at a time — backup + commit each; do NOT batch)
 - ContextMenu.jsx font 'Patrick Hand' → Nunito (one line).
