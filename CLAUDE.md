@@ -51,17 +51,30 @@ Also when writing Claude Code prompts:
 ## Project Info
 - App: ~/Developer/cozydesk (moved off iCloud Desktop — see Environment). Mac: "Minty."
 - Dev server: `npm run dev` (check terminal for port; usually 5173).
-- GitHub Pages, repo a-grow/cozydesk. `dev` = active development, `main` = landing page only. Domain: cozydesk.app; app will live at app.cozydesk.app.
+- GitHub Pages, repo a-grow/cozydesk. `dev` = active development AND the production branch — every push to `dev` auto-deploys to app.cozydesk.app. `main` in this repo is stale/unused. The landing page lives in the separate repo a-grow/cozydesk-landing (`main`).
 - Stack: Vite + React (PWA). UI font: Nunito everywhere.
 - Hosting is 100% free and needs nothing running on Andrew's end. Users each run their own copy; deployed updates reach them on next open (once the service worker is correct — see below).
 
 ## Environment — CRITICAL
 - Project MUST live at ~/Developer/cozydesk — NOT on the iCloud-synced Desktop. iCloud sync creates conflict-duplicate files ("useDeskState 2.js") and duplicates Vite's cache → stale builds. Old Desktop location is backup-only.
 
-## Delivery Model (Phase 1 — DECIDED)
-- Ship as a **PWA (Option A), free.** Users visit app.cozydesk.app once and INSTALL through the browser: Chrome/Edge = one-click; Safari = File → Add to Dock; Firefox CANNOT install PWAs. End result = a real app in the dock/taskbar, own window, no browser visible.
-- There is NO downloaded installer file. Landing copy must say "Install," never "Download for Mac" (that would be the Tauri path).
-- Tauri (true `.dmg`/`.exe` installer, silent auto-save to a chosen folder) is DEFERRED — costs ~$99/yr Apple signing + notarization. Revisit only if beta proves demand.
+## Deployment — CRITICAL
+- Push to `dev` → GitHub Actions (`.github/workflows/deploy.yml`) builds with Vite → publishes `dist` → live in ~2 minutes. **During beta, treat "push" as "publish."**
+- `public/CNAME` MUST contain `app.cozydesk.app`. If it drifts, the custom domain gets wiped on every deploy.
+- The `github-pages` environment must allow the `dev` branch (Settings → Environments → github-pages → Deployment branches). Without that rule the build passes and the deploy fails.
+- Bump the `package.json` version before each deploy — Settings shows it live, so bug reports name the build.
+- After pushing, check `github.com/a-grow/cozydesk/actions`.
+- A green `build` job with a red `deploy` job = permissions/config, not code.
+- Landing + legal pages deploy separately from `a-grow/cozydesk-landing` (`main`, root). Setting a custom domain there creates a GitHub-authored CNAME commit — `git pull --rebase` before pushing.
+
+## Delivery Model (Phase 1 — LIVE)
+- CozyDesk is a **website**, shipped as a PWA. There is NO downloadable installer. "Install" is the browser's own button (Chrome/Edge one-click; Safari File → Add to Dock; Firefox CANNOT install PWAs) — it gives the app a dock icon and its own window. Same pattern as Excalidraw, Photopea, Figma.
+- **App is LIVE at `https://app.cozydesk.app`** — built from `a-grow/cozydesk`, branch `dev`.
+- **Landing page is at `https://cozydesk.app`** — separate repo `a-grow/cozydesk-landing`, branch `main`, root.
+- WHY TWO REPOS: GitHub Pages allows only ONE custom domain per repository. The landing page was moved out so the app repo could own `app.cozydesk.app`.
+- Legal pages live on the landing repo: `cozydesk.app/legal/terms.html`, `/legal/privacy.html`, `/legal/refund.html`. `local-save-warning.md` stays as in-app UI copy, not a page.
+- Landing copy must lead with "Open CozyDesk," with "Install" as a small secondary line. Never "Download for Mac" (that would be the Tauri path).
+- Tauri (true `.dmg`/`.exe`, silent auto-save to a folder) is DEFERRED — ~$99/yr Apple signing + notarization. Revisit only if beta proves demand.
 - Desktop-first. Phone/tablet responsive pass deferred post-beta.
 
 ## Data Model (understand before touching persistence)
@@ -190,21 +203,28 @@ All visual config in `src/themes/themeRegistry.js` — never hardcode theme name
 - The doc drifts from the code. When CLAUDE.md and the files disagree, the CODE wins — verify, then fix the note.
 - CLAUDE CODE OVERSTEPS WITHOUT THE HARD RULES BLOCK. Lead every prompt with it.
 - Service worker only runs in the production build — a cache/SW fix can't be fully tested in `npm run dev`; verify after deploy.
+- ALWAYS `cd ~/Developer/cozydesk` before running `claude`. It once opened in the parent folder, which would have exposed every project and backup. Verify the "Accessing workspace" line before answering the trust prompt.
+- `git push` printing "Everything up-to-date" means the COMMIT never happened. Verify with `git log --oneline -3` after every push.
+- A rejected push usually means the remote has a commit you don't (often GitHub-generated, e.g. a CNAME commit). `git fetch` + `git log origin/main` to confirm before acting.
+- A green `build` job with a red `deploy` job is good news — it isolates the failure to permissions/config, not code.
+- `src/App.jsx` is DEAD CODE — never imported by `main.jsx`. Candidate for a cleanup commit.
 
 ## Completed — Do Not Rebuild or Re-break
 Universal sticky notes; per-theme maxItems + delete-completed ✕; settings panel zIndex 600; pin-to-front + Unpin; clock flip + XS/S/M/L/XL sizing; attach/detach for stickers and notes; Save / My Desks (10 slots/theme); lofi sidebar icons; steampunk gears + mahogany sidebar; per-theme theme-color meta; aspect-ratio locking; 4 tracks/theme; sticker box hugs art; storage-full warning; calendar sharing; sticker + note + to-do-paper rotation persistence (rotationRef pattern — onMove writes ref, onUp reads it, dodges stale closure; add fns seed rotation:0; initialRotation prop seeds on load); **cache/app-shell fix; error boundary; backup/restore; cross-theme save-overwrite fix** (all Jul 20). Settings now shows a live version number (read from package.json) plus a 'Report a bug' mailto link to cozydesksupport@gmail.com (Jul 21).
 
 ## Launch Prep — Where We Are
-Done: cache fix, error boundary, backup/restore, Settings version + Report a Bug (Jul 21), all four legal docs drafted (Jul 21). Legal docs live in ~/Documents/CozyDesk Legal/ — NOT yet placed in the app; onboarding places them. Support email: cozydesksupport@gmail.com (forwards to growandygrow). Next, in order:
-✅ 4. Settings additions — version number (so bug reports name the build) + lightweight "Report a Bug" contact.
-✅ 5. Legal docs — Terms/EULA, Privacy, Refund, local-save warning (Claude drafts; review or run through Termly/iubenda). NOT legal advice.
-6. Onboarding — splash + first-launch pick-your-world + Terms/Privacy gate + local-save warning + "Artwork made with AI tools" line; store `cozydesk_terms_v1`; returning users go straight to last theme.
-7. Deploy — app.cozydesk.app (subdomain, keeps Vite base at '/'), GoDaddy DNS CNAME app → GitHub Pages, install button, "how to install (Chrome/Edge/Safari; Firefox can't)" copy.
-8. Smoke-test matrix — fresh install, reinstall, save, load, theme switch, calendar, sticky notes, to-do lists, updates-don't-erase-data; check right-click layer menu on touch (long-press).
-9. Friends beta (3–5).
-10. Launch auditor — CozyDesk-specific PASS/FAIL gate (NOT a backend-SaaS checklist — no DB/RLS/server-auth items apply here).
+Shipped: cache fix, error boundary, backup/restore, Settings version + Report a Bug, legal docs, onboarding, deploy, smoke test.
+- ✅ 4. Settings — live version number + "Report a Bug" mailto (cozydesksupport@gmail.com).
+- ✅ 5. Legal docs — Terms/EULA, Privacy, Refund published as styled HTML at cozydesk.app/legal/. Dated Jul 24, 2026. NOT legal advice.
+- ✅ 6. Onboarding — SHIPPED Jul 23 (commit dfd4d5e). `src/components/OnboardingFlow.jsx` + `src/utils/onboardingState.js`; `main.jsx` AppGate wrapper; `setThemeDirect` in ThemeContext.jsx. Two paths: true first-timer gets splash → pick-your-world → Terms/Privacy gate; existing user (has desk data, no terms flag) gets the gate ONLY, worded "Welcome back." Returning agreed user goes straight to their last theme. Existing-user detection reads `cozydesk_state_*` / `cozydesk_saved_*` — NOT `cozydesk_active_theme` (written every launch, always looks set). `cozydesk_terms_v1` stores the acceptance DATE, not `true`. Beta shows all four worlds free and unlocked — no lock/price/store code in onboarding. The gatekeeper is defensive: any error falls through to the desk. The desk always renders.
+- ✅ 7. Deploy — LIVE at app.cozydesk.app, HTTPS, installable. See Deployment section.
+- ✅ 8. Smoke test — PASSED on the live site: notes, to-do check-off, calendar, clock, stickers, right-click menu, theme switch, refresh persistence, music, save/load slots, backup download.
+- 🔄 9. Friends beta — link sent to first tester. Soft deadline **Monday, Aug 3**. Testing philosophy: free real use, NOT assigned tasks — assigned tasks only prove features work (already known); free use reveals where people get lost, and fresh eyes only work once. A programmer is the best bug-finder and the worst confusion signal; weight a non-technical tester's confusion highest.
+- 10. Launch auditor — CozyDesk-specific PASS/FAIL gate (NOT a backend-SaaS checklist — no DB/RLS/server-auth items apply).
 
-Legal notes: no law requires disclosing the app was BUILT with AI; the AI-art line is goodwill. EU AI Act Art. 50 (applicable Aug 2, 2026) targets live AI systems/deepfakes, not a static app shipping pre-made art. Confirm commercial rights to the AI-generated images. Payments (LemonSqueezy, merchant of record) wired LAST, after worlds + store exist; sign up early (verification is slow). Recommend paid themes at $2.99 (flat $0.50/txn fee stings at $1.99).
+**BETA PUSH FREEZE:** do NOT push to `dev` until feedback is in on Aug 3. Exceptions: a crash or something actually broken. Build stickers and worlds freely — just hold the push. CLAUDE.md-only commits are safe (not part of the build).
+
+Legal notes: no law requires disclosing the app was BUILT with AI; the AI-art line is goodwill. EU AI Act Art. 50 (applicable Aug 2, 2026) targets live AI systems/deepfakes, not a static app shipping pre-made art. Confirm commercial rights to the AI-generated images. Payments (LemonSqueezy, merchant of record) wired LAST; sign up early (verification is slow). Recommend paid themes at $2.99 (flat $0.50/txn fee stings at $1.99).
 
 ## Parked — After Beta / Growth (NOT launch blockers)
 Build new worlds (standing priority once launch prep is done). "Worlds" rename (Themes → Worlds — its own deliberate session). Positioning/landing copy ("cozy workspace," sell the feeling first). Premium messaging + community roadmap + vote-on-next-world. Analytics (adds a privacy-policy obligation — defer, add the disclosure when it ships). Demo video + screenshots. Sidebar Themes dropdown → visual gallery (thumbnails, lock + $1.99; surface $10.99 all-access only at buy moment, worded "all current and future worlds, one payment" — never "forever"). Hover-glow (desktop-only). Export a single desk to share (distinct from backup). Tauri native wrap (only if beta demands a real installer / folder auto-save).
