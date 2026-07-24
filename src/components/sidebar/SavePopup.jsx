@@ -90,7 +90,7 @@ export default function SavePopup({ themeName, currentDesk, onSave, onClose }) {
   const inputStyle = {
     fontFamily: FONT, fontSize: '0.9rem', width: '100%', boxSizing: 'border-box',
     border: '1.5px solid #ddd', borderRadius: '8px', padding: '8px 10px',
-    outline: 'none', marginBottom: '14px', color: '#333',
+    outline: 'none', marginBottom: '14px', color: '#333', background: '#fff',
   };
   const rowStyle = { display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' };
   const msgStyle = { fontFamily: FONT, fontSize: '0.9rem', color: '#333', margin: '0 0 16px', textAlign: 'center', lineHeight: 1.4 };
