@@ -52,6 +52,13 @@ export const ThemeProvider = ({ children }) => {
     setCarryOverPending(null);
   }, []);
 
+  // Used by onboarding's "pick your world" — sets the starting theme with no
+  // calendar-sharing popup baggage. Guards against unknown theme names.
+  const setThemeDirect = useCallback((name) => {
+    if (!THEME_CONFIGS[name] && !availableThemeNames.includes(name)) return;
+    setThemeName(name);
+  }, []);
+
   // setTheme is called by ThemesSection via useTheme().
   // currentThemeName is injected by cozykawaii.jsx so we can read the right localStorage key.
   const setTheme = useCallback((name, _getSnapshot, currentThemeName) => {
@@ -102,6 +109,7 @@ export const ThemeProvider = ({ children }) => {
     <ThemeContext.Provider value={{
       theme,
       setTheme,
+      setThemeDirect,
       themeName,
       themeStickers,
       themeStickyNotes,
