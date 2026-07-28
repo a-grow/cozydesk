@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Jul 21, 2026. Read fully before touching any code.
+Last updated: Jul 24, 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -187,7 +187,7 @@ All visual config in `src/themes/themeRegistry.js` — never hardcode theme name
 - DO NOT RE-BREAK: loadThemeState must load the shared calendar even when a theme has NO saved desk (else new themes show no events AND an empty autosave wipes the blob).
 - Opt-in popup shows only when the flag is unset AND the source theme has events (ThemeContext.jsx). Settings toggle in cozykawaii.jsx. "Clear All" while sharing ON shows an unchecked "Also erase shared calendar events" checkbox; clearDesk takes `{ clearCalendar }`.
 - Force the popup again: `localStorage.removeItem('cozydesk_calendar_shared')` then reload.
-- Inert `snapshot`/`_getSnapshot` leftovers in ThemeContext.jsx are intentional. There is NO `cozydesk_carryover_pref` key. Sticky notes and to-do lists are strictly per-theme, never carried across a switch.
+- Inert `snapshot`/`_getSnapshot` leftovers in ThemeContext.jsx are intentional. There is NO `cozydesk_carryover_pref` key. Sticky notes and to-do lists are strictly per-theme, never carried across a switch — TODAY. Shared to-do lists ("Pass 2") were always the intended next step after calendar sharing but were blocked because to-do items live in a separate system with per-theme item caps and per-theme board heights (kawaii/steampunk 6, café 5, lofi 4) — unclear where overflow would go if one list were shown across boards of different sizes. Resolved Jul 24: adding SCROLL to the to-do widget removes this blocker entirely (the underlying list can be identical across themes; each board just becomes a differently-sized window onto it). Build order: scroll first, then shared to-do. See Parked section.
 
 ## Key Learnings
 - NEVER `localStorage.clear()` in dev (breaks Vite HMR → black screen). Safe clear: `Object.keys(localStorage).filter(k=>k.startsWith('cozydesk')).forEach(k=>localStorage.removeItem(k)); location.reload()`.
@@ -208,9 +208,10 @@ All visual config in `src/themes/themeRegistry.js` — never hardcode theme name
 - A rejected push usually means the remote has a commit you don't (often GitHub-generated, e.g. a CNAME commit). `git fetch` + `git log origin/main` to confirm before acting.
 - A green `build` job with a red `deploy` job is good news — it isolates the failure to permissions/config, not code.
 - `src/App.jsx` is DEAD CODE — never imported by `main.jsx`. Candidate for a cleanup commit.
+- Custom input styles must set BOTH `color` AND `background` explicitly. `SavePopup.jsx`'s desk-name input set `color: '#333'` with no `background` — invisible dark-on-dark in OS dark mode (fixed Jul 24, commit `179fe5e` — added `background: '#fff'`). Any other bare input style is a candidate for the same bug; worth a dark-mode click-through when convenient.
 
 ## Completed — Do Not Rebuild or Re-break
-Universal sticky notes; per-theme maxItems + delete-completed ✕; settings panel zIndex 600; pin-to-front + Unpin; clock flip + XS/S/M/L/XL sizing; attach/detach for stickers and notes; Save / My Desks (10 slots/theme); lofi sidebar icons; steampunk gears + mahogany sidebar; per-theme theme-color meta; aspect-ratio locking; 4 tracks/theme; sticker box hugs art; storage-full warning; calendar sharing; sticker + note + to-do-paper rotation persistence (rotationRef pattern — onMove writes ref, onUp reads it, dodges stale closure; add fns seed rotation:0; initialRotation prop seeds on load); **cache/app-shell fix; error boundary; backup/restore; cross-theme save-overwrite fix** (all Jul 20). Settings now shows a live version number (read from package.json) plus a 'Report a bug' mailto link to cozydesksupport@gmail.com (Jul 21).
+Universal sticky notes; per-theme maxItems + delete-completed ✕; settings panel zIndex 600; pin-to-front + Unpin; clock flip + XS/S/M/L/XL sizing; attach/detach for stickers and notes; Save / My Desks (10 slots/theme); lofi sidebar icons; steampunk gears + mahogany sidebar; per-theme theme-color meta; aspect-ratio locking; 4 tracks/theme; sticker box hugs art; storage-full warning; calendar sharing; sticker + note + to-do-paper rotation persistence (rotationRef pattern — onMove writes ref, onUp reads it, dodges stale closure; add fns seed rotation:0; initialRotation prop seeds on load); **cache/app-shell fix; error boundary; backup/restore; cross-theme save-overwrite fix** (all Jul 20). Settings now shows a live version number (read from package.json) plus a 'Report a bug' mailto link to cozydesksupport@gmail.com (Jul 21). Fixed: SavePopup.jsx desk-name input invisible in OS dark mode (Jul 24, commit `179fe5e`).
 
 ## Launch Prep — Where We Are
 Shipped: cache fix, error boundary, backup/restore, Settings version + Report a Bug, legal docs, onboarding, deploy, smoke test.
@@ -229,6 +230,38 @@ Legal notes: no law requires disclosing the app was BUILT with AI; the AI-art li
 ## Parked — After Beta / Growth (NOT launch blockers)
 Build new worlds (standing priority once launch prep is done). "Worlds" rename (Themes → Worlds — its own deliberate session). Positioning/landing copy ("cozy workspace," sell the feeling first). Premium messaging + community roadmap + vote-on-next-world. Analytics (adds a privacy-policy obligation — defer, add the disclosure when it ships). Demo video + screenshots. Sidebar Themes dropdown → visual gallery (thumbnails, lock + $1.99; surface $10.99 all-access only at buy moment, worded "all current and future worlds, one payment" — never "forever"). Hover-glow (desktop-only). Export a single desk to share (distinct from backup). Tauri native wrap (only if beta demands a real installer / folder auto-save).
 New parked (Jul 21): Remove the dead 'Notify Me / Save My Cozy Spot' email box from the landing page BEFORE legal docs go live (a live-looking signup contradicts 'no email collection'; it currently collects nothing). At checkout (store UI task), add a 'unlocks instantly, non-refundable once used (see Refund Policy)' line near the Buy button — this makes the refund waiver bind. Refund stance DECIDED: no automatic refund window, instant-access, final-by-default, case-by-case goodwill.
+
+New parked (Jul 24, from first beta bug reports):
+- Safari bug (reported by tester Bruce): to-do list shows yellow streak artifacts, suspected caused by a glow effect the to-do list has that no other widget has (an inconsistency Andrew wants removed regardless). Also reported to-do list "cutting off" tasks — needs clarifying with Bruce whether this means (a) the per-theme item cap is correctly stopping new items [designed behavior] or (b) items are being visually clipped [a real bug] before any fix is written.
+- To-do list SCROLL — elevated priority. Fixes Bruce's cutting-off report either way, AND is now understood to be the prerequisite that unblocks shared to-do lists (see To-Do List Rules / Calendar Sharing sections). Build before shared to-do.
+- Shared to-do list "Pass 2" — build after scroll ships. Same pattern as calendar sharing: one shared list, every theme reads/writes it. Do NOT require the visible content area to be pixel-identical across themes (would mean redrawing all four to-do boards to match) — with scrolling the underlying LIST is identical, the WINDOW onto it can keep varying by theme, same as today.
+- Auto-add calendar events to the to-do list — separate, unresolved idea. Risky as automatic behavior (could flood the to-do with every appointment); more plausible as opt-in per event. Not decided.
+- Save/My Desks UX: Andrew went to "My Desks" first to save a desk, not the Save button — natural instinct, not user error. If beta confirms others do the same, add a save action INSIDE the My Desks popup rather than retraining people to look elsewhere.
+- Install button discoverability: Chrome's address-bar install icon is easy to miss. Plan an in-app "Install CozyDesk" button (sidebar or Settings) that only shows when the browser supports installing; Safari users get a "File → Add to Dock" hint instead since there's no button to show. Pair with ONE gentle, dismissible nudge after a user's 3rd visit ("Enjoying CozyDesk? Keep it in your dock") — not on the splash screen, which is too early to ask for that commitment.
+- Backup filename timestamp: add HHMM so same-day backups don't collide as `(1).json`. One line in `backupManager.js`.
+- Small-screen notice: warm "CozyDesk is built for a bigger screen" message for phone visitors. Needed before public launch, not for a briefed friends beta.
+
+## Strategy & Direction (parked — no code changes from this yet)
+Jul 24 evening: a long product-strategy conversation concluded CozyDesk today is
+strong on atmosphere/customization but has no mechanism that gives users a reason
+to return daily — closing the tab currently costs nothing. Three candidate directions
+were discussed, NOT decided, and explicitly deferred until after the Aug 3 beta
+deadline so real feedback (not one enthusiastic text) drives the choice:
+1. Give the to-do list "teeth" — carryover of unfinished items, a sense of "today,"
+   a completion moment when finishing something. Closest to what exists; highest
+   leverage; the direct beneficiary of the shared-to-do-list work above.
+2. Make the Pomodoro/focus timer the centerpiece rather than a sidebar afterthought
+   — position CozyDesk as a focus-ritual destination competing with "leave a lo-fi
+   video running," not with Notion. Most differentiated option.
+3. Let the world visibly remember daily use over time (growing plant, seasonal decor)
+   — ties retention directly to theme-purchase motivation.
+Full reasoning, including how non-creative productivity apps (Notion/Todoist/Calendar)
+retain users and why CozyDesk shouldn't try to out-compete them at being "depended
+upon," lives in the session summary docs, not reproduced here. Also confirmed this
+session: the PWA + Lemon Squeezy payment model needs no special architecture — no
+accounts, Lemon Squeezy is merchant of record, unlock state is a license key checked
+against localStorage, same local-first tradeoff as desks (clearing data loses the
+unlock; mitigated by the emailed key). Nothing here changes before Aug 3.
 
 ## Queued Cleanups (one at a time — backup + commit each; do NOT batch)
 - ContextMenu.jsx font 'Patrick Hand' → Nunito (one line).
