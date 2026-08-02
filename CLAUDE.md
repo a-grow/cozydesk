@@ -240,6 +240,14 @@ New parked (Jul 24, from first beta bug reports):
 - Install button discoverability: Chrome's address-bar install icon is easy to miss. Plan an in-app "Install CozyDesk" button (sidebar or Settings) that only shows when the browser supports installing; Safari users get a "File → Add to Dock" hint instead since there's no button to show. Pair with ONE gentle, dismissible nudge after a user's 3rd visit ("Enjoying CozyDesk? Keep it in your dock") — not on the splash screen, which is too early to ask for that commitment.
 - Backup filename timestamp: add HHMM so same-day backups don't collide as `(1).json`. One line in `backupManager.js`.
 - Small-screen notice: warm "CozyDesk is built for a bigger screen" message for phone visitors. Needed before public launch, not for a briefed friends beta.
+## Experiment Branches (as of Aug 2, 2026 — NOT on dev, NOT shipped)
+Two experiment branches exist off `dev`. Neither is merged; both await the Aug 3 beta decision. `dev` and the live app are untouched by either.
+- `experiment-mascot` (commit c2a672a) — "Mugzy" coffee-mug mascot: bottom-right 132px badge, idle breathing, sparkle-pop on task complete, Settings toggle (localStorage `cozydesk_mugzy`). Event-bus architecture (`src/utils/mugzyBus.js`) chosen over prop threading. 7 poses in `src/assets/mascot/`.
+- `experiment-focus` (commit b255b79, branched off experiment-mascot) — "Focus Mode": hitting the Pomodoro Start makes the world respond (dark vignette + warm center overlay via `FocusOverlay.jsx`; blanket contrast/brightness filter on the desk; music reacts via audioManager play-or-next; Mugzy cheers then holds the `mug-focus` reading pose with a blue "Focus glow" badge ring). Uses `src/utils/focusBus.js`. Only fires on `mode==='work'`. Full detail in the Aug 2 session summary.
+- Decision on whether to merge either into `dev` waits for Aug 3 feedback.
+
+## KNOWN BUG (diagnosed Aug 2, not yet fixed) — Pomodoro timer resets across Lo-Fi
+The timer keeps running when switching kawaii↔steampunk↔café but RESETS crossing into/out of Lo-Fi. Cause: timer state is local `useState` in `PomodoroTimer.jsx`; `Sidebar.jsx` returns a different component for Lo-Fi (`if (themeName==='lofi') return <LofiSidebar/>`), so the element-TYPE change at that slot unmounts the timer and wipes its state. Other themes share the same `<div className="cozy-sidebar">` root so the instance survives. Fix (not built): move timer state out of the component into shared/persisted state so it survives the Lo-Fi remount. First task next session.
 
 ## Strategy & Direction (parked — no code changes from this yet)
 Jul 24 evening: a long product-strategy conversation concluded CozyDesk today is
