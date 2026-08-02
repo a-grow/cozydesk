@@ -3,6 +3,7 @@ import { Rnd } from "react-rnd";
 import paperImg from "../assets/stickynotes/todolist1.png";
 import { useTheme } from "../themes/ThemeContext";
 import { soundManager } from '../utils/soundManager';
+import { fireTaskComplete } from '../utils/mugzyBus';
 
 const SPARKLE_EMOJIS = ["✨", "⭐", "🌟", "💫", "🎉"];
 
@@ -29,6 +30,7 @@ function ReminderRow({ rem, onToggle, onDelete, width, fontSizeRatio, fontFamily
     onToggle(rem.id);
     if (!rem.done) {
       soundManager.play('sfx_ping');
+      fireTaskComplete();
       setShowSparkle(true);
       setAnimKey(k => k + 1);
       setTimeout(() => setShowSparkle(false), 650);

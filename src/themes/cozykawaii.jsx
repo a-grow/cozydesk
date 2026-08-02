@@ -11,6 +11,7 @@ import Sidebar from "../components/Sidebar";
 import Reminders from "../components/Reminders";
 import CalendarSticker from "../components/CalendarSticker";
 import ContextMenu from "../components/ContextMenu";
+import Mugzy from "../components/Mugzy";
 import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
@@ -421,6 +422,17 @@ export default function Cozykawaii() {
             📅 Calendar events shared in every theme · {calendarShared ? "On" : "Off"}
           </button>
           <button
+            style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#f0e0d6", color: "#5a3b2a", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}
+            onClick={() => {
+              soundManager.play('sfx_click_button');
+              const next = localStorage.getItem('cozydesk_mugzy') === 'off' ? 'on' : 'off';
+              localStorage.setItem('cozydesk_mugzy', next);
+              window.dispatchEvent(new Event('cozydesk-mugzy-toggle'));
+            }}
+          >
+            ☕ Show Mugzy · {localStorage.getItem('cozydesk_mugzy') === 'off' ? "Off" : "On"}
+          </button>
+          <button
             style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#ffe0e0", color: "#c00", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}
             onClick={(e) => { e.stopPropagation(); soundManager.play('sfx_areyousure'); setShowClearConfirm(true); }}
           >
@@ -828,6 +840,9 @@ export default function Cozykawaii() {
           />
         );
       })}
+
+      {/* ── Mugzy the mascot ── */}
+      <Mugzy />
 
       {/* ── Layer context menu ── */}
       {contextMenu && (
