@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { soundManager } from '../../utils/soundManager';
+import audioManager from '../../utils/audioManager';
+import { setFocusActive } from '../../utils/focusBus';
 
 export default function PomodoroTimer() {
   const [workMins, setWorkMins] = useState(25);
@@ -28,6 +30,11 @@ export default function PomodoroTimer() {
     return () => clearInterval(id);
   }, [isRunning]);
 
+  useEffect(() => {
+    setFocusActive(isRunning && mode === 'work');
+    return () => setFocusActive(false);
+  }, [isRunning, mode]);
+
   const handleStartStop = () => {
     if (isComplete) {
       const next = mode === 'work' ? 'break' : 'work';
@@ -37,7 +44,17 @@ export default function PomodoroTimer() {
       setIsRunning(true);
     } else {
       setIsRunning(r => {
-        if (!r) soundManager.play('sfx_timer_start');
+        const starting = !r;
+        if (starting) {
+          soundManager.play('sfx_timer_start');
+          // Music reacts: if off, start it; if already playing, skip to next track.
+          const musicState = audioManager.getState();
+          if (musicState.isPlaying) {
+            audioManager.next();
+          } else {
+            audioManager.play();
+          }
+        }
         return !r;
       });
     }

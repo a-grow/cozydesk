@@ -12,6 +12,8 @@ import Reminders from "../components/Reminders";
 import CalendarSticker from "../components/CalendarSticker";
 import ContextMenu from "../components/ContextMenu";
 import Mugzy from "../components/Mugzy";
+import FocusOverlay from "../components/FocusOverlay";
+import { onFocusChange } from "../utils/focusBus";
 import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
@@ -41,6 +43,11 @@ export default function Cozykawaii() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  useEffect(() => {
+    const off = onFocusChange(setFocusActive);
+    return () => off();
+  }, []);
+
   // UI-only state (not persisted with desk items)
   const [selectedId, setSelectedId]       = useState(null);
   const [activeMenu, setActiveMenu]       = useState(null);
@@ -62,6 +69,7 @@ export default function Cozykawaii() {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [carryRemember, setCarryRemember] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [focusActive, setFocusActive] = useState(false);
   const [calendarShared, setCalendarShared] = useState(() => localStorage.getItem('cozydesk_calendar_shared') === 'on');
   const [calHintDismissed, setCalHintDismissed] = useState(false);
   const [clearAlsoCalendar, setClearAlsoCalendar] = useState(false);
@@ -347,6 +355,10 @@ export default function Cozykawaii() {
         width: "100vw", height: "100vh",
         position: "relative", overflow: "hidden",
         fontFamily: "'Nunito', sans-serif",
+        filter: focusActive
+          ? "brightness(1.06) contrast(1.14) saturate(1.12)"
+          : "none",
+        transition: "filter 1.4s ease-in-out",
       }}
       onClick={() => { setSelectedId(null); setActiveMenu(null); setContextMenu(null); }}
       onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedId(null); }}
@@ -840,6 +852,9 @@ export default function Cozykawaii() {
           />
         );
       })}
+
+      {/* ── Focus mode overlay ── */}
+      <FocusOverlay />
 
       {/* ── Mugzy the mascot ── */}
       <Mugzy />
