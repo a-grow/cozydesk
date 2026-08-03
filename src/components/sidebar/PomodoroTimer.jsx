@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { soundManager } from '../../utils/soundManager';
 import audioManager from '../../utils/audioManager';
 import { setFocusActive } from '../../utils/focusBus';
+import sleepPose from '../../assets/mascot/mug-sleep.png';
+import wavePose from '../../assets/mascot/mug-wave.png';
 
 export default function PomodoroTimer() {
   const [workMins, setWorkMins] = useState(25);
@@ -12,6 +14,22 @@ export default function PomodoroTimer() {
   const [isComplete, setIsComplete] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const completedRef = useRef(false);
+
+  const [mugzyOn, setMugzyOn] = useState(() => localStorage.getItem('cozydesk_mugzy') !== 'off');
+
+  useEffect(() => {
+    const sync = () => setMugzyOn(localStorage.getItem('cozydesk_mugzy') !== 'off');
+    window.addEventListener('cozydesk-mugzy-toggle', sync);
+    return () => window.removeEventListener('cozydesk-mugzy-toggle', sync);
+  }, []);
+
+  const toggleMugzy = () => {
+    soundManager.play('sfx_mugzy_toggle');
+    const next = mugzyOn ? 'off' : 'on';
+    localStorage.setItem('cozydesk_mugzy', next);
+    setMugzyOn(next !== 'off');
+    window.dispatchEvent(new Event('cozydesk-mugzy-toggle'));
+  };
 
   useEffect(() => {
     if (!isRunning) return;
@@ -54,6 +72,13 @@ export default function PomodoroTimer() {
           } else {
             audioManager.play();
           }
+          // Starting a work session summons Mugzy if he's currently off,
+          // so the user sees his focus glow. He stays on afterward.
+          if (mode === 'work' && localStorage.getItem('cozydesk_mugzy') === 'off') {
+            localStorage.setItem('cozydesk_mugzy', 'on');
+            setMugzyOn(true);
+            window.dispatchEvent(new Event('cozydesk-mugzy-toggle'));
+          }
         } else {
           // Pausing the timer quiets the music.
           audioManager.pause();
@@ -88,6 +113,17 @@ export default function PomodoroTimer() {
         <button className="pomo-btn pomo-reset-btn" onClick={handleReset}>↺</button>
         <button className="pomo-btn pomo-gear-btn" onClick={() => setShowSettings(s => !s)}>⚙</button>
       </div>
+      <button
+        className="pomo-mugzy-btn"
+        onClick={toggleMugzy}
+        title={mugzyOn ? 'Hide Mugzy' : 'Show Mugzy'}
+      >
+        <img
+          src={mugzyOn ? wavePose : sleepPose}
+          alt=""
+          className="pomo-mugzy-btn-img"
+        />
+      </button>
       {showSettings && (
         <div className="pomo-settings">
           <label className="pomo-setting">

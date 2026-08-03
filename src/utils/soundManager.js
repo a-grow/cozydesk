@@ -14,6 +14,7 @@ const SOUNDS = [
   'sfx_undo_redo',
   'sfx_clear_screen',
   'sfx_areyousure',
+  'sfx_mugzy_toggle',
 ];
 
 const STORAGE_KEY = 'cozydesk_sfx';

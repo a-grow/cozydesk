@@ -728,6 +728,36 @@
   50%      { transform: scale(1.04); }
 }
 
+/* Cute 3D Mugzy toggle button */
+.pomo-mugzy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(#ffe8a3, #ffd766);
+  box-shadow: 0 4px 0 #e0b100, 0 5px 10px rgba(160,120,40,0.35), inset 0 2px 3px rgba(255,255,255,0.7);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.2s ease;
+}
+.pomo-mugzy-btn:hover {
+  background: linear-gradient(#ffedb5, #ffdd7a);
+}
+.pomo-mugzy-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #e0b100, 0 2px 4px rgba(160,120,40,0.35), inset 0 2px 3px rgba(255,255,255,0.6);
+}
+.pomo-mugzy-btn-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
 
 /* ════════════════════════════════════════════════
    Mini Calendar
