@@ -125,7 +125,7 @@ const StickyNote = ({
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`sticky-note-wrapper ${isHovered ? 'hover-glow' : ''}`}
+      className="sticky-note-wrapper"
     >
       <div
         onContextMenu={onContextMenu}

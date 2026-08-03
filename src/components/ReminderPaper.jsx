@@ -168,10 +168,16 @@ const ReminderPaper = ({
     window.addEventListener("pointercancel", onUp);
   };
 
-  const handleAddInline = (e) => {
-    if (e.key === "Enter" && newText.trim()) {
+  const commitInline = () => {
+    if (newText.trim()) {
       onAddInlineReminder?.({ id: Date.now(), text: newText.trim(), emoji: "", done: false });
       setNewText("");
+    }
+  };
+
+  const handleAddInline = (e) => {
+    if (e.key === "Enter") {
+      commitInline();
     }
   };
 
@@ -201,7 +207,7 @@ const ReminderPaper = ({
       onMouseLeave={() => setIsHovered(false)}
       onDragStart={onSelect}
       onDragStop={(e, d) => onUpdate({ x: d.x, y: d.y, width, height })}
-      className={isHovered ? 'hover-glow' : ''}
+      className=""
       onResizeStop={(e, dir, ref, delta, pos) =>
         onUpdate({ x: pos.x, y: pos.y, width: ref.offsetWidth, height: ref.offsetHeight })
       }
@@ -226,7 +232,7 @@ const ReminderPaper = ({
           height: "100%",
           objectFit: "fill",
           pointerEvents: "none",
-          filter: isHovered ? "drop-shadow(0 4px 16px rgba(0,0,0,0.3)) brightness(1.05)" : "drop-shadow(0 4px 12px rgba(0,0,0,0.2))",
+          filter: isHovered ? "brightness(1.05)" : "none",
           transition: "filter 0.3s ease"
         }}
       />
@@ -301,6 +307,7 @@ const ReminderPaper = ({
               value={newText}
               onChange={e => setNewText(e.target.value)}
               onKeyDown={handleAddInline}
+              onBlur={commitInline}
             />
           </div>
         )}
