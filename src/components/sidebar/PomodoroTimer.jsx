@@ -54,6 +54,9 @@ export default function PomodoroTimer() {
           } else {
             audioManager.play();
           }
+        } else {
+          // Pausing the timer quiets the music.
+          audioManager.pause();
         }
         return !r;
       });
@@ -62,6 +65,7 @@ export default function PomodoroTimer() {
 
   const handleReset = () => {
     soundManager.play('sfx_timer_reset');
+    audioManager.pause();
     setIsRunning(false);
     setIsComplete(false);
     setTimeLeft((mode === 'work' ? workMins : breakMins) * 60);

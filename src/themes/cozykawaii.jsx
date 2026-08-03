@@ -48,6 +48,8 @@ export default function Cozykawaii() {
     return () => off();
   }, []);
 
+
+
   // UI-only state (not persisted with desk items)
   const [selectedId, setSelectedId]       = useState(null);
   const [activeMenu, setActiveMenu]       = useState(null);
@@ -71,6 +73,7 @@ export default function Cozykawaii() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [focusActive, setFocusActive] = useState(false);
   const [calendarShared, setCalendarShared] = useState(() => localStorage.getItem('cozydesk_calendar_shared') === 'on');
+  const [mugzyOn, setMugzyOn] = useState(() => localStorage.getItem('cozydesk_mugzy') !== 'off');
   const [calHintDismissed, setCalHintDismissed] = useState(false);
   const [clearAlsoCalendar, setClearAlsoCalendar] = useState(false);
 
@@ -437,12 +440,13 @@ export default function Cozykawaii() {
             style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#f0e0d6", color: "#5a3b2a", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}
             onClick={() => {
               soundManager.play('sfx_click_button');
-              const next = localStorage.getItem('cozydesk_mugzy') === 'off' ? 'on' : 'off';
+              const next = mugzyOn ? 'off' : 'on';
               localStorage.setItem('cozydesk_mugzy', next);
+              setMugzyOn(next !== 'off');
               window.dispatchEvent(new Event('cozydesk-mugzy-toggle'));
             }}
           >
-            ☕ Show Mugzy · {localStorage.getItem('cozydesk_mugzy') === 'off' ? "Off" : "On"}
+            ☕ Show Mugzy · {mugzyOn ? "On" : "Off"}
           </button>
           <button
             style={{ width: "100%", padding: "10px", border: "none", borderRadius: "12px", background: "#ffe0e0", color: "#c00", fontFamily: "'Nunito', sans-serif", fontWeight: "bold", fontSize: "15px", cursor: "pointer" }}
@@ -719,9 +723,8 @@ export default function Cozykawaii() {
       ))}
 
       {/* ── Regular stickers ── */}
-      {desk.stickers.filter(s => !s.backdrop).map(sticker => (
+      {desk.stickers.filter(s => !s.backdrop).map((sticker, i) => (
         <Sticker
-          key={sticker.id}
           src={sticker.src}
           alt={sticker.name}
           x={sticker.xRatio * dimensions.width}
@@ -750,6 +753,9 @@ export default function Cozykawaii() {
           deskW={dimensions.width}
           deskH={dimensions.height}
           isAttached={!!sticker.attachedTo}
+          key={sticker.id}
+          focusActive={focusActive}
+          bounceDelay={i * 50}
           onContextMenu={(e) => handleContextMenu(e, 'sticker', sticker.id)}
           flippedX={sticker.flippedX || false}
           flippedY={sticker.flippedY || false}

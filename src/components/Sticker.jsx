@@ -40,6 +40,7 @@ const Sticker = ({
   deskW = window.innerWidth, deskH = window.innerHeight,
   isBackdrop = false, layer, onContextMenu,
   isAttached = false, onDragMove, onResizeMove,
+  focusActive = false, bounceDelay = 0,
   flippedX: initFlippedX = false,
   flippedY: initFlippedY = false,
   rotation: initRotation = 0,
@@ -48,6 +49,18 @@ const Sticker = ({
   const [flippedX, setFlippedX] = useState(initFlippedX);
   const [flippedY, setFlippedY] = useState(initFlippedY);
   const [rotation, setRotation] = useState(initRotation);
+
+  const [isBouncing, setIsBouncing] = useState(false);
+  const prevFocusRef = React.useRef(focusActive);
+  React.useEffect(() => {
+    if (focusActive && !prevFocusRef.current) {
+      setIsBouncing(true);
+      const t = setTimeout(() => setIsBouncing(false), bounceDelay + 500);
+      prevFocusRef.current = focusActive;
+      return () => clearTimeout(t);
+    }
+    prevFocusRef.current = focusActive;
+  }, [focusActive]);
 
   // Live rotation, readable at gesture-end. The state variable is frozen inside
   // handleRotate's closure, so onUp must read the latest angle from this ref.
@@ -121,6 +134,14 @@ const Sticker = ({
         onUpdate({ x: position.x, y: position.y, width: ref.offsetWidth, height: ref.offsetHeight });
       }}
     >
+      <div
+        className={isBouncing ? "sticker-settle" : undefined}
+        style={{
+          width: "100%",
+          height: "100%",
+          animationDelay: `${bounceDelay}ms`,
+        }}
+      >
       <div
         onContextMenu={onContextMenu}
         style={{
@@ -244,6 +265,7 @@ const Sticker = ({
             )}
           </>
         )}
+      </div>
       </div>
     </Rnd>
   );

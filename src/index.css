@@ -410,3 +410,14 @@ button:not(.delete-btn):not(.flip-handle):not(.rotate-handle):not(.emoji-picker-
   filter: drop-shadow(0 0 12px rgba(255, 235, 150, 0.5)) brightness(1.05);
   transition: filter 0.3s ease;
 }
+
+/* Focus-mode settle-in bounce for stickers */
+@keyframes stickerSettle {
+  0%   { transform: translateY(0) scale(1); }
+  35%  { transform: translateY(-6px) scale(1.03); }
+  70%  { transform: translateY(2px) scale(0.995); }
+  100% { transform: translateY(0) scale(1); }
+}
+.sticker-settle {
+  animation: stickerSettle 0.5s ease-out;
+}
