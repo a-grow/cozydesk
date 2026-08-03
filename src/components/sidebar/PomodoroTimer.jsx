@@ -100,8 +100,8 @@ export default function PomodoroTimer() {
   const ss = String(timeLeft % 60).padStart(2, '0');
 
   return (
-    <div className={`pomo-widget ${isComplete ? 'pomo-complete' : ''}`}>
-      <div className={`pomo-circle ${mode === 'break' ? 'pomo-break-mode' : ''} ${isComplete ? 'pomo-wiggle pomo-glow' : ''} ${isRunning ? 'pomo-pulse' : ''}`}>
+    <div className={`pomo-widget ${isComplete ? 'pomo-complete' : ''} ${isRunning && mode === 'work' ? 'pomo-widget-focus' : ''}`}>
+      <div className={`pomo-circle ${mode === 'break' ? 'pomo-break-mode' : ''} ${isComplete ? 'pomo-wiggle pomo-glow' : ''} ${isRunning ? 'pomo-pulse' : ''} ${isRunning && mode === 'work' ? 'pomo-focus-glow' : ''}`}>
         <span className="pomo-emoji">🍅</span>
         <span className="pomo-timer">{mm}:{ss}</span>
         <span className="pomo-label">{mode === 'work' ? 'Focus' : 'Break'}</span>

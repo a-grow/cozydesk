@@ -719,6 +719,24 @@
   border-color: var(--sb-pomo-work);
 }
 
+/* Blue focus glow on the circle while a work session runs — matches Mugzy's badge */
+.pomo-circle.pomo-focus-glow {
+  border-color: #8ec5ff;
+  box-shadow: 0 0 16px rgba(130,190,255,0.85), 0 0 30px rgba(120,170,255,0.5);
+  animation: pomo-focus-pulse 3.4s ease-in-out infinite;
+}
+@keyframes pomo-focus-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(130,190,255,0.75), 0 0 28px rgba(120,170,255,0.4); }
+  50%      { box-shadow: 0 0 22px rgba(130,190,255,0.95), 0 0 40px rgba(120,170,255,0.6); }
+}
+
+/* Restrained blue frame on the whole card during a work session — supports, does not compete with, the circle */
+.pomo-widget.pomo-widget-focus {
+  border-color: rgba(142,197,255,0.85);
+  box-shadow: 0 0 10px rgba(130,190,255,0.35), 0 0 20px rgba(120,170,255,0.18);
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
 /* ── Subtle pulse while running ── */
 .pomo-pulse {
   animation: pomo-breathe 2s ease-in-out infinite;
