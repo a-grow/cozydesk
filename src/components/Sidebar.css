@@ -655,7 +655,7 @@
   padding: 5px 10px;
   border: 1px solid var(--sb-border);
   border-radius: 8px;
-  font-family: 'Patrick Hand', cursive;
+  font-family: 'Nunito', sans-serif;
   font-size: 0.78rem;
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
