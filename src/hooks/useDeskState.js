@@ -674,6 +674,19 @@ const updateNote = (id, data) => {
     else                                addStickerAtPosition(data, xRatio, yRatio);
   }, [addStickerAtPosition]);
 
+  // Double-click twin of handleDeskDrop: same dispatch, but places the item at a
+  // randomized near-center spot instead of a mouse position. Caps/sounds are handled
+  // inside each ...AtPosition fn, so this inherits them for free.
+  const handleDeskAdd = useCallback((data) => {
+    if (!data) return;
+    const xRatio = 0.40 + Math.random() * 0.15;
+    const yRatio = 0.30 + Math.random() * 0.15;
+    if      (data.type === 'todolist')  addPaperAtPosition(xRatio, yRatio);
+    else if (data.type === 'note')      addNoteAtPosition(data.src, xRatio, yRatio);
+    else if (data.type === 'calendar')  addCalendarAtPosition(xRatio, yRatio);
+    else                                addStickerAtPosition(data, xRatio, yRatio);
+  }, [addStickerAtPosition]);
+
   const handleTidyDesk = () => {
     pushUndo();
     setNotes(prev => prev.map((n, i) => {
@@ -790,7 +803,7 @@ const updateNote = (id, data) => {
     // storage warning
     storageFull, setStorageFull,
     // desk-wide
-    handleDeskDrop, handleTidyDesk, clearDesk,
+    handleDeskDrop, handleDeskAdd, handleTidyDesk, clearDesk,
     // shared calendar
     enableCalendarSharing,
     disableCalendarSharing,

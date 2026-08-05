@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MusicPlayer from './MusicPlayer';
 
 // ── Live clock overlay for the kawaii clock icon ──────────────────────────────
-function LiveClockIcon({ src, onDragStart }) {
+function LiveClockIcon({ src, onDragStart, onDoubleClick }) {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -23,6 +23,7 @@ function LiveClockIcon({ src, onDragStart }) {
         className="sb-todo-icon-img"
         draggable
         onDragStart={onDragStart}
+        onDoubleClick={onDoubleClick}
         style={{ display: 'block', width: '100%' }}
       />
       <div className="sb-clock-overlay" style={{ pointerEvents: 'none' }}>
@@ -35,7 +36,7 @@ function LiveClockIcon({ src, onDragStart }) {
 // ── Live clock overlay for the steampunk clock icon ──────────────────────────
 // Shows 4 glowing orange digits over the 4 glass tubes in steampunkclock.png.
 // Image is 750×982 (portrait); tube centers are at roughly cx 26/39/54/67 %, cy 28%.
-function LiveSteampunkClockIcon({ onDragStart }) {
+function LiveSteampunkClockIcon({ onDragStart, onDoubleClick }) {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -57,6 +58,7 @@ function LiveSteampunkClockIcon({ onDragStart }) {
         className="sb-todo-icon-img"
         draggable
         onDragStart={onDragStart}
+        onDoubleClick={onDoubleClick}
         style={{ display: 'block', width: '100%' }}
       />
       {digits.map((digit, i) => (
@@ -177,7 +179,7 @@ import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png'
 import cafeClockIcon from '../themes/cafe/widgets/cafe-clock.png';
 
 // ── Live clock overlay for the café clock sidebar icon ────────────────────────
-function LiveCafeClockIcon({ onDragStart }) {
+function LiveCafeClockIcon({ onDragStart, onDoubleClick }) {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -198,6 +200,7 @@ function LiveCafeClockIcon({ onDragStart }) {
         className="sb-todo-icon-img"
         draggable
         onDragStart={onDragStart}
+        onDoubleClick={onDoubleClick}
         style={{ display: 'block', width: '100%' }}
       />
       <div style={{
@@ -231,6 +234,7 @@ export default function Sidebar({
   stickers,
   onAddNote,
   onAddTodoList,
+  onDeskAdd,
   onReset,
   onSettings,
   canUndo,
@@ -272,6 +276,7 @@ export default function Sidebar({
       <LofiSidebar
         stickers={stickers}
         onAddNote={onAddNote}
+        onDeskAdd={onDeskAdd}
         onSettings={onSettings}
         canUndo={canUndo}
         onUndo={onUndo}
@@ -339,10 +344,11 @@ export default function Sidebar({
                   alt="To-Do List"
                   className="sb-todo-icon-img"
                   draggable
+                  onDoubleClick={() => onDeskAdd({ type: 'todolist' })}
                   onDragStart={(e) => {
                     e.dataTransfer.setData('application/json', JSON.stringify({ type: 'todolist' }));
                     e.dataTransfer.effectAllowed = 'copy';
-                    
+
                     const ghost = e.currentTarget.cloneNode(true);
                     ghost.style.opacity = '0.5';
                     ghost.style.position = 'absolute';
@@ -357,7 +363,7 @@ export default function Sidebar({
           </div>
 
           <div className="sb-todo-container">
-            <StickyNotesSection onAddNote={onAddNote} />
+            <StickyNotesSection onAddNote={onAddNote} onDeskAdd={onDeskAdd} />
             <div className="sb-icon-label" style={{ marginTop: '2px' }}>Sticky Notes</div>
           </div>
 
@@ -372,10 +378,11 @@ export default function Sidebar({
                   alt="Calendar"
                   className="sb-todo-icon-img"
                   draggable
+                  onDoubleClick={() => onDeskAdd({ type: 'calendar' })}
                   onDragStart={(e) => {
                     e.dataTransfer.setData('application/json', JSON.stringify({ type: 'calendar' }));
                     e.dataTransfer.effectAllowed = 'copy';
-                    
+
                     const ghost = e.currentTarget.cloneNode(true);
                     ghost.style.opacity = '0.5';
                     ghost.style.position = 'absolute';
@@ -397,6 +404,7 @@ export default function Sidebar({
               >
                 {themeName === 'steampunk' ? (
                   <LiveSteampunkClockIcon
+                    onDoubleClick={() => onDeskAdd({ name: 'steampunkclock.png', src: steampunkClockIcon })}
                     onDragStart={(e) => {
                       e.dataTransfer.setData('application/json', JSON.stringify({ name: 'steampunkclock.png', src: steampunkClockIcon }));
                       e.dataTransfer.effectAllowed = 'copy';
@@ -410,6 +418,7 @@ export default function Sidebar({
                   />
                 ) : themeName === 'cafe' ? (
                   <LiveCafeClockIcon
+                    onDoubleClick={() => onDeskAdd({ name: 'cafe-clock.png', src: cafeClockIcon })}
                     onDragStart={(e) => {
                       e.dataTransfer.setData('application/json', JSON.stringify({ name: 'cafe-clock.png', src: cafeClockIcon }));
                       e.dataTransfer.effectAllowed = 'copy';
@@ -424,6 +433,7 @@ export default function Sidebar({
                 ) : (
                   <LiveClockIcon
                     src={clockIcon}
+                    onDoubleClick={() => onDeskAdd({ name: 'cozyclock.png', src: clockIcon })}
                     onDragStart={(e) => {
                       e.dataTransfer.setData('application/json', JSON.stringify({ name: 'cozyclock.png', src: clockIcon }));
                       e.dataTransfer.effectAllowed = 'copy';
@@ -455,6 +465,7 @@ export default function Sidebar({
 
         <StickersSection
           stickers={stickers}
+          onDeskAdd={onDeskAdd}
           canUndo={canUndo}
           onUndo={onUndo}
           canRedo={canRedo}

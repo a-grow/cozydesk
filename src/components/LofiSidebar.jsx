@@ -168,13 +168,14 @@ function makeDragGhost(label) {
 }
 
 // ── Big icon card ─────────────────────────────────────────────────────────────
-function BigCard({ icon, label, onDragStart, children }) {
+function BigCard({ icon, label, onDragStart, onDoubleClick, children }) {
   return (
     <div
       className="lofi-big-card"
       title={onDragStart ? 'Drag to add to desk' : undefined}
       draggable={!!onDragStart}
       onDragStart={onDragStart}
+      onDoubleClick={onDoubleClick}
       style={!onDragStart ? { cursor: 'default' } : undefined}
     >
       {icon && <div className="lofi-icon-box">{icon}</div>}
@@ -188,6 +189,7 @@ function BigCard({ icon, label, onDragStart, children }) {
 export default function LofiSidebar({
   stickers,
   onAddNote,
+  onDeskAdd,
   onSettings,
   canUndo,
   onUndo,
@@ -271,6 +273,7 @@ export default function LofiSidebar({
         <BigCard
           label="TO-DO LIST"
           onDragStart={startDrag({ type: 'todolist' }, 'To-Do List')}
+          onDoubleClick={() => onDeskAdd({ type: 'todolist' })}
         >
           <img src={lofiTodoImg} alt="To-Do List" style={{ width: '100%', maxWidth: '130px', height: 'auto', objectFit: 'contain', pointerEvents: 'none', userSelect: 'none' }} />
         </BigCard>
@@ -281,6 +284,7 @@ export default function LofiSidebar({
             { type: 'note', src: lofiNoteIcon?.src, name: lofiNoteIcon?.name || 'lofistickynoteyellow.png' },
             'Sticky Note',
           )}
+          onDoubleClick={() => onDeskAdd({ type: 'note', src: lofiNoteIcon?.src, name: lofiNoteIcon?.name || 'lofistickynoteyellow.png' })}
         >
           <img src={lofiNoteIcon?.src} alt="Sticky Notes" style={{ width: '100%', maxWidth: '130px', height: 'auto', objectFit: 'contain', pointerEvents: 'none', userSelect: 'none' }} />
         </BigCard>
@@ -288,6 +292,7 @@ export default function LofiSidebar({
         <BigCard
           label="CALENDAR"
           onDragStart={startDrag({ type: 'calendar' }, 'Calendar')}
+          onDoubleClick={() => onDeskAdd({ type: 'calendar' })}
         >
           <img src={lofiCalendarImg} alt="Calendar" style={{ width: '100%', maxWidth: '130px', height: 'auto', objectFit: 'contain', pointerEvents: 'none', userSelect: 'none' }} />
         </BigCard>
@@ -296,6 +301,7 @@ export default function LofiSidebar({
         <BigCard
           label="CLOCK"
           onDragStart={startDrag({ name: 'loficlock.png', src: clockIcon }, 'Clock')}
+          onDoubleClick={() => onDeskAdd({ name: 'loficlock.png', src: clockIcon })}
         >
           <SidebarLofiClock />
         </BigCard>
@@ -312,6 +318,7 @@ export default function LofiSidebar({
         <div className="lofi-section-label">STICKERS</div>
         <StickersSection
           stickers={stickers}
+          onDeskAdd={onDeskAdd}
           canUndo={canUndo}
           onUndo={onUndo}
           canRedo={canRedo}

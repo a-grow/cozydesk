@@ -402,6 +402,7 @@ export default function Cozykawaii() {
           onRedo={desk.handleRedo}
           onAddNote={desk.addNote}
           onAddTodoList={desk.addTodoList}
+          onDeskAdd={desk.handleDeskAdd}
           onSaveSlot={desk.saveToSlot}
           onLoadSlot={desk.loadFromSlot}
           onSetTheme={setTheme}

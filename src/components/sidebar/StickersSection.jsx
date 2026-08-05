@@ -1,7 +1,7 @@
 import React from 'react';
 import { soundManager } from '../../utils/soundManager';
 
-export default function StickersSection({ stickers, canUndo, onUndo, canRedo, onRedo }) {
+export default function StickersSection({ stickers, onDeskAdd, canUndo, onUndo, canRedo, onRedo }) {
   return (
     <div className="stickers-section">
       {/* Undo / Redo bar — always visible */}
@@ -23,6 +23,7 @@ export default function StickersSection({ stickers, canUndo, onUndo, canRedo, on
               alt={sticker.name}
               className="sticker-thumb-img"
               draggable
+              onDoubleClick={() => onDeskAdd(sticker)}
               onDragStart={(e) => {
                 soundManager.play('sfx_sticker_lift');
                 e.dataTransfer.setData('application/json', JSON.stringify(sticker));

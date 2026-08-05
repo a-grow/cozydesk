@@ -5,7 +5,7 @@ import { useTheme } from '../../themes/ThemeContext';
 // Fallback default icon (always available regardless of theme)
 import defaultIcon from '../../assets/stickynotes/stickynotecozyyellow.png';
 
-export default function StickyNotesSection({ onAddNote }) {
+export default function StickyNotesSection({ onAddNote, onDeskAdd }) {
   const { themeStickyNotes } = useTheme();
   const [swatches, setSwatches] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +52,7 @@ export default function StickyNotesSection({ onAddNote }) {
           alt="Sticky Notes"
           className="sb-todo-icon-img"
           draggable
+          onDoubleClick={() => onDeskAdd({ type: 'note', src: getDefaultNoteSrc(), name: themeStickyNotes.find(s => s.name.includes("yellow"))?.name || 'stickynote.png' })}
           onDragStart={(e) => {
             const noteSrc = getDefaultNoteSrc();
             const noteName = themeStickyNotes.find(s => s.name.includes("yellow"))?.name || 'stickynote.png';
