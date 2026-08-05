@@ -9,6 +9,18 @@ import './index.css';
 
 // Gatekeeper: decides whether to show onboarding or the desk on launch.
 // Wrapped defensively — if the check ever throws, we fall through to the desk.
+// Captured ONCE at module load — before any component mounts or autosaves.
+// If we read this during AppGate's render instead, the desk's first autosave
+// can write a cozydesk_state_ key before the read, making a true first-timer
+// look like an existing user (skips splash + pick-your-world). Freeze it here.
+const INITIAL_EXISTING_USER = (() => {
+  try {
+    return hasExistingDeskData();
+  } catch (_) {
+    return false;
+  }
+})();
+
 function AppGate() {
   const [needsOnboarding, setNeedsOnboarding] = useState(() => {
     try {
@@ -18,12 +30,7 @@ function AppGate() {
     }
   });
 
-  let existingUser = false;
-  try {
-    existingUser = hasExistingDeskData();
-  } catch (_) {
-    existingUser = false;
-  }
+  const existingUser = INITIAL_EXISTING_USER;
 
   if (needsOnboarding) {
     return (
