@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Aug 5, 2026. Read fully before touching any code.
+Last updated: Aug 6, 2026. Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
