@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Aug 8, 2026. Read fully before touching any code.
+Last updated: Aug 8, 2026 (landing redesign session). Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -231,11 +231,13 @@ Universal sticky notes; per-theme maxItems + delete-completed ✕; settings pane
 ## Launch Prep — Where We Are
 Shipped and LIVE: cache fix, error boundary, backup/restore, Settings version + Report a Bug, legal docs, onboarding, deploy, smoke test, focus mode + Mugzy, timer-reset fix, double-click-to-add, press-Start nudge. Friends beta is DONE — tester feedback drove the double-click + press-Start work; the beta push freeze is LIFTED.
 
-The onboarding-comprehension problem (first-timers not knowing to press Start) is SOLVED by the nudge. Remaining before Andrew can SELL:
+LANDING PAGE — FULLY REDESIGNED & LIVE (Aug 8, commit 94728c9 on a-grow/cozydesk-landing). Was a stale waitlist; now: live-app framing ("Open CozyDesk"), transparent logo, all 4 worlds with correct free/paid tags, dark worlds-band, $10.99 bundle CTA (→ GUMROAD_BUNDLE_URL placeholder until Gumroad exists), soft/non-binding "$100 → 2 new worlds" note, browser-aware install hint, footer legal links wired to live pages + cozydesksupport@gmail.com contact. Still open (non-blocking): Lo-Fi hero video (hero.mp4 in images/), replace GUMROAD_BUNDLE_URL.
+
+IN-APP LOCKED-THEME UX — DECIDED (not built): clicking a locked/paid world shows a clean "unlock this world" PREVIEW SCREEN (full-bleed world bg + card with name, flavor text, Unlock button → Gumroad, "already bought? enter key" link). Do NOT do the "grayed-out tools inside the desk" version. Onboarding first-screen shows only the 2 FREE worlds; paid worlds discovered via dropdown.
 1. Set up CozyDesk products in the existing Gumroad store (handle: DoodleAndy) — the theme products + the $10.99 all-access bundle.
 2. Build + verify the license-key unlock in the app (check a Gumroad license key against localStorage; VERIFY the full purchase→email→enter-key→unlocked loop end-to-end before relying on it). This is the one real remaining build before selling.
 
-PAYMENTS — DECIDED: GUMROAD (changed from Lemon Squeezy). Use the EXISTING DoodleAndy Gumroad store (already approved/verified — removes Lemon Squeezy's slow-verification launch risk). Gumroad is Merchant of Record (handles global VAT/GST/sales tax — Andrew's "least tax work" requirement met). Fee 10% + $0.50/direct sale (higher than LS's 5%+50¢, but the difference is trivial at launch volume). The flat $0.50 bites hardest on cheap items: price themes at $2.99 (NOT $1.99 — loses ~35%), and PROMOTE the $10.99 all-access bundle (loses only ~10% vs ~27% on a $2.99 theme). Profile-name "DoodleAndy" does NOT need renaming to launch — CozyDesk themes are products inside it; renaming is a later optional branding call.
+PAYMENTS — DECIDED: GUMROAD (changed from Lemon Squeezy). Use the EXISTING DoodleAndy Gumroad store (already approved/verified — removes Lemon Squeezy's slow-verification launch risk). Gumroad is Merchant of Record (handles global VAT/GST/sales tax — Andrew's "least tax work" requirement met). Fee 10% + $0.50/direct sale (higher than LS's 5%+50¢, but the difference is trivial at launch volume). FREE/PAID SPLIT (confirmed Aug 8): FREE = Cozy Kawaii + Lo-Fi Night. PAID = Café Morning + Steampunk. PRICING DECIDED: per-world à la carte $2.99 each (keeps ~$2.19 after Gumroad's 10%+$0.50; chose $2.99 over $1.99 because $1.99 loses ~35% to the flat fee, and buying all 4 individually = ~$12 makes the bundle the smarter buy). All-access bundle $10.99 (keeps ~$9.39; buyers are warm, not cold impulse). Instead of lowering prices, run a LAUNCH DISCOUNT (e.g. "first two weeks" or a YouTube code) for the "deal" + urgency while keeping anchors. PROMOTE the bundle over per-theme sales. Profile-name "DoodleAndy" does NOT need renaming to launch — CozyDesk themes are products inside it; renaming is a later optional branding call.
 
 Legal notes: no law requires disclosing the app was BUILT with AI; the AI-art line is goodwill. EU AI Act Art. 50 (applicable Aug 2, 2026) targets live AI systems/deepfakes, not a static app shipping pre-made art. Confirm commercial rights to the AI-generated images.
 
