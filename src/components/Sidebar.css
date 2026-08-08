@@ -671,6 +671,38 @@
 }
 .pomo-main-btn:hover { background: var(--sb-accent-light); }
 
+/* ── One-time "press Start" nudge ── */
+.pomo-start-nudge {
+  margin: 0 auto 6px;
+  max-width: 150px;
+  padding: 5px 9px;
+  background: var(--sb-accent-light);
+  color: var(--sb-heading);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.25;
+  border-radius: 10px;
+  border: 1px solid var(--sb-accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  animation: pomo-nudge-in 0.5s ease-out, pomo-nudge-breathe 2.4s ease-in-out 0.5s infinite;
+}
+@keyframes pomo-nudge-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pomo-nudge-breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+.pomo-main-btn.pomo-start-glow {
+  animation: pomo-start-glow-pulse 1.6s ease-in-out infinite;
+}
+@keyframes pomo-start-glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,180,80,0.75), 0 0 16px rgba(255,160,60,0.4); }
+  50%      { box-shadow: 0 0 14px rgba(255,190,90,0.95), 0 0 26px rgba(255,160,60,0.6); }
+}
+
 /* Settings panel */
 .pomo-settings {
   margin-top: 8px;

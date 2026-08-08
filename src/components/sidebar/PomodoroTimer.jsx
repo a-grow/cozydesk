@@ -15,6 +15,27 @@ export default function PomodoroTimer() {
 
   const [mugzyOn, setMugzyOn] = useState(() => localStorage.getItem('cozydesk_mugzy') !== 'off');
 
+  // One-time "press Start" nudge: shows only for users who've never pressed Start.
+  const [showStartNudge, setShowStartNudge] = useState(false);
+  useEffect(() => {
+    if (localStorage.getItem('cozydesk_start_discovered')) return;
+    if (timerStore.getState().isRunning) return;
+    const t = setTimeout(() => {
+      // Re-check: don't show if they started the timer during the delay.
+      if (!localStorage.getItem('cozydesk_start_discovered') && !timerStore.getState().isRunning) {
+        setShowStartNudge(true);
+      }
+    }, 3500);
+    return () => clearTimeout(t);
+  }, []);
+
+  const dismissStartNudge = () => {
+    if (!localStorage.getItem('cozydesk_start_discovered')) {
+      localStorage.setItem('cozydesk_start_discovered', 'true');
+    }
+    setShowStartNudge(false);
+  };
+
   useEffect(() => {
     const sync = () => setMugzyOn(localStorage.getItem('cozydesk_mugzy') !== 'off');
     window.addEventListener('cozydesk-mugzy-toggle', sync);
@@ -29,7 +50,10 @@ export default function PomodoroTimer() {
     window.dispatchEvent(new Event('cozydesk-mugzy-toggle'));
   };
 
-  const handleStartStop = () => timerStore.startStop();
+  const handleStartStop = () => {
+    dismissStartNudge();
+    timerStore.startStop();
+  };
   const handleReset = () => timerStore.reset();
 
   const mm = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -42,8 +66,11 @@ export default function PomodoroTimer() {
         <span className="pomo-timer">{mm}:{ss}</span>
         <span className="pomo-label">{mode === 'work' ? 'Focus' : 'Break'}</span>
       </div>
+      {showStartNudge && (
+        <div className="pomo-start-nudge">Your world is waiting… press Start</div>
+      )}
       <div className="pomo-btns">
-        <button className="pomo-btn pomo-main-btn" onClick={handleStartStop}>
+        <button className={`pomo-btn pomo-main-btn ${showStartNudge ? 'pomo-start-glow' : ''}`} onClick={handleStartStop}>
           {isComplete ? '⏭ Next' : isRunning ? '⏸ Pause' : '▶ Start'}
         </button>
         <button className="pomo-btn pomo-reset-btn" onClick={handleReset}>↺</button>
