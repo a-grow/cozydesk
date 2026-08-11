@@ -258,7 +258,7 @@ export default function LofiSidebar({
       </div>
       {/* ── Theme ── */}
       <div className="lofi-section-block">
-        <div className="lofi-section-label">THEMES</div>
+        <div className="lofi-section-label">WORLDS</div>
         <ThemesSection onSetTheme={onSetTheme} />
       </div>
 

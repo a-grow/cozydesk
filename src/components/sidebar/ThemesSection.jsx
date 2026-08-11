@@ -1,24 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../themes/ThemeContext';
-import { THEME_CONFIGS, availableThemeNames } from '../../themes/themeRegistry';
+import WorldGalleryModal from './WorldGalleryModal';
 
 export default function ThemesSection({ onSetTheme }) {
   const { themeName, setTheme } = useTheme();
   const handleSetTheme = onSetTheme || setTheme;
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   return (
     <div className="themes-section">
-      <select
-        className="theme-dropdown"
-        value={themeName}
-        onChange={(e) => handleSetTheme(e.target.value)}
+      <button
+        type="button"
+        className="world-gallery-trigger"
+        onClick={() => setGalleryOpen(true)}
       >
-        {availableThemeNames.map((key) => (
-          <option key={key} value={key}>
-            {THEME_CONFIGS[key]?.name || key}
-          </option>
-        ))}
-      </select>
+        Choose Your World
+      </button>
+
+      {galleryOpen && (
+        <WorldGalleryModal
+          currentTheme={themeName}
+          onPick={(key) => { handleSetTheme(key); setGalleryOpen(false); }}
+          onClose={() => setGalleryOpen(false)}
+        />
+      )}
     </div>
   );
 }

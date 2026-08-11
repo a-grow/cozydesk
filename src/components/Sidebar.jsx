@@ -316,7 +316,7 @@ export default function Sidebar({
             Themes
             ═══════════════════════════════════════ */}
         <div className="sb-section">
-          <h3 className="sb-section-title">🎨 Themes</h3>
+          <h3 className="sb-section-title">🎨 Worlds</h3>
           <ThemesSection onSetTheme={onSetTheme} />
         </div>
 

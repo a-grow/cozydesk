@@ -290,4 +290,19 @@ export function getThemeStickyNotes(name) {
   return [...notes, ...ownTodo];
 }
 
+// Raw background image URLs (registry stores them as `url(...)` CSS strings;
+// the World Gallery needs the raw src for <img> thumbnails).
+export const THEME_BACKGROUNDS = {
+  cozykawaii: cozyBackground,
+  lofi: lofiBackground,
+  steampunk: steampunkBackground,
+  cafe: cafeBackground,
+};
+
+// Gumroad checkout URLs for paid worlds (used by the unlock preview screen).
+export const THEME_GUMROAD_URLS = {
+  cafe: 'https://doodleandy.gumroad.com/l/cafe-morning',
+  steampunk: 'https://doodleandy.gumroad.com/l/steampunk',
+};
+
 export { THEME_CONFIGS, availableThemeNames, stickersByTheme, stickyNotesByTheme };
