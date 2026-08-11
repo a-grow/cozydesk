@@ -7,6 +7,7 @@ import {
   THEME_GUMROAD_URLS,
 } from '../../themes/themeRegistry';
 import { isPaidWorld, isWorldUnlocked } from '../../utils/licenseManager';
+import { soundManager } from '../../utils/soundManager';
 
 const FLAVOR = {
   cafe: "A fresh cup and a cozy table that's always waiting. It's morning here whenever you need it to be — quiet, unhurried, and entirely yours.",
@@ -32,6 +33,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
     if (paid && !unlocked) {
       setPreviewWorld(key);   // open the unlock preview
     } else {
+      soundManager.play('sfx_place_note');
       onPick(key);            // free or already-unlocked → switch
     }
   }

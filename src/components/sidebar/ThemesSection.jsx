@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../themes/ThemeContext';
+import { soundManager } from '../../utils/soundManager';
 import WorldGalleryModal from './WorldGalleryModal';
 
 export default function ThemesSection({ onSetTheme }) {
@@ -12,7 +13,7 @@ export default function ThemesSection({ onSetTheme }) {
       <button
         type="button"
         className="world-gallery-trigger"
-        onClick={() => setGalleryOpen(true)}
+        onClick={() => { soundManager.play('sfx_click_button'); setGalleryOpen(true); }}
       >
         Choose Your World
       </button>
