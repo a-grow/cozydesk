@@ -633,12 +633,15 @@
 }
 .pomo-emoji { font-size: 20px; line-height: 1; }
 .pomo-timer {
-  font-family: 'Fredoka', cursive;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
   font-size: 1.1rem;
   color: var(--sb-heading);
   letter-spacing: 0.05em;
 }
 .pomo-label {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
   font-size: 0.6rem;
   color: var(--sb-subtext);
   text-transform: uppercase;
@@ -663,13 +666,111 @@
   color: var(--sb-text);
 }
 .pomo-btn:hover { transform: scale(1.05); }
+/* ── Primary Start/Pause button — glossy candy-orange pill, greens when running ── */
 .pomo-main-btn {
-  background: var(--sb-card);  /* Matching the other buttons */
-  color: var(--sb-text);       /* Dark, readable text */
-  border-color: var(--sb-border);
-  font-weight: bold;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 2px 0 10px;
+  padding: 15px 14px;
+  border: 2px solid #f3d29a;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(150,80,20,0.45);
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.35) 0%,
+      rgba(255,255,255,0.05) 34%,
+      rgba(255,255,255,0) 46%),
+    linear-gradient(180deg, #f5b04e 0%, #ec9433 52%, #dc7f22 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255,240,215,0.85),
+    0 5px 0 #c06a1c,
+    0 8px 12px rgba(170,95,30,0.4);
+  transition: background 0.35s ease, box-shadow 0.12s ease,
+              transform 0.12s ease, border-color 0.35s ease;
 }
-.pomo-main-btn:hover { background: var(--sb-accent-light); }
+.pomo-main-btn:hover { filter: brightness(1.04); }
+.pomo-main-btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 1px 1px rgba(255,240,215,0.85),
+    0 1px 0 #c06a1c,
+    0 2px 5px rgba(170,95,30,0.4);
+}
+
+/* Running state — warm green, same candy treatment */
+.pomo-main-btn.pomo-running {
+  border-color: #cfe6a4;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.35) 0%,
+      rgba(255,255,255,0.05) 34%,
+      rgba(255,255,255,0) 46%),
+    linear-gradient(180deg, #9ccc5a 0%, #7bb03e 52%, #5f9e34 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(240,255,220,0.85),
+    0 5px 0 #4a7d28,
+    0 8px 12px rgba(70,120,40,0.4);
+}
+.pomo-main-btn.pomo-running:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 1px 1px rgba(240,255,220,0.85),
+    0 1px 0 #4a7d28,
+    0 2px 5px rgba(70,120,40,0.4);
+}
+
+/* Label cross-fade — cosmetic only */
+.pomo-main-label {
+  display: inline-block;
+  white-space: nowrap;
+  transition: opacity 0.16s ease;
+  opacity: 1;
+}
+.pomo-main-label.pomo-label-fading { opacity: 0; }
+
+/* ── Reset button — full-width secondary, icon + text ── */
+.pomo-reset-btn {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--sb-text);
+  background: var(--sb-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s, transform 0.12s;
+}
+.pomo-reset-btn:hover { background: var(--sb-accent-light); transform: scale(1.01); }
+.pomo-reset-icon { font-size: 15px; line-height: 1; }
+
+/* Lofi: the default card bg + text was too low-contrast — give Reset a readable surface */
+.cozy-sidebar[data-theme="lofi"] .pomo-reset-btn {
+  background: rgba(124,115,192,0.18);
+  color: #e0dce8;
+  border-color: rgba(124,115,192,0.5);
+}
+.cozy-sidebar[data-theme="lofi"] .pomo-reset-btn:hover {
+  background: rgba(124,115,192,0.32);
+}
+
+/* Always-visible Work/Break settings */
+.pomo-settings-always { margin-top: 2px; }
 
 /* ── One-time "press Start" nudge ── */
 .pomo-start-nudge {
@@ -715,6 +816,8 @@
   border-radius: 8px;
 }
 .pomo-setting {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
   font-size: 0.75rem;
   display: flex;
   align-items: center;
@@ -726,6 +829,8 @@
   border: 1px solid var(--sb-input-border);
   border-radius: 4px;
   padding: 2px 3px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
   font-size: 0.75rem;
   background: var(--sb-input-bg);
   color: var(--sb-text);
@@ -1558,8 +1663,7 @@
   box-shadow: 0 0 14px rgba(184,115,51,0.3);
   transform: translateY(-1px);
 }
-.cozy-sidebar[data-theme="steampunk"] .pomo-btn,
-.cozy-sidebar[data-theme="steampunk"] .pomo-main-btn {
+.cozy-sidebar[data-theme="steampunk"] .pomo-btn {
   font-family: 'Cinzel Decorative', serif;
   font-size: 0.6rem;
   letter-spacing: 0.05em;
@@ -1568,8 +1672,7 @@
   color: #e8d4b0;
   border-radius: 4px;
 }
-.cozy-sidebar[data-theme="steampunk"] .pomo-btn:hover,
-.cozy-sidebar[data-theme="steampunk"] .pomo-main-btn:hover {
+.cozy-sidebar[data-theme="steampunk"] .pomo-btn:hover {
   background: linear-gradient(180deg, #3e2c18, #241810);
   box-shadow: 0 0 8px rgba(184,115,51,0.35);
 }
@@ -2131,13 +2234,11 @@
 /* Café timer buttons — café never got the per-theme override steampunk has, so the
    buttons inherited a near-white default with cream text on top (invisible). Give them
    a café-brown surface, readable cream text, and a green edge to define the button. */
-.cozy-sidebar[data-theme="cafe"] .pomo-btn,
-.cozy-sidebar[data-theme="cafe"] .pomo-main-btn {
+.cozy-sidebar[data-theme="cafe"] .pomo-btn {
   background: #4a2818;
   color: #f5f0e8;
   border-color: #2d5a27;
 }
-.cozy-sidebar[data-theme="cafe"] .pomo-btn:hover,
-.cozy-sidebar[data-theme="cafe"] .pomo-main-btn:hover {
+.cozy-sidebar[data-theme="cafe"] .pomo-btn:hover {
   background: var(--sb-accent-light);
 }

@@ -11,8 +11,6 @@ export default function PomodoroTimer() {
 
   const { workMins, breakMins, mode, timeLeft, isRunning, isComplete } = timerStore.getState();
 
-  const [showSettings, setShowSettings] = useState(false);
-
   const [mugzyOn, setMugzyOn] = useState(() => localStorage.getItem('cozydesk_mugzy') !== 'off');
 
   // One-time "press Start" nudge: shows only for users who've never pressed Start.
@@ -50,6 +48,19 @@ export default function PomodoroTimer() {
     window.dispatchEvent(new Event('cozydesk-mugzy-toggle'));
   };
 
+  // Cosmetic label cross-fade when Start<->Pause toggles. Purely visual;
+  // timerStore stays the source of truth for actual timer state.
+  const [labelFade, setLabelFade] = useState(false);
+  const prevRunning = React.useRef(isRunning);
+  useEffect(() => {
+    if (prevRunning.current !== isRunning) {
+      prevRunning.current = isRunning;
+      setLabelFade(true);
+      const t = setTimeout(() => setLabelFade(false), 160);
+      return () => clearTimeout(t);
+    }
+  }, [isRunning]);
+
   const handleStartStop = () => {
     dismissStartNudge();
     timerStore.startStop();
@@ -69,13 +80,40 @@ export default function PomodoroTimer() {
       {showStartNudge && (
         <div className="pomo-start-nudge">Your world is waiting… press Start</div>
       )}
-      <div className="pomo-btns">
-        <button className={`pomo-btn pomo-main-btn ${showStartNudge ? 'pomo-start-glow' : ''}`} onClick={handleStartStop}>
-          {isComplete ? '⏭ Next' : isRunning ? '⏸ Pause' : '▶ Start'}
-        </button>
-        <button className="pomo-btn pomo-reset-btn" onClick={handleReset}>↺</button>
-        <button className="pomo-btn pomo-gear-btn" onClick={() => setShowSettings(s => !s)}>⚙</button>
+      <button
+        className={`pomo-main-btn ${isRunning ? 'pomo-running' : ''} ${showStartNudge ? 'pomo-start-glow' : ''}`}
+        onClick={handleStartStop}
+      >
+        <span className={`pomo-main-label ${labelFade ? 'pomo-label-fading' : ''}`}>
+          {isComplete ? '⏭ Next' : isRunning ? '⏸ Pause Focus' : '▶ Start Focus'}
+        </span>
+      </button>
+
+      <button className="pomo-reset-btn" onClick={handleReset}>
+        <span className="pomo-reset-icon">↻</span> Reset
+      </button>
+
+      <div className="pomo-settings pomo-settings-always">
+        <label className="pomo-setting">
+          Work Time
+          <input
+            type="number" className="pomo-num" min={1} max={99}
+            value={workMins}
+            onChange={e => timerStore.setWork(+e.target.value)}
+          />
+          min
+        </label>
+        <label className="pomo-setting">
+          Break Time
+          <input
+            type="number" className="pomo-num" min={1} max={99}
+            value={breakMins}
+            onChange={e => timerStore.setBreak(+e.target.value)}
+          />
+          min
+        </label>
       </div>
+
       <button
         className="pomo-mugzy-btn"
         onClick={toggleMugzy}
@@ -87,28 +125,6 @@ export default function PomodoroTimer() {
           className="pomo-mugzy-btn-img"
         />
       </button>
-      {showSettings && (
-        <div className="pomo-settings">
-          <label className="pomo-setting">
-            Work
-            <input
-              type="number" className="pomo-num" min={1} max={99}
-              value={workMins}
-              onChange={e => timerStore.setWork(+e.target.value)}
-            />
-            min
-          </label>
-          <label className="pomo-setting">
-            Break
-            <input
-              type="number" className="pomo-num" min={1} max={99}
-              value={breakMins}
-              onChange={e => timerStore.setBreak(+e.target.value)}
-            />
-            min
-          </label>
-        </div>
-      )}
     </div>
   );
 }

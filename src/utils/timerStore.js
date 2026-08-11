@@ -99,6 +99,7 @@ export const timerStore = {
       startInterval();
     } else {
       // Pausing the timer quiets the music.
+      soundManager.play('sfx_click_button');
       audioManager.pause();
       stopInterval();
     }
