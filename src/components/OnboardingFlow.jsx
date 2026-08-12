@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import { useTheme } from '../themes/ThemeContext.jsx';
 import { recordTermsAgreement } from '../utils/onboardingState.js';
 import { getThemeConfig } from '../themes/themeRegistry';
+import { isPaidWorld } from '../utils/licenseManager';
 import cozydeskLogo from '../assets/cozydesk-logo.png';
 
 // The four worlds shown on the pick-your-world screen.
 // Card image = each theme's existing background. To swap in styled hero shots
 // later, change ONLY what worldImage() returns — nothing else needs to change.
+// Onboarding shows FREE worlds only — paid worlds are discovered later via the
+// World Gallery (where the buy flow lives).
 const WORLDS = [
   { key: 'cafe',       label: 'Café Morning' },
   { key: 'cozykawaii', label: 'Cozy Kawaii' },
   { key: 'steampunk',  label: 'Steampunk' },
   { key: 'lofi',       label: 'Lo-Fi' },
-];
+].filter((w) => !isPaidWorld(w.key));
 
 // Pull a displayable background image URL out of a theme's config.
 function worldImage(themeKey) {

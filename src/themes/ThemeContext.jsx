@@ -6,6 +6,7 @@ import {
   getThemeStickyNotes,
   THEME_CONFIGS,
 } from './themeRegistry';
+import { isPaidWorld, isWorldUnlocked } from '../utils/licenseManager';
 
 const CALENDAR_SHARED_KEY = 'cozydesk_calendar_shared';
 
@@ -25,7 +26,10 @@ export const ThemeProvider = ({ children }) => {
   const [themeName, setThemeName] = useState(() => {
     try {
       const saved = localStorage.getItem('cozydesk_active_theme');
-      if (saved && (THEME_CONFIGS[saved] || availableThemeNames.includes(saved))) return saved;
+      const validName = saved && (THEME_CONFIGS[saved] || availableThemeNames.includes(saved));
+      // If the saved world is a locked paid world (e.g. unlock cache cleared or refunded),
+      // don't restore into it — fall back to a free world.
+      if (validName && !(isPaidWorld(saved) && !isWorldUnlocked(saved))) return saved;
     } catch (_) {}
     return 'cozykawaii';
   });
@@ -56,6 +60,8 @@ export const ThemeProvider = ({ children }) => {
   // calendar-sharing popup baggage. Guards against unknown theme names.
   const setThemeDirect = useCallback((name) => {
     if (!THEME_CONFIGS[name] && !availableThemeNames.includes(name)) return;
+    // Never allow entering a locked paid world.
+    if (isPaidWorld(name) && !isWorldUnlocked(name)) return;
     setThemeName(name);
   }, []);
 
@@ -63,6 +69,8 @@ export const ThemeProvider = ({ children }) => {
   // currentThemeName is injected by cozykawaii.jsx so we can read the right localStorage key.
   const setTheme = useCallback((name, _getSnapshot, currentThemeName) => {
     if (!THEME_CONFIGS[name] && !availableThemeNames.includes(name)) return;
+    // Never allow entering a locked paid world.
+    if (isPaidWorld(name) && !isWorldUnlocked(name)) return;
 
     const sharingPref = localStorage.getItem(CALENDAR_SHARED_KEY);
 
