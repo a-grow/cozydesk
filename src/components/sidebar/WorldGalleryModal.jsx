@@ -6,7 +6,7 @@ import {
   THEME_BACKGROUNDS,
   THEME_GUMROAD_URLS,
 } from '../../themes/themeRegistry';
-import { isPaidWorld, isWorldUnlocked } from '../../utils/licenseManager';
+import { isPaidWorld, isWorldUnlocked, verifyAndUnlock } from '../../utils/licenseManager';
 import allAccessBanner from '../../assets/backgrounds/all-access-banner.png';
 import comingSpaceBg from '../../assets/backgrounds/space-cruiser-background.png';
 import comingDynastyBg from '../../assets/backgrounds/chinese-dynasty-background.png';
@@ -29,6 +29,141 @@ const overlay = {
 export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
   // When set to a world key, we're showing that world's unlock preview screen.
   const [previewWorld, setPreviewWorld] = useState(null);
+  // When true, we're showing the key-entry screen for the current previewWorld.
+  const [enteringKey, setEnteringKey] = useState(false);
+  const [keyInput, setKeyInput] = useState('');
+  const [keyStatus, setKeyStatus] = useState(null); // null | 'checking' | 'invalid' | 'network' | 'success'
+
+  // The world a successful unlock should drop the user into.
+  // For the bundle screen we use 'cafe' (verifyAndUnlock tries cafe, then the bundle).
+  function unlockTargetWorld() {
+    return previewWorld === 'allaccess' ? 'cafe' : previewWorld;
+  }
+
+  async function handleUnlockSubmit() {
+    if (keyStatus === 'checking') return;
+    const target = unlockTargetWorld();
+    setKeyStatus('checking');
+    const result = await verifyAndUnlock(target, keyInput);
+    if (result.ok) {
+      setKeyStatus('success');
+      soundManager.play('sfx_place_note');
+      // Drop straight into the unlocked world after a short beat.
+      setTimeout(() => { onPick(target); }, 900);
+    } else {
+      setKeyStatus(result.reason === 'network' ? 'network' : 'invalid');
+    }
+  }
+
+  function openKeyEntry() {
+    setKeyInput('');
+    setKeyStatus(null);
+    setEnteringKey(true);
+  }
+
+  function closeKeyEntry() {
+    setEnteringKey(false);
+    setKeyStatus(null);
+    setKeyInput('');
+  }
+
+  // ---------- Key-entry screen (shared by both preview screens) ----------
+  function renderKeyEntry() {
+    const checking = keyStatus === 'checking';
+    const success = keyStatus === 'success';
+    return createPortal(
+      <div style={overlay} onClick={onClose}>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'relative',
+            width: 'min(460px, 92vw)',
+            borderRadius: '18px',
+            background: '#fff8f0',
+            padding: '34px 30px 30px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            fontFamily: "'Nunito', sans-serif",
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '22px', fontWeight: 800, color: '#4b3b2a', marginBottom: '10px' }}>
+            Enter your unlock key
+          </div>
+          <div style={{ fontSize: '14.5px', lineHeight: 1.55, color: '#8a6f52', marginBottom: '20px' }}>
+            Check your email for a message from Gumroad — it has your key inside.
+            Paste it below and press Unlock.
+          </div>
+
+          <input
+            type="text"
+            value={keyInput}
+            onChange={(e) => { setKeyInput(e.target.value); if (keyStatus === 'invalid' || keyStatus === 'network') setKeyStatus(null); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleUnlockSubmit(); }}
+            placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+            disabled={checking || success}
+            autoFocus
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              padding: '13px 14px', borderRadius: '12px',
+              border: '2px solid #e0cdb8',
+              background: '#fffdf8', color: '#4b3b2a',
+              fontSize: '15px', fontFamily: "'Nunito', sans-serif",
+              textAlign: 'center', letterSpacing: '0.5px',
+              marginBottom: '16px', outline: 'none',
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={handleUnlockSubmit}
+            disabled={checking || success}
+            style={{
+              width: '100%',
+              padding: '13px 0', borderRadius: '30px',
+              border: '1px solid rgba(255,240,200,0.6)',
+              cursor: (checking || success) ? 'default' : 'pointer',
+              fontWeight: 800, fontSize: '16px',
+              background: 'linear-gradient(180deg, #ffd98a 0%, #f6b73c 55%, #e8992e 100%)',
+              color: '#3a2410',
+              boxShadow: '0 6px 18px rgba(180,120,30,0.4), inset 0 1px 1px rgba(255,255,255,0.5)',
+              opacity: (checking || success) ? 0.75 : 1,
+            }}
+          >
+            {checking ? 'Checking your key…' : success ? "You're in! Unlocking…" : 'Unlock'}
+          </button>
+
+          {keyStatus === 'invalid' && (
+            <div style={{ marginTop: '16px', fontSize: '13.5px', lineHeight: 1.5, color: '#a4442f' }}>
+              That key didn't work. Double-check it matches the one in your email,
+              or reach us at cozydesksupport@gmail.com
+            </div>
+          )}
+          {keyStatus === 'network' && (
+            <div style={{ marginTop: '16px', fontSize: '13.5px', lineHeight: 1.5, color: '#a4442f' }}>
+              Couldn't connect. Please check your internet and try again.
+            </div>
+          )}
+
+          {!success && (
+            <div
+              onClick={closeKeyEntry}
+              style={{
+                marginTop: '18px', fontSize: '13px', textDecoration: 'underline',
+                cursor: 'pointer', color: '#8a6f52',
+              }}
+            >
+              Back
+            </div>
+          )}
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
+  if (enteringKey) {
+    return renderKeyEntry();
+  }
 
   function handleCardClick(key) {
     const paid = isPaidWorld(key);
@@ -98,7 +233,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
               Get All-Access — $10.99
             </button>
             <div
-              onClick={() => console.log('[Step 3] enter-key flow goes here for allaccess')}
+              onClick={openKeyEntry}
               style={{
                 marginTop: '18px', fontSize: '13px', textDecoration: 'underline',
                 cursor: 'pointer', opacity: 0.9,
@@ -181,7 +316,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
               Unlock — {PRICE[previewWorld] || '$2.99'}
             </button>
             <div
-              onClick={() => console.log('[Step 3] enter-key flow goes here for', previewWorld)}
+              onClick={openKeyEntry}
               style={{
                 marginTop: '18px', fontSize: '13px', textDecoration: 'underline',
                 cursor: 'pointer', opacity: 0.9,
