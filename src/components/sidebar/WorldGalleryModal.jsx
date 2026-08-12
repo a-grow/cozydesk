@@ -8,6 +8,8 @@ import {
 } from '../../themes/themeRegistry';
 import { isPaidWorld, isWorldUnlocked } from '../../utils/licenseManager';
 import allAccessBanner from '../../assets/backgrounds/all-access-banner.png';
+import comingSpaceBg from '../../assets/backgrounds/space-cruiser-background.png';
+import comingDynastyBg from '../../assets/backgrounds/chinese-dynasty-background.png';
 import { soundManager } from '../../utils/soundManager';
 
 const FLAVOR = {
@@ -312,6 +314,49 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
               </div>
             );
           })}
+
+          {[
+            { label: 'Space Cruiser', bg: comingSpaceBg },
+            { label: 'Ancient Dynasty', bg: comingDynastyBg },
+          ].map((soon) => (
+            <div
+              key={soon.label}
+              style={{
+                position: 'relative',
+                borderRadius: '14px',
+                overflow: 'hidden',
+                cursor: 'default',
+                border: '3px solid transparent',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+              }}
+            >
+              <div style={{
+                width: '100%', aspectRatio: '16 / 10',
+                backgroundImage: `url(${soon.bg})`,
+                backgroundColor: '#e8ddd0',
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                filter: 'brightness(0.62)',
+              }} />
+
+              <div style={{
+                position: 'absolute', top: '10px', right: '10px',
+                background: 'rgba(0,0,0,0.6)', color: '#fff',
+                borderRadius: '20px', padding: '4px 11px',
+                fontSize: '12px', fontWeight: 700,
+              }}>
+                Coming Soon!
+              </div>
+
+              <div style={{
+                position: 'absolute', left: 0, right: 0, bottom: 0,
+                padding: '10px 12px',
+                background: 'linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0))',
+                color: '#fff', fontWeight: 800, fontSize: '15px',
+              }}>
+                {soon.label}
+              </div>
+            </div>
+          ))}
         </div>
 
         {!(isWorldUnlocked('cafe') && isWorldUnlocked('steampunk')) && (
