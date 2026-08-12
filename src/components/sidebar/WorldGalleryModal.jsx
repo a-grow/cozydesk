@@ -7,6 +7,7 @@ import {
   THEME_GUMROAD_URLS,
 } from '../../themes/themeRegistry';
 import { isPaidWorld, isWorldUnlocked } from '../../utils/licenseManager';
+import allAccessBanner from '../../assets/backgrounds/all-access-banner.png';
 import { soundManager } from '../../utils/soundManager';
 
 const FLAVOR = {
@@ -38,7 +39,102 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
     }
   }
 
-  // ---------- Unlock preview screen ----------
+  // ---------- All-Access bundle preview screen ----------
+  if (previewWorld === 'allaccess') {
+    return createPortal(
+      <div style={overlay} onClick={onClose}>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'relative',
+            width: 'min(560px, 92vw)',
+            borderRadius: '18px',
+            overflow: 'hidden',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            fontFamily: "'Nunito', sans-serif",
+          }}
+        >
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url(${allAccessBanner})`,
+            backgroundSize: 'cover', backgroundPosition: 'center',
+            filter: 'brightness(1.25)',
+          }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,16,24,0.25)' }} />
+
+          <div style={{
+            position: 'relative',
+            margin: '40px auto',
+            maxWidth: '400px',
+            padding: '30px 26px',
+            borderRadius: '18px',
+            background: 'rgba(20,16,24,0.42)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.28)',
+            color: '#fff', textAlign: 'center',
+          }}>
+            <div style={{ fontSize: '28px', fontWeight: 800, marginBottom: '14px' }}>
+              Unlock Every World
+            </div>
+            <div style={{ fontSize: '16px', lineHeight: 1.6, maxWidth: '440px', margin: '0 auto 28px', opacity: 0.96 }}>
+              Café, Steampunk, and every new world I add... and I've got a lot more ideas. Buy once, they're all yours.
+            </div>
+            <button
+              type="button"
+              onClick={() => window.open(THEME_GUMROAD_URLS.allaccess, '_blank', 'noopener,noreferrer')}
+              style={{
+                padding: '13px 30px', borderRadius: '30px',
+                border: '1px solid rgba(255,240,200,0.6)',
+                cursor: 'pointer', fontWeight: 800, fontSize: '16px',
+                background: 'linear-gradient(180deg, #ffd98a 0%, #f6b73c 55%, #e8992e 100%)',
+                color: '#3a2410',
+                boxShadow: '0 6px 20px rgba(180,120,30,0.45), inset 0 1px 1px rgba(255,255,255,0.5)',
+              }}
+            >
+              Get All-Access — $10.99
+            </button>
+            <div
+              onClick={() => console.log('[Step 3] enter-key flow goes here for allaccess')}
+              style={{
+                marginTop: '18px', fontSize: '13px', textDecoration: 'underline',
+                cursor: 'pointer', opacity: 0.9,
+              }}
+            >
+              Already bought? Enter your key
+            </div>
+          </div>
+
+          <div
+            onClick={() => setPreviewWorld(null)}
+            style={{
+              position: 'absolute', top: '14px', left: '16px', zIndex: 2,
+              color: '#fff', fontSize: '22px', cursor: 'pointer', lineHeight: 1,
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            }}
+            title="Back"
+          >
+            ‹
+          </div>
+          <div
+            onClick={onClose}
+            style={{
+              position: 'absolute', top: '14px', right: '16px', zIndex: 2,
+              color: '#fff', fontSize: '22px', cursor: 'pointer', lineHeight: 1,
+              textShadow: '0 1px 4px rgba(0,0,0,0.6)',
+            }}
+            title="Close"
+          >
+            ×
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
+  // ---------- Unlock preview screen (single world) ----------
   if (previewWorld) {
     const cfg = THEME_CONFIGS[previewWorld];
     const bg = THEME_BACKGROUNDS[previewWorld];
@@ -217,6 +313,71 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
             );
           })}
         </div>
+
+        {!(isWorldUnlocked('cafe') && isWorldUnlocked('steampunk')) && (
+          <div
+            onClick={() => {
+              soundManager.play('sfx_click_button');
+              setPreviewWorld('allaccess');
+            }}
+            style={{
+              position: 'relative',
+              marginTop: '22px',
+              borderRadius: '14px',
+              overflow: 'hidden',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+              minHeight: '150px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: `url(${allAccessBanner})`,
+              backgroundSize: 'cover', backgroundPosition: 'center',
+              filter: 'brightness(1.25)',
+            }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,16,24,0.22)' }} />
+            <div style={{
+              position: 'relative',
+              margin: '18px',
+              padding: '18px 24px',
+              borderRadius: '16px',
+              background: 'rgba(20,16,24,0.42)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              boxShadow: '0 4px 18px rgba(0,0,0,0.25)',
+              color: '#fff',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '11px',
+              textAlign: 'center',
+              maxWidth: '480px',
+            }}>
+              <div style={{ fontSize: '22px', fontWeight: 800 }}>
+                Unlock Every World
+              </div>
+              <div style={{ fontSize: '15px', lineHeight: 1.55, opacity: 0.96 }}>
+                Café, Steampunk, and every new world I add... and I've got a lot more ideas. Buy once, they're all yours.
+              </div>
+              <div style={{
+                marginTop: '4px',
+                padding: '10px 22px', borderRadius: '24px',
+                border: '1px solid rgba(255,240,200,0.6)',
+                background: 'linear-gradient(180deg, #ffd98a 0%, #f6b73c 55%, #e8992e 100%)',
+                color: '#3a2410',
+                fontWeight: 800, fontSize: '14px',
+                boxShadow: '0 4px 14px rgba(180,120,30,0.45), inset 0 1px 1px rgba(255,255,255,0.5)',
+              }}>
+                Get All-Access — $10.99
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body

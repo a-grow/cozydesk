@@ -303,6 +303,7 @@ export const THEME_BACKGROUNDS = {
 export const THEME_GUMROAD_URLS = {
   cafe: 'https://doodleandy.gumroad.com/l/cafe-morning',
   steampunk: 'https://doodleandy.gumroad.com/l/steampunk',
+  allaccess: 'https://doodleandy.gumroad.com/l/all-access',
 };
 
 export { THEME_CONFIGS, availableThemeNames, stickersByTheme, stickyNotesByTheme };
