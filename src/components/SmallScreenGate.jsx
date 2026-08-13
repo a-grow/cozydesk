@@ -5,7 +5,7 @@ import WorldGalleryModal from './sidebar/WorldGalleryModal';
 // Pure-touch devices only: a finger is the ONLY pointer (phones + tablets).
 // A touchscreen laptop also has a fine pointer (trackpad), so it passes through
 // to the real app. A small desktop browser window is 'fine' too — never gated.
-const TOUCH_ONLY_QUERY = '(pointer: coarse) and not (pointer: fine)';
+const TOUCH_ONLY_QUERY = '(hover: none) and (pointer: coarse)';
 
 function isTouchOnly() {
   try {
