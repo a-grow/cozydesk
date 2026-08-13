@@ -4,6 +4,7 @@ import { ThemeProvider } from "./themes/ThemeContext.jsx";
 import Cozykawaii from "./themes/cozykawaii.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import OnboardingFlow from "./components/OnboardingFlow.jsx";
+import SmallScreenGate from "./components/SmallScreenGate.jsx";
 import { hasAgreedToTerms, hasExistingDeskData } from "./utils/onboardingState.js";
 import './index.css';
 
@@ -54,7 +55,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ErrorBoundary>
       <ThemeProvider>
-        <AppGate />
+        <SmallScreenGate>
+          <AppGate />
+        </SmallScreenGate>
       </ThemeProvider>
     </ErrorBoundary>
   </React.StrictMode>
