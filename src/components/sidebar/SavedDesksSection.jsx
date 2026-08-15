@@ -31,7 +31,7 @@ function Btn({ color, onClick, children, style }) {
   return <button style={{ ...BTN_BASE, background: COLORS[color] || color, ...style }} onClick={onClick}>{children}</button>;
 }
 
-export default function SavedDesksSection({ themeName, onLoad }) {
+export default function SavedDesksSection({ themeName, onLoad, screen = 'load' }) {
   const [refresh, setRefresh]           = useState(0);
   const [expandedSlot, setExpandedSlot] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -117,10 +117,13 @@ export default function SavedDesksSection({ themeName, onLoad }) {
 
   return (
     <div data-refresh={refresh}>
+      {screen === 'backup' && (
+      <>
       {/* ── Backup warning + actions ── */}
       <div style={{ fontFamily: FONT, fontSize: '0.85rem', lineHeight: 1.5, color: 'var(--sb-heading)', marginBottom: '8px' }}>
-        Your desks live on your computer, not in the cloud. If you clear the app's data, they'll be erased —
-        so <strong>save a backup file</strong> to keep them safe.
+        Your desks live on your computer, not in the cloud. A backup saves every desk in every world
+        into one file you keep. If you ever clear the app's data — or switch computers — that file
+        is how you bring them all back.
       </div>
       <div style={{ display: 'flex', gap: '5px', marginBottom: '6px' }}>
         <Btn
@@ -148,8 +151,10 @@ export default function SavedDesksSection({ themeName, onLoad }) {
         style={{ display: 'none' }}
         onChange={handleFileChosen}
       />
+      </>
+      )}
 
-      {slots.map(({ slot, data }) => {
+      {screen === 'load' && slots.map(({ slot, data }) => {
         const isExpanded   = expandedSlot === slot;
         const isConfirming = confirmDelete === slot;
 

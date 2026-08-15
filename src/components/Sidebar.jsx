@@ -321,7 +321,7 @@ export default function Sidebar({
         </div>
 
         <button className="sb-action-btn sb-action-mydesks" onClick={() => { soundManager.play('sfx_click_button'); setSavedDesksOpen(true); }}>
-          📁 My Desks
+          💾 My Desks
         </button>
 
         <hr className="sb-divider" />
@@ -476,10 +476,6 @@ export default function Sidebar({
       {/* Push settings to the bottom */}
       <div className="sb-spacer" />
 
-      <button className="sb-action-btn sb-action-save" onClick={() => { soundManager.play('sfx_click_button'); setSavePopupOpen(true); }}>
-        💾 SAVE
-      </button>
-
       <button className="sb-action-btn sb-action-settings" onClick={() => { soundManager.play('sfx_click_button'); onSettings(); }}>
         ⚙️ Settings
       </button>
@@ -488,6 +484,7 @@ export default function Sidebar({
         <SavedDesksModal
           themeName={themeName}
           onLoad={handleLoad}
+          onSaveCurrent={() => setSavePopupOpen(true)}
           onClose={() => setSavedDesksOpen(false)}
         />
       )}

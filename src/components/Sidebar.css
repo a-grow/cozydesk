@@ -2050,6 +2050,69 @@
   border-radius: 4px;
 }
 
+/* ── My Desks fork (Save / Load / Backup choices) ── */
+.sds-fork {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0;
+}
+.sds-fork-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1px solid var(--sb-border);
+  border-radius: 12px;
+  background: var(--sb-card);
+  color: var(--sb-heading);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.12s, box-shadow 0.2s;
+}
+.sds-fork-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  filter: brightness(1.03);
+}
+.sds-fork-btn:active { transform: translateY(0); }
+.sds-fork-emoji { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+.sds-fork-label { display: flex; flex-direction: column; gap: 2px; }
+.sds-fork-sublabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sb-subtext);
+  letter-spacing: 0.01em;
+}
+
+/* Primary choice — honey-amber, matches the logo/CTAs */
+.sds-fork-btn--primary {
+  border: none;
+  color: #3d2410;
+  background: linear-gradient(180deg, #F6B73C 0%, #E8843C 100%);
+}
+.sds-fork-btn--primary:hover { filter: brightness(1.04); }
+
+/* Back arrow in the modal header */
+.sds-back-btn {
+  background: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  color: var(--sb-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 2px 10px;
+  transition: filter 0.15s;
+}
+.sds-back-btn:hover { filter: brightness(0.95); }
+
 
 /* ── Saved Desks slot additions ── */
 

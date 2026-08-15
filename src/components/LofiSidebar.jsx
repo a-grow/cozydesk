@@ -263,7 +263,7 @@ export default function LofiSidebar({
       </div>
 
       <button className="lofi-settings-full-btn" onClick={() => { soundManager.play('sfx_click_button'); setSavedDesksOpen(true); }}>
-        📁 My Desks
+        💾 My Desks
       </button>
 
       {/* ── Productivity Tools ── */}
@@ -328,10 +328,6 @@ export default function LofiSidebar({
 
       <div className="sb-spacer" />
 
-      <button className="lofi-settings-full-btn lofi-save-btn" onClick={() => { soundManager.play('sfx_click_button'); setSavePopupOpen(true); }}>
-        💾 SAVE
-      </button>
-
       <button className="lofi-settings-full-btn" onClick={() => { soundManager.play('sfx_click_button'); onSettings(); }}>
         ⊙ Settings
       </button>
@@ -340,6 +336,7 @@ export default function LofiSidebar({
         <SavedDesksModal
           themeName="lofi"
           onLoad={handleLoad}
+          onSaveCurrent={() => setSavePopupOpen(true)}
           onClose={() => setSavedDesksOpen(false)}
         />
       )}
