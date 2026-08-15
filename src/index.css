@@ -89,6 +89,26 @@ body {
 }
 .paper-item-input::placeholder { color: rgba(150,110,70,0.45); }
 
+/* Cozy scrollbar for the to-do list (honey-amber, rounded) */
+.todo-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #E8843C transparent;
+}
+.todo-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.todo-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 2px 0;
+}
+.todo-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #F6B73C 0%, #E8843C 100%);
+  border-radius: 10px;
+}
+.todo-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #F6B73C 0%, #D9722E 100%);
+}
+
 /* Reminder widget */
 .reminder-section-title {
   font-family: 'Patrick Hand', cursive;
