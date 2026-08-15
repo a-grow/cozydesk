@@ -2066,8 +2066,8 @@
   padding: 14px 16px;
   border: 1px solid var(--sb-border);
   border-radius: 12px;
-  background: var(--sb-card);
-  color: var(--sb-heading);
+  background-color: #e9dcc9 !important;
+  color: #4b3b2a !important;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 0.95rem;
@@ -2086,7 +2086,7 @@
 .sds-fork-sublabel {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--sb-subtext);
+  color: #7a5a3a;
   letter-spacing: 0.01em;
 }
 

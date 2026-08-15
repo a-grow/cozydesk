@@ -49,6 +49,11 @@ export default function SavedDesksSection({ themeName, onLoad, screen = 'load' }
     if (!canBackup) return;
     soundManager.play('sfx_save');
     downloadBackup();
+    const stamp = new Date().toISOString().slice(0, 10);
+    setRestoreMsg({
+      kind: 'success',
+      text: `✓ Saved to your Downloads folder as cozydesk-backup-${stamp}.json. Keep it somewhere safe!`,
+    });
   };
 
   const handleRestoreClick = () => {
@@ -133,6 +138,9 @@ export default function SavedDesksSection({ themeName, onLoad, screen = 'load' }
         >
           Save a backup file
         </Btn>
+      </div>
+      <div style={{ fontFamily: FONT, fontSize: '0.72rem', lineHeight: 1.4, color: 'var(--sb-subtext)', marginBottom: '5px' }}>
+        Look for <strong>cozydesk-backup-….json</strong> in your Downloads folder (or wherever you saved it).
       </div>
       <div style={{ display: 'flex', gap: '5px', marginBottom: '12px' }}>
         <Btn color="load" onClick={handleRestoreClick} style={{ flex: 1 }}>
