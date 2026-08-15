@@ -546,8 +546,7 @@ const updateNote = (id, data) => {
   };
 
   const sendReminderToDeskPaper = (reminder) => {
-    const maxItems = getThemeConfig(themeName).maxItems ?? DEFAULT_ITEMS_PER_PAPER;
-    const existing = papers.find(p => p.reminderIds.length < maxItems);
+    const existing = papers[0];
     if (existing) {
       setPapers(prev => prev.map(p => p.id === existing.id
         ? { ...p, reminderIds: [...p.reminderIds, reminder.id] } : p));

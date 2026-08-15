@@ -265,12 +265,15 @@ const ReminderPaper = ({
           flexDirection: "column",
           gap: "2px",
           zIndex: 3,
-          overflow: "hidden",
+          overflowY: "auto",
+          overflowX: "hidden",
         }}
+        className="nodrag todo-scroll"
         onPointerDownCapture={e => e.stopPropagation()}
+        onWheel={e => e.stopPropagation()}
       >
         {/* Existing reminder rows */}
-        {reminders.slice(0, ITEMS_PER_PAPER).map(rem => (
+        {reminders.map(rem => (
           <ReminderRow
             key={rem.id}
             rem={rem}
@@ -283,14 +286,14 @@ const ReminderPaper = ({
           />
         ))}
 
-        {/* Inline "add" input when slots remain */}
-        {remainingSlots > 0 && (
-          <div style={{
+        {/* Inline "add" input — always available (list scrolls) */}
+        <div style={{
             display: "flex",
             alignItems: "center",
             gap: "6px",
             padding: "3px 4px",
             marginTop: reminders.length > 0 ? "2px" : 0,
+            flexShrink: 0,
           }}>
             <div style={{
               width: "15px", height: "15px",
@@ -309,8 +312,7 @@ const ReminderPaper = ({
               onKeyDown={handleAddInline}
               onBlur={commitInline}
             />
-          </div>
-        )}
+        </div>
       </div>
 
         {/* Delete when selected */}
