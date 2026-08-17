@@ -1,5 +1,5 @@
 # CozyDesk — Claude Instructions
-Last updated: Aug 12, 2026 (License unlock feature COMPLETE — Steps 1–5 shipped; All-Access banner + Coming Soon teaser cards + Gumroad cover images). Read fully before touching any code.
+Last updated: Aug 17, 2026 (v1.3.3 to-do scroll + unlimited items; v1.3.4 My Desks three-choice fork owns saving; v1.3.5 backup "saved to Downloads" messages + theme-independent fork buttons). Read fully before touching any code.
 
 ## Claude's Role
 A senior expert wearing three hats:
@@ -87,9 +87,17 @@ Also when writing Claude Code prompts:
 - A browser app CANNOT silently auto-save to a folder (sandbox). Every save-to-disk needs a user click. That's why backup is manual (one click), not automatic.
 - NEVER `localStorage.clear()` in dev (breaks Vite HMR → black screen). Safe clear: `Object.keys(localStorage).filter(k=>k.startsWith('cozydesk')).forEach(k=>localStorage.removeItem(k)); location.reload()`.
 
+## My Desks Fork (SHIPPED v1.3.4 — do not re-break)
+- The sidebar button is now `💾 My Desks` (disk icon, both sidebars; icon matches the modal title). The old bottom `SAVE` button was REMOVED from both sidebars — My Desks now OWNS saving.
+- `SavedDesksModal.jsx` holds a `screen` state: 'fork' | 'load' | 'backup'. Fork screen shows three choices: Save current desk (→ closes modal, opens the existing SavePopup via `onSaveCurrent` prop passed from each sidebar — keeps SavePopup's `currentDesk` overwrite logic intact), Load a saved desk (→ slot list), Backup & Restore / All desks in all worlds (→ backup screen). Non-fork screens show a `‹` back arrow in the header.
+- `SavedDesksSection.jsx` takes `screen` ('load' default) and renders ONLY the slot list on 'load', ONLY the backup UI on 'backup'.
+- Fork buttons are THEME-INDEPENDENT ON PURPOSE: fixed cozy tan `#e9dcc9` bg / `#4b3b2a` text (Load + Backup), honey-amber gradient for the Save hero. Do NOT wire them to `--sb-card`/`--sb-heading` — those swing per theme and caused the white-button saga (see Key Learnings). Sublabel is fixed `#7a5a3a`.
+- Orphaned CSS after this change (queued cleanup): `.sds-save-current-btn`, `.sb-action-save`, `.lofi-save-btn`.
+
 ## Backup / Restore (SHIPPED — do not re-break)
 - `src/utils/backupManager.js`: `hasBackupData()`, `downloadBackup()` (dumps every `cozydesk`-prefixed localStorage key into one downloaded JSON with a `_marker: 'cozydesk-backup'`), `restoreFromFile(file)` (validates `_marker`, then clears all cozydesk keys and rewrites from the file — a full REPLACE, not a merge).
-- UI in `src/components/sidebar/SavedDesksSection.jsx`: a warning line + "Save a backup file" (green) and "Restore from a backup file" (blue) at the top of My Desks. Save disabled only when zero cozydesk data exists anywhere. Restore always enabled → validates → polite refusal on bad file → "replace current desks?" confirm → success msg → auto-reload after ~1s.
+- UI in `src/components/sidebar/SavedDesksSection.jsx`, now gated by a `screen` prop ('load' | 'backup') set by the My Desks fork (see "My Desks Fork"). Backup screen: warning line + "Save a backup file" (green) + a restore-helper line ("Look for cozydesk-backup-….json in your Downloads folder…") + "Restore from a backup file" (blue). Save disabled only when zero cozydesk data exists anywhere. Restore validates → polite refusal on bad file → "replace current desks?" confirm → success msg → auto-reload after ~1s. After a save, a confirmation shows the real dated filename ("✓ Saved to your Downloads folder as cozydesk-backup-YYYY-MM-DD.json…").
+- Browser sandbox CANNOT choose the download folder or pre-open it on restore. The fix is CLEAR WORDS (tell users it lands in Downloads + name the file so Spotlight finds it even if moved), NOT code. Same limit family as the PWA-install lesson.
 - Backup is GLOBAL (all themes + current desk + settings in one file), not per-theme.
 - Warning text uses `var(--sb-heading)` so it's readable on all four themes (NOT a hardcoded color).
 - Parked one-liner: add HHMM to the backup filename so same-day backups don't collide as `(1).json`.
@@ -131,7 +139,9 @@ SIZE = absolute pixels (window-independent). POSITION = ratios (xRatio/yRatio).
 ## To-Do List Rules
 - Every theme needs a todo asset in its stickynotes/ folder, filename containing `todo`. Fallback: `src/assets/stickynotes/todolist1.png`.
 - `todoBase` per theme drives sizing: kawaii {w:358,h:402}, lofi {358,384}, steampunk {358,519}, cafe {358,353}.
-- PER-THEME ITEM CAP `maxItems` in themeRegistry (kawaii 6, lofi 4, steampunk 6, café 5). Read by ReminderPaper.jsx (`theme.maxItems ?? 6`) and useDeskState.js (DEFAULT_ITEMS_PER_PAPER = 6 fallback). Per-theme because boards differ in height. At the cap the input hides and the list holds still (correct "full" state). Checked rows show a small ✕ → deleteReminder.
+- UNLIMITED + SCROLLABLE (v1.3.3): the per-theme item cap was REMOVED. The to-do list now holds unlimited items and scrolls inside the paper. Reminders container in ReminderPaper.jsx uses `overflowY: auto` + class `todo-scroll` (cozy honey-amber scrollbar in index.css); the add-item input is always visible. Checked rows show a small ✕ → deleteReminder.
+- `maxItems` in themeRegistry and `DEFAULT_ITEMS_PER_PAPER` in useDeskState.js are now UNUSED leftovers (queued cleanup) — do not wire new logic to them.
+- Calendar → to-do (`sendReminderToDeskPaper` in useDeskState.js) now always targets the existing paper (`papers[0]`), never spawns a second paper.
 
 ## Calendar ↔ Sticky Note Sync
 - Notes link to calendar via `noteId` — preserve it through ALL edit/move/drag ops, never regenerate.
@@ -223,6 +233,9 @@ All visual config in `src/themes/themeRegistry.js` — never hardcode theme name
 - A visually appealing feature can still be wrong for the product (wall art abandoned — manual stretch broke "drop and forget"). Test UX fit early.
 - The doc drifts from the code. When CLAUDE.md and the files disagree, the CODE wins — verify, then fix the note.
 - CLAUDE CODE OVERSTEPS WITHOUT THE HARD RULES BLOCK. Lead every prompt with it.
+- CSS-OVERRIDE BUGS: READ THE LIVE DEVTOOLS CASCADE FIRST, not after guessing. The My Desks fork buttons rendered white/unreadable; Claude proposed FOUR fixes from assumption before actually inspecting. DevTools showed the cause in one screenshot: `.sds-modal-box` had `data-theme` overrides only for lofi/steampunk, so café/kawaii fell back to the near-white default `--sb-card`. Cost many turns. For any "override doesn't take" or "wrong color" bug, inspect the winning rule on the LIVE element before touching CSS.
+- CROSS-THEME ELEMENTS: don't wire them to swinging theme variables. When an element must look identical across all worlds (fork buttons, the Pomodoro Start pill), use FIXED values, not `--sb-*`. Making the fork buttons theme-independent is what finally ended the white-button saga.
+- COMMIT EACH TESTED FEATURE BEFORE STARTING THE NEXT. Two features tangled in the working tree because we rolled from one into the next without committing. `git diff <file>` instantly settles "did I break something?" — check, don't worry.
 - existingUser-style checks must be captured ONCE at module load, not recomputed per render — any re-render reading live localStorage can change a routing decision. (`INITIAL_EXISTING_USER` in main.jsx; do not revert to per-render.)
 - Onboarding test method: clear cozydesk keys in the console THEN IMMEDIATELY hard-refresh (Cmd+Shift+R) before the mounted desk autosaves itself back. Clearing while the app runs proves nothing — the desk re-writes cozydesk_state_* and you wrongly get "Welcome back." Confirm you're on the localhost port whose `npm run dev` banner shows cozydesk@<version> — NOT app.cozydesk.app, NOT a stale tab.
 - TERMINAL STEPS IN SAFE ORDER: present multi-step commands in exact safe execution order — the precondition/safety step comes FIRST (e.g. `cd ~` before a `cp -r` backup, so the backup never runs from inside the folder being copied).
@@ -252,7 +265,7 @@ Landing page fully redesigned (Aug 14): white background, honey-amber vertical-g
 
 ## Launch Prep — Status
 Shipped & LIVE: cache fix, error boundary, backup/restore, Settings version + Report a Bug, legal docs, onboarding, deploy, smoke test, focus mode + Mugzy, timer-reset fix, double-click-to-add, press-Start nudge, landing redesign, Gumroad products, World Gallery (Step 2), Pomodoro redesign. Friends beta DONE; beta push freeze LIFTED. Small-screen gate (phones/tablets, (hover:none) and (pointer:coarse), v1.3.2) and the landing redesign (Aug 14) are now SHIPPED & LIVE.
-Pre-public-launch blockers still open: (1) to-do list scrolling all worlds; (2) hero loop video; (3) in-app "Install CozyDesk" instructions/button (landing now promises this). Plus Andrew's checks: cross-browser/Windows/phone test, live Gumroad purchase test, bundle CTA confirm. (License unlock feature COMPLETE; Gumroad cover images done — café/steampunk from live-app screenshots, bundle image on hand.)
+Pre-public-launch blockers still open: (1) hero loop video; (2) in-app "Install CozyDesk" instructions/button (landing now promises this). Plus Andrew's checks: cross-browser/Windows/phone test, live Gumroad purchase test, bundle CTA confirm. (To-do list scrolling SHIPPED v1.3.3; License unlock feature COMPLETE; Gumroad cover images done.)
 
 ## Completed — Do Not Rebuild or Re-break (one-line index)
 Universal sticky notes; per-theme maxItems + delete-completed ✕; settings panel zIndex 600; pin-to-front + Unpin; clock flip + XS–XL sizing; attach/detach (stickers + notes); Save / My Desks (10 slots/theme); lofi sidebar icons; steampunk gears + mahogany sidebar; per-theme theme-color meta; aspect-ratio locking; 4 tracks/theme; sticker box hugs art; storage-full warning; calendar sharing; rotation persistence (rotationRef pattern: onMove writes ref, onUp reads it — dodges stale closure; add fns seed rotation:0; initialRotation prop seeds on load); cache/app-shell fix; error boundary; backup/restore; cross-theme save-overwrite fix; Settings live version + Report-a-Bug mailto; SavePopup dark-mode input fix; Focus Mode + Mugzy (v1.2.0); onboarding existing-user freeze fix; new café stickers; Lo-Fi timer-reset fix (timerStore singleton); double-click-to-add; press-Start nudge; Lo-Fi sleeping-dog sticker; World Gallery Step 2; Pomodoro redesign (candy button + Nunito + lofi fixes) + gallery/pause sounds; All-Access bundle banner + preview (gold buttons, frosted glass); Coming Soon teaser cards (Space Cruiser, Ancient Dynasty — teaser ART only, NOT real worlds yet); license unlock Steps 3–5 (enter-key screen + locked-world gating in setTheme/setThemeDirect + onboarding free-only); Gumroad café/steampunk cover images (cropped from live-app screenshots); small-screen gate (SmallScreenGate.jsx, phone/tablet takeover + Browse-the-worlds buy path, iOS-correct (hover:none)+(pointer:coarse) detection); landing redesign (white/amber, worlds showcase, real testimonials, single Open-CozyDesk CTA).
@@ -264,12 +277,12 @@ Universal sticky notes; per-theme maxItems + delete-completed ✕; settings pane
 - Analytics — privacy-friendly only (Plausible / Fathom / Cloudflare), landing page only, not in-app. Adds a privacy-policy disclosure obligation — add it when analytics ship.
 - Demo video + screenshots.
 - Hover-glow (desktop-only). Export a single desk to share (distinct from backup). Tauri native wrap (only if demand proves a real installer / folder auto-save).
-- To-do list SCROLL — elevated priority. Fixes tester Bruce's "cutting off" report AND is the prerequisite that unblocks shared to-do lists. Build before shared to-do. (Also: Bruce reported a Safari yellow-streak artifact on the to-do list, suspected from a glow effect no other widget has — Andrew wants it removed regardless.)
+- (To-do list SCROLL — SHIPPED v1.3.3, unblocks shared to-do. Bruce's Safari yellow-streak artifact is also fixed.)
 - Shared to-do list "Pass 2" — after scroll ships. Same pattern as calendar sharing: one shared list, every theme reads/writes it. Do NOT require the visible content area to be pixel-identical across themes — with scroll the underlying LIST is identical, the WINDOW can vary per theme.
 - Auto-add calendar events to the to-do list — unresolved; risky as automatic (could flood), more plausible as opt-in per event.
-- Save/My Desks UX: Andrew instinctively went to "My Desks" first to save. If beta confirms others do too, add a save action INSIDE the My Desks popup rather than retraining people.
+- (Save/My Desks UX — DONE v1.3.4: saving now lives inside My Desks via the three-choice fork. See "My Desks Fork".)
 - Install-button discoverability: in-app "Install CozyDesk" button (sidebar or Settings) shown only when `beforeinstallprompt` fires; Safari gets a "File → Add to Dock" hint; hidden if already installed. Both sidebars. Pair with ONE gentle dismissible nudge after the 3rd visit — not on the splash.
-- Small-screen notice: warm "CozyDesk is built for a bigger screen" message for phone visitors, shown only on phone-sized viewports. Needed before public launch.
+- (Small-screen notice — SHIPPED v1.3.2 as SmallScreenGate.jsx.)
 - Welcome/tutorial screen — NOT a fourth forced popup (first-run flow already has splash → pick world → terms; fatigue risk). Instead: dismissible "i" info button in sidebar corner, with a one-time gentle nudge for first-timers, opening a Mugzy 1-2-3 (calendar/notes · drag stickers · press Start Focus). Build post-launch, informed by whether real users seem lost; the press-Start nudge may already suffice.
 - When Space Cruiser / Ancient Dynasty become real worlds: swap the lush teaser backgrounds for plainer wall+desk versions, with the window/pond as a placeable sticker (keeps "drop and forget" intact). The current teaser images are gallery art only.
 - Timer discoverability upgrades IF the press-Start nudge proves insufficient: richer "guided Mugzy tutorial (Version B)" (Mugzy spotlights sticker area → to-do → glows Start), and/or a "first-focus whisper after the world transforms" (`cozydesk_focus_revealed` flag). Not needed now.
@@ -286,6 +299,8 @@ Universal sticky notes; per-theme maxItems + delete-completed ✕; settings pane
 - Move old `cozydesk_backup_*` folders out of `~/Developer` to declutter search.
 - Unused deps: framer-motion only (verify first). react-draggable IS used — do NOT remove.
 - Dead code removal: `src/App.jsx`, `ThemeSwitcher.jsx`.
+- Orphaned CSS from the My Desks fork: `.sds-save-current-btn`, `.sb-action-save`, `.lofi-save-btn` (unused after v1.3.4).
+- Unused: `maxItems` (themeRegistry) + `DEFAULT_ITEMS_PER_PAPER` (useDeskState.js) after v1.3.3 unlimited to-do.
 
 ## Known Limits
 - Firefox desktop cannot install PWAs (browser limitation, not fixable).
