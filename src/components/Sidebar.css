@@ -1603,8 +1603,7 @@
   border-color: #7a5a30;
 }
 
-/* ── Save / My Desks / Settings — theme-aware via CSS variables ── */
-.cozy-sidebar[data-theme="steampunk"] .sb-action-save,
+/* ── My Desks / Settings — theme-aware via CSS variables ── */
 .cozy-sidebar[data-theme="steampunk"] .sb-action-mydesks,
 .cozy-sidebar[data-theme="steampunk"] .sb-action-settings {
   background: var(--btn-bg);
@@ -1616,7 +1615,6 @@
   letter-spacing: 0.05em;
   box-shadow: none;
 }
-.cozy-sidebar[data-theme="steampunk"] .sb-action-save:hover,
 .cozy-sidebar[data-theme="steampunk"] .sb-action-mydesks:hover,
 .cozy-sidebar[data-theme="steampunk"] .sb-action-settings:hover {
   filter: brightness(0.88);
@@ -2149,15 +2147,6 @@
 }
 
 
-/* ── SAVE button ── */
-.sb-action-save {
-  background: var(--btn-bg);
-  color: var(--btn-text);
-  font-family: var(--btn-font);
-  font-weight: 600;
-}
-.sb-action-save:hover { filter: brightness(0.92); }
-
 /* ── My Desks button ── */
 .sb-action-mydesks {
   background: var(--btn-bg);
@@ -2166,15 +2155,6 @@
   font-weight: 600;
 }
 .sb-action-mydesks:hover { filter: brightness(0.92); }
-
-/* ── Lofi SAVE button ── */
-.lofi-save-btn {
-  background: var(--btn-bg);
-  color: var(--btn-text);
-  font-family: var(--btn-font);
-  font-weight: 600;
-}
-.lofi-save-btn:hover { filter: brightness(0.92); }
 
 /* ── SFX Toggle Row ─────────────────────────────────────── */
 .sfx-toggle-row {
