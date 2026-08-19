@@ -7,6 +7,9 @@ import OnboardingFlow from "./components/OnboardingFlow.jsx";
 import SmallScreenGate from "./components/SmallScreenGate.jsx";
 import { hasAgreedToTerms, hasExistingDeskData } from "./utils/onboardingState.js";
 import './index.css';
+import { installManager } from './utils/installManager.js';
+
+installManager.init();
 
 // Gatekeeper: decides whether to show onboarding or the desk on launch.
 // Wrapped defensively — if the check ever throws, we fall through to the desk.

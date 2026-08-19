@@ -380,7 +380,7 @@ h1 {
 }
 
 /* Only apply global button reset to non-CozyDesk buttons */
-button:not(.delete-btn):not(.flip-handle):not(.rotate-handle):not(.emoji-picker-btn):not(.reminder-add-btn):not(.send-to-desk-btn):not(.undo-redo-btn):not(.sb-action-btn):not(.lofi-settings-full-btn):not(.sds-modal-close-btn):not(.sb-undo-btn):not(.sb-redo-btn):not(.pomo-btn):not(.pomo-main-btn):not(.pomo-reset-btn) {
+button:not(.delete-btn):not(.flip-handle):not(.rotate-handle):not(.emoji-picker-btn):not(.reminder-add-btn):not(.send-to-desk-btn):not(.undo-redo-btn):not(.sb-action-btn):not(.lofi-settings-full-btn):not(.sds-modal-close-btn):not(.sb-undo-btn):not(.sb-redo-btn):not(.pomo-btn):not(.pomo-main-btn):not(.pomo-reset-btn):not(.sb-install-btn) {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -440,4 +440,50 @@ button:not(.delete-btn):not(.flip-handle):not(.rotate-handle):not(.emoji-picker-
 }
 .sticker-settle {
   animation: stickerSettle 0.5s ease-out;
+}
+
+/* ── Install CozyDesk button (shared by both sidebars) ──
+   Cross-theme element: FIXED honey-amber values, never --sb-* vars,
+   so it looks identical in all four worlds (same rule as the fork
+   buttons and the Pomodoro Start pill). */
+.sb-install-wrap {
+  width: 100%;
+}
+.sb-install-note {
+  margin: 3px 0 4px 0;
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--sb-heading, #a07850);
+  opacity: 0.75;
+  line-height: 1.3;
+}
+.sb-install-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 10px 0 4px 0;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #F6B73C 0%, #E8843C 100%);
+  color: #4b3b2a;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.14);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+.sb-install-btn:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+.sb-install-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 7px rgba(0,0,0,0.16);
 }

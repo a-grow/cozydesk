@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MusicPlayer from './MusicPlayer';
+import InstallButton from './InstallButton';
 
 // ── Live clock overlay for the kawaii clock icon ──────────────────────────────
 function LiveClockIcon({ src, onDragStart, onDoubleClick }) {
@@ -301,6 +302,7 @@ export default function Sidebar({
           />
           <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
         </div>
+        <InstallButton />
         <MusicPlayer />
         <div className="sfx-toggle-row">
           <span className="sfx-toggle-label">🔊 Sound Effects</span>

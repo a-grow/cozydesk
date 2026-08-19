@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MusicPlayer from './MusicPlayer';
+import InstallButton from './InstallButton';
 import './Sidebar.css';
 import ThemesSection from './sidebar/ThemesSection';
 import StickersSection from './sidebar/StickersSection';
@@ -246,6 +247,7 @@ export default function LofiSidebar({
   />
   <p className="sb-logo-subtitle">YOUR COZY WORKSPACE ✦</p>
 </div>
+      <InstallButton />
       <MusicPlayer />
       <div className="sfx-toggle-row">
         <span className="sfx-toggle-label">🔊 Sound Effects</span>
