@@ -8,7 +8,7 @@ const VERIFY_URL = 'https://api.gumroad.com/v2/licenses/verify';
 
 // Gumroad product IDs (public — safe in frontend).
 const PRODUCT_IDS = {
-  cafe: 'ag2OVA20ZA5MRprzdCfkbQ==',
+  cafe: 'ag20VA20ZA5MRprzdCfkbQ==',
   steampunk: 'dTPl_boio9BdX4AmKgLFDA==',
   bundle: 'ow1nWZSw-biORBpzMWA1Qw==',
 };
