@@ -216,7 +216,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
               Unlock Every World
             </div>
             <div style={{ fontSize: '16px', lineHeight: 1.6, maxWidth: '440px', margin: '0 auto 28px', opacity: 0.96 }}>
-              Café, Steampunk, and every new world I add... and I've got a lot more ideas. Buy once, they're all yours.
+              Café, Steampunk, and 2 more worlds coming soon — 6 total. Buy once, they're all yours.
             </div>
             <button
               type="button"
@@ -542,7 +542,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
                 Unlock Every World
               </div>
               <div style={{ fontSize: '15px', lineHeight: 1.55, opacity: 0.96 }}>
-                Café, Steampunk, and every new world I add... and I've got a lot more ideas. Buy once, they're all yours.
+                Café, Steampunk, and 2 more worlds coming soon — 6 total. Buy once, they're all yours.
               </div>
               <div style={{
                 marginTop: '4px',
