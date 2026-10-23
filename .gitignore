@@ -29,3 +29,6 @@ src-tauri/target/
 *.sln
 *.sw?
 .claude/settings.local.json
+
+# Claude instructions (local only, never committed)
+CLAUDE.md
