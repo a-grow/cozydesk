@@ -18,6 +18,7 @@ import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
 import { soundManager } from '../utils/soundManager';
+import { healStickerSrc, healNoteSrc } from '../utils/assetHeal';
 import pkg from '../../package.json';
 
 const SIDEBAR_WIDTH = 250;
@@ -791,7 +792,7 @@ export default function Cozykawaii() {
       {desk.stickers.filter(s => s.backdrop).map(sticker => (
         <Sticker
           key={sticker.id}
-          src={sticker.src}
+          src={healStickerSrc(sticker, themeName)}
           alt={sticker.name}
           x={sticker.xRatio * dimensions.width}
           y={sticker.yRatio * dimensions.height}
@@ -831,7 +832,7 @@ export default function Cozykawaii() {
       {/* ── Regular stickers ── */}
       {desk.stickers.filter(s => !s.backdrop).map((sticker, i) => (
         <Sticker
-          src={sticker.src}
+          src={healStickerSrc(sticker, themeName)}
           alt={sticker.name}
           x={sticker.xRatio * dimensions.width}
           y={sticker.yRatio * dimensions.height}
@@ -878,7 +879,7 @@ export default function Cozykawaii() {
           y={note.yRatio * dimensions.height}
           width={note.w ?? note.wRatio * dimensions.width}
           height={note.w ?? note.wRatio * dimensions.width}
-          src={note.src}
+          src={healNoteSrc(note.src)}
           pinned={note.pinned}
           isAttached={!!note.attachedTo}
           layer={note.layer}
