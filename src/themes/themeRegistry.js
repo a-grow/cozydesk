@@ -1,19 +1,7 @@
-import ClockSticker from '../components/ClockSticker';
-import LofiClockSticker from '../components/LofiClockSticker';
-import SteampunkClockSticker from '../components/SteampunkClockSticker';
-import DigitalClockSticker from '../components/DigitalClockSticker';
-import CalendarSticker from '../components/CalendarSticker';
-
-import cozyBackground from '../assets/backgrounds/cozycornerbg.png';
-import lofiBackground from '../assets/backgrounds/lofiblue.png';
-import steampunkBackground from '../assets/backgrounds/steampunkbg.png';
-import cafeBackground from '../assets/backgrounds/cafe-background.png';
-import cafeCalendarBase from './cafe/widgets/cafe-calendar.png';
-import cafeClockImg from './cafe/widgets/cafe-clock.png';
-
-import kawaiiCalendarBase from './cozykawaii/widgets/cozycalendarbase.png';
-import lofiCalendarBase from './lofi/widgets/loficalendarbase.png';
-import steampunkCalendarBase from './steampunk/widgets/stmpnkcalendarbase.png';
+// themeRegistry.js — the list of worlds, found automatically.
+// Every world is ONE folder in src/themes/ with a world.js file inside
+// (settings, price, music, flavor text). Add a folder → the world appears.
+// The folder name is the world key used in customers' save keys — never rename one.
 
 import noteYellow from '../assets/stickynotes/note-yellow.png';
 import notePink   from '../assets/stickynotes/note-pink.png';
@@ -30,217 +18,16 @@ const allThemeStickyNotes = import.meta.glob(
   { eager: true }
 );
 
-const THEME_CONFIGS = {
-  cozykawaii: {
-    name: 'Cozy Kawaii',
-    background: `url(${cozyBackground})`,
-    text: '#4b4b4b',
-    accent: '#ffb6b9',
-    fontFamily: "'Nunito', sans-serif",
-    previewBg: '#fff8f0',
-    previewAccent: '#ffb6b9',
-    themeColor: '#e6cba8',
-    tabStyle: { backgroundColor: '#f5d0e5', color: '#fff', boxShadow: '0 2px 8px rgba(245,208,229,0.5)', hoverGlow: '0 0 14px rgba(245,208,229,0.7)' },
-    sound: 'pastel-click',
-    modalTheme: { bg: '#fff8f0', border: '#ecddd0', text: '#4b3b2a', accent: '#d4a373', headerBg: '#fdf0e8', subtext: '#a07850', inputBg: '#fffdf8' },
-    brandFont: "'Nunito', sans-serif",
-    defaultNoteFont: "'Nunito', sans-serif",
-    todoTextArea: { top: '30%', left: '12%', right: '6%', bottom: '8%' },
-    todoSize: { wRatio: 0.18, hRatio: 0.202 },
-    todoBase: { w: 358, h: 402 },
-    showTape: true,
-    todoInputColor: undefined,
-    checkboxBorder: '2px solid #c8a97e',
-    clockComponent: ClockSticker,
-    calendarComponent: CalendarSticker,
-    stickyNoteSize: 180,
-    maxItems: 6,
-    calendarTheme: {
-      image: kawaiiCalendarBase,
-      baseW: 260,
-      baseH: 270,
-      contentArea: { top: '62px', left: '18px', right: '18px', bottom: '58px' },
-      font: "'Nunito', sans-serif",
-      colors: {
-        accent: '#8b5e3c',
-        text: '#4b3b2a',
-        today: '#d4a373',
-        selectedBg: 'rgba(200,169,126,0.2)',
-        dayLabel: '#b5977a',
-        navBtn: '#8b5e3c',
-        popupBg: 'white',
-        popupBorder: '#e0d4c8',
-        popupText: '#4b3b2a',
-        addBtn: '#d4a373',
-        contentBg: 'transparent',
-      },
-      sizeButtons: {
-        active: { bg: '#d4a373', color: '#fff', border: '#d4a373' },
-        inactive: { bg: '#fff', color: '#8b5e3c', border: '#d4a373' },
-      },
-    },
-  },
-  lofi: {
-    name: 'Lo-Fi',
-    background: `url(${lofiBackground})`,
-    text: '#e0e0e0',
-    accent: '#a29bfe',
-    fontFamily: "'Nunito', sans-serif",
-    previewBg: '#1e1e2f',
-    previewAccent: '#a29bfe',
-    themeColor: '#1e1e2f',
-    tabStyle: { backgroundColor: '#6d5fc0', color: '#e8e0ff', boxShadow: '0 0 12px rgba(109,95,192,0.7), 0 2px 6px rgba(0,0,0,0.3)', hoverGlow: '0 0 22px rgba(109,95,192,1), 0 0 44px rgba(109,95,192,0.45)' },
-    sound: 'lofi-pop',
-    modalTheme: { bg: '#1a1a2e', border: '#3a3a5c', text: '#c8c4d8', accent: '#7c73c0', headerBg: '#252540', subtext: '#8888a8', inputBg: '#252540' },
-    brandFont: "'Nunito', sans-serif",
-    defaultNoteFont: "'Caveat', cursive",
-    todoTextArea: { top: 'calc(46% + 20px)', left: '10%', right: '10%', bottom: '14%' },
-    todoSize: { wRatio: 0.18, hRatio: 0.38 },
-    todoBase: { w: 358, h: 384 },
-    showTape: false,
-    todoInputColor: '#ffffff',
-    checkboxBorder: '2px solid rgba(255,255,255,0.6)',
-    clockComponent: LofiClockSticker,
-    calendarComponent: CalendarSticker,
-    stickyNoteSize: 180,
-    maxItems: 4,
-    calendarTheme: {
-      image: lofiCalendarBase,
-      baseW: 260,
-      baseH: 340,
-      contentArea: { top: '130px', left: '18px', right: '18px', bottom: '20px' },
-      font: "'Nunito', sans-serif",
-      colors: {
-        accent: '#6d5fc0',
-        text: '#e8e0ff',
-        today: '#6d5fc0',
-        selectedBg: 'rgba(124,115,192,0.2)',
-        dayLabel: '#c5b8ff',
-        navBtn: '#6d5fc0',
-        popupBg: '#1e1640',
-        popupBorder: '#7c73c0',
-        popupText: '#e8e0ff',
-        addBtn: '#7c73c0',
-        contentBg: 'transparent',
-      },
-      sizeButtons: {
-        active: { bg: '#7c73c0', color: '#fff', border: '#7c73c0' },
-        inactive: { bg: '#fff', color: '#4d3fa0', border: '#7c73c0' },
-      },
-    },
-  },
-  steampunk: {
-    name: 'Steampunk',
-    background: `url(${steampunkBackground})`,
-    text: '#f5deb3',
-    accent: '#c19a6b',
-    fontFamily: "'Cinzel Decorative', serif",
-    previewBg: '#3b2f2f',
-    previewAccent: '#c19a6b',
-    themeColor: '#2a1f1f',
-    tabStyle: { backgroundColor: '#b87333', color: '#3b2f2f', boxShadow: 'inset 0 0 4px #2a1f1f, 0 2px 6px rgba(0,0,0,0.3)', hoverGlow: '0 0 14px rgba(184,115,51,0.6)' },
-    sound: 'gear-shift',
-    modalTheme: { bg: '#2a2018', border: '#5a4a3a', text: '#e8d4b0', accent: '#b87333', headerBg: '#3a2e22', subtext: '#b8a080', inputBg: '#3a2e22' },
-    brandFont: "'Cinzel Decorative', serif",
-    defaultNoteFont: "'Nunito', sans-serif",
-    todoTextArea: { top: '18%', left: '26%', right: '6%', bottom: '6%' },
-    todoSize: { wRatio: 0.18, hRatio: 0.261 },
-    todoBase: { w: 358, h: 519 },
-    showTape: true,
-    todoInputColor: undefined,
-    checkboxBorder: '2px solid #c8a97e',
-    clockComponent: SteampunkClockSticker,
-    calendarComponent: CalendarSticker,
-    stickyNoteSize: 180,
-    maxItems: 6,
-    calendarTheme: {
-      image: steampunkCalendarBase,
-      baseW: 260,
-      baseH: 300,
-      contentArea: { top: '85px', left: '25px', right: '25px', bottom: '60px' },
-      font: "'Nunito', sans-serif",
-      colors: {
-        accent: '#b87333',
-        text: '#3b2f2f',
-        today: '#b87333',
-        selectedBg: 'rgba(184,115,51,0.2)',
-        dayLabel: '#8b6914',
-        navBtn: '#b87333',
-        popupBg: '#2a2018',
-        popupBorder: '#5a4a3a',
-        popupText: '#e8d4b0',
-        addBtn: '#b87333',
-        contentBg: 'transparent',
-      },
-      sizeButtons: {
-        active: { bg: '#b87333', color: '#fff', border: '#b87333' },
-        inactive: { bg: '#fff', color: '#3b2f2f', border: '#b87333' },
-      },
-    },
-  },
-  cafe: {
-  name: 'Café Morning',
-  background: `url(${cafeBackground})`,
-  text: '#f5f0e8',
-  accent: '#2d5a27',
-  fontFamily: "'Nunito', sans-serif",
-  previewBg: '#7a1f2e',
-  previewAccent: '#2d5a27',
-  themeColor: '#7a1f2e',
-  tabStyle: { backgroundColor: '#2d5a27', color: '#f5f0e8', boxShadow: '0 2px 8px rgba(45,90,39,0.5)', hoverGlow: '0 0 14px rgba(45,90,39,0.7)' },
-  sound: 'pastel-click',
-  modalTheme: { bg: '#3d1a20', border: '#5a2d35', text: '#f5f0e8', accent: '#2d5a27', headerBg: '#4a2028', subtext: '#c4a882', inputBg: '#4a2028' },
-  brandFont: "'Nunito', sans-serif",
-  defaultNoteFont: "'Nunito', sans-serif",
-  todoTextArea: { top: '25%', left: '22%', right: '14%', bottom: '28%' },
-  todoSize: { wRatio: 0.18, hRatio: 0.202 },
-  todoBase: { w: 358, h: 353 },
-  showTape: true,
-  todoInputColor: '#f0ece3',
-  checkboxBorder: '2px solid #2d5a27',
-  clockComponent: DigitalClockSticker,
-  clockTheme: {
-    image: cafeClockImg,
-    aspect: 617 / 945,
-    screen: { left: '10%', right: '10%', top: '15%', bottom: '32%' },
-    numberColor: '#f6b73c',
-    numberFont: "'Nunito', sans-serif",
-    activeBtn:   { bg: '#f6b73c', color: '#2c1a0e', border: '#f6b73c' },
-    inactiveBtn: { bg: '#2c1a0e', color: '#f6b73c', border: '#f6b73c' },
-    hideFlip: true,
-  },
-  calendarComponent: CalendarSticker,
-  stickyNoteSize: 180,
-  maxItems: 5,
-  calendarTheme: {
-    image: cafeCalendarBase,
-    baseW: 240,
-    baseH: 275,
-    contentArea: { top: '100px', left: '38px', right: '38px', bottom: '20px' },
-    font: "'Nunito', sans-serif",
-    gridAutoRows: '15px',
-    navFontSize: '16px',
-    monthFontSize: '11px',
-    colors: {
-      accent: '#2d5a27',
-      text: '#2a1a0a',
-      today: '#2d5a27',
-      selectedBg: 'rgba(45,90,39,0.2)',
-      dayLabel: '#5a3e28',
-      navBtn: '#2d5a27',
-      popupBg: '#3d1a20',
-      popupBorder: '#5a2d35',
-      popupText: '#f5f0e8',
-      addBtn: '#2d5a27',
-      contentBg: 'transparent',
-    },
-    sizeButtons: {
-      active: { bg: '#2d5a27', color: '#fff', border: '#2d5a27' },
-      inactive: { bg: '#fff', color: '#2d5a27', border: '#2d5a27' },
-    },
-  },
-},
-};
+const worldModules = import.meta.glob('./*/world.js', { eager: true });
+
+// All worlds, in World Gallery order. Each: { key, order, paid, price, gumroadProductId,
+// gumroadUrl, flavor, backgroundImage, music, config }.
+export const WORLDS = Object.entries(worldModules)
+  .map(([path, mod]) => ({ key: path.split('/')[1], ...mod.default }))
+  .sort((a, b) => a.order - b.order);
+
+// Desk settings per world (same shape as before the move to world.js files).
+const THEME_CONFIGS = Object.fromEntries(WORLDS.map((w) => [w.key, w.config]));
 
 function groupByTheme(globResult) {
   const themes = {};
@@ -292,17 +79,14 @@ export function getThemeStickyNotes(name) {
 
 // Raw background image URLs (registry stores them as `url(...)` CSS strings;
 // the World Gallery needs the raw src for <img> thumbnails).
-export const THEME_BACKGROUNDS = {
-  cozykawaii: cozyBackground,
-  lofi: lofiBackground,
-  steampunk: steampunkBackground,
-  cafe: cafeBackground,
-};
+export const THEME_BACKGROUNDS = Object.fromEntries(
+  WORLDS.map((w) => [w.key, w.backgroundImage])
+);
 
 // Gumroad checkout URLs for paid worlds (used by the unlock preview screen).
+// Each paid world's link comes from its world.js; the bundle link lives here.
 export const THEME_GUMROAD_URLS = {
-  cafe: 'https://doodleandy.gumroad.com/l/cafe-morning',
-  steampunk: 'https://doodleandy.gumroad.com/l/steampunk',
+  ...Object.fromEntries(WORLDS.filter((w) => w.gumroadUrl).map((w) => [w.key, w.gumroadUrl])),
   allaccess: 'https://doodleandy.gumroad.com/l/all-access',
 };
 
