@@ -16,8 +16,11 @@ const PRODUCT_IDS = {
 // Which worlds require payment. Everything not listed here is free.
 const PAID_WORLDS = ['cafe', 'steampunk'];
 
-// A bundle key unlocks all of these (plus any future paid world added to this list).
-const BUNDLE_UNLOCKS = ['cafe', 'steampunk'];
+// A bundle key unlocks EVERY paid world — including worlds added later.
+const BUNDLE_UNLOCKS = PAID_WORLDS;
+
+// Record format version stored inside cozydesk_unlocked (additive field, see migrateUnlocks).
+const UNLOCKS_VERSION = 2;
 
 function readUnlocks() {
   try {
@@ -36,6 +39,28 @@ function writeUnlocks(obj) {
   } catch (_) {}
 }
 
+// One-time upgrade of existing purchase records (runs once per browser, at startup).
+// Old records only list worlds (e.g. { cafe: true, steampunk: true }) — they can't tell a
+// bundle buyer from someone who bought both worlds separately. Decision (Oct 23, 2026):
+// anyone who already owns BOTH is treated as a bundle owner, so new worlds unlock for them.
+// Only ADDS fields ('bundle', '_v'); never removes. Old app versions ignore the extra fields.
+function migrateUnlocks() {
+  try {
+    if (!localStorage.getItem(UNLOCK_KEY)) return; // no purchases on record — nothing to upgrade
+    const unlocks = readUnlocks();
+    if (unlocks._v) return; // already upgraded
+    if (unlocks.cafe === true && unlocks.steampunk === true) unlocks.bundle = true;
+    unlocks._v = UNLOCKS_VERSION;
+    writeUnlocks(unlocks);
+  } catch (_) {}
+}
+migrateUnlocks();
+
+// True if this browser has a bundle purchase on record.
+export function ownsBundle() {
+  return readUnlocks().bundle === true;
+}
+
 export function isPaidWorld(name) {
   return PAID_WORLDS.includes(name);
 }
@@ -43,13 +68,16 @@ export function isPaidWorld(name) {
 export function isWorldUnlocked(name) {
   if (!isPaidWorld(name)) return true; // free worlds always open
   const unlocks = readUnlocks();
-  return unlocks[name] === true;
+  if (unlocks[name] === true) return true;
+  return unlocks.bundle === true && BUNDLE_UNLOCKS.includes(name);
 }
 
-// Marks one or more worlds unlocked in the cache.
-function grantUnlocks(worldNames) {
+// Marks one or more worlds unlocked in the cache (and the bundle, if bought).
+function grantUnlocks(worldNames, isBundle = false) {
   const unlocks = readUnlocks();
   worldNames.forEach((w) => { unlocks[w] = true; });
+  if (isBundle) unlocks.bundle = true;
+  unlocks._v = UNLOCKS_VERSION;
   writeUnlocks(unlocks);
 }
 
@@ -107,7 +135,7 @@ export async function verifyAndUnlock(worldName, licenseKey) {
     // 2) Try the bundle.
     const bundleData = await callVerify(PRODUCT_IDS.bundle, key);
     if (isValidPurchase(bundleData)) {
-      grantUnlocks(BUNDLE_UNLOCKS);
+      grantUnlocks(BUNDLE_UNLOCKS, true);
       return { ok: true, unlocked: [...BUNDLE_UNLOCKS] };
     }
 
