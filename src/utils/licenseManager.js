@@ -3,21 +3,27 @@
 // Unlocks are verified against Gumroad once, then cached to localStorage forever (offline after).
 // No secrets live here: Gumroad's verify endpoint needs only product_id + license_key (both public).
 
+import { WORLDS } from '../themes/themeRegistry';
+
 const UNLOCK_KEY = 'cozydesk_unlocked';
 const VERIFY_URL = 'https://api.gumroad.com/v2/licenses/verify';
 
-// Gumroad product IDs (public — safe in frontend).
-const PRODUCT_IDS = {
-  cafe: 'ag20VA20ZA5MRprzdCfkbQ==',
-  steampunk: 'dTPl_boio9BdX4AmKgLFDA==',
-  bundle: 'ow1nWZSw-biORBpzMWA1Qw==',
-};
+// The All-Access bundle's Gumroad product ID (public — safe in frontend).
+// Each paid world's own product ID lives in its world.js (gumroadProductId).
+const BUNDLE_PRODUCT_ID = 'ow1nWZSw-biORBpzMWA1Qw==';
 
-// Which worlds require payment. Everything not listed here is free.
-const PAID_WORLDS = ['cafe', 'steampunk'];
-
+// Paid worlds = world.js files with `paid: true`. Everything else is free.
 // A bundle key unlocks EVERY paid world — including worlds added later.
-const BUNDLE_UNLOCKS = PAID_WORLDS;
+// Read on demand (never at load time) ON PURPOSE: the world files load the calendar,
+// which loads ThemeContext, which loads this file — reading WORLDS at load would crash.
+function paidWorlds() {
+  return WORLDS.filter((w) => w.paid).map((w) => w.key);
+}
+
+function productIdFor(name) {
+  const w = WORLDS.find((x) => x.key === name);
+  return w ? w.gumroadProductId : undefined;
+}
 
 // Record format version stored inside cozydesk_unlocked (additive field, see migrateUnlocks).
 const UNLOCKS_VERSION = 2;
@@ -62,14 +68,14 @@ export function ownsBundle() {
 }
 
 export function isPaidWorld(name) {
-  return PAID_WORLDS.includes(name);
+  return paidWorlds().includes(name);
 }
 
 export function isWorldUnlocked(name) {
   if (!isPaidWorld(name)) return true; // free worlds always open
   const unlocks = readUnlocks();
   if (unlocks[name] === true) return true;
-  return unlocks.bundle === true && BUNDLE_UNLOCKS.includes(name);
+  return unlocks.bundle === true; // bundle owners get every paid world
 }
 
 // Marks one or more worlds unlocked in the cache (and the bundle, if bought).
@@ -120,7 +126,7 @@ export async function verifyAndUnlock(worldName, licenseKey) {
   const key = (licenseKey || '').trim();
   if (!key) return { ok: false, reason: 'invalid' };
 
-  const ownId = PRODUCT_IDS[worldName];
+  const ownId = productIdFor(worldName);
 
   try {
     // 1) Try the world's own product.
@@ -133,10 +139,11 @@ export async function verifyAndUnlock(worldName, licenseKey) {
     }
 
     // 2) Try the bundle.
-    const bundleData = await callVerify(PRODUCT_IDS.bundle, key);
+    const bundleData = await callVerify(BUNDLE_PRODUCT_ID, key);
     if (isValidPurchase(bundleData)) {
-      grantUnlocks(BUNDLE_UNLOCKS, true);
-      return { ok: true, unlocked: [...BUNDLE_UNLOCKS] };
+      const all = paidWorlds();
+      grantUnlocks(all, true);
+      return { ok: true, unlocked: all };
     }
 
     // Key was readable by Gumroad but matched neither this product nor the bundle,
@@ -149,4 +156,4 @@ export async function verifyAndUnlock(worldName, licenseKey) {
 }
 
 // Exposed for future UI / debugging.
-export { PRODUCT_IDS, PAID_WORLDS, BUNDLE_UNLOCKS };
+export { paidWorlds, productIdFor, BUNDLE_PRODUCT_ID };
