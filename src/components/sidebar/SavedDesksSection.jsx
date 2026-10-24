@@ -77,7 +77,12 @@ export default function SavedDesksSection({ themeName, onLoad, screen = 'load' }
       setRestoreMsg({ kind: 'success', text: 'Restored! Reloading…' });
       setTimeout(() => window.location.reload(), 1000);
     } else {
-      setRestoreMsg({ kind: 'error', text: "Hmm, that doesn't look like a CozyDesk backup file." });
+      setRestoreMsg({
+        kind: 'error',
+        text: result.reason === 'write-failed'
+          ? "Couldn't restore — your browser's storage is full. Nothing was changed."
+          : "Hmm, that doesn't look like a CozyDesk backup file.",
+      });
     }
   };
 

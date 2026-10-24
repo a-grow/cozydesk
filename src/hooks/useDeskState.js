@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getThemeConfig, THEME_CONFIGS } from "../themes/themeRegistry";
 import { soundManager } from '../utils/soundManager';
+import { isRestoreDone } from '../utils/backupManager';
 
 const DEFAULT_ITEMS_PER_PAPER = 6;
 
@@ -46,6 +47,7 @@ export function useDeskState({ dimensions, themeName }) {
   const storageKey = (theme) => `cozydesk_state_${theme}`;
 
   const saveThemeState = (theme) => {
+    if (isRestoreDone()) return; // a backup was just restored — don't overwrite it before the reload
     try {
       const s = stateRef.current;
       const sharingOn = localStorage.getItem('cozydesk_calendar_shared') === 'on';

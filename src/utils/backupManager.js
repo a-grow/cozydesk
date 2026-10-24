@@ -5,6 +5,27 @@
 
 const PREFIX = 'cozydesk';
 const BACKUP_MARKER = 'cozydesk-backup';
+const UNLOCK_KEY = 'cozydesk_unlocked';
+
+// Set once a restore has been written. Until the page reloads, the desk must NOT autosave —
+// otherwise the desk still on screen overwrites the restored copy of the current world.
+let restoreDone = false;
+export function isRestoreDone() {
+  return restoreDone;
+}
+
+// Purchases are never lost by a restore: unlocks from the current browser and from the
+// backup are combined (anything unlocked in either stays unlocked).
+function mergeUnlocks(currentRaw, backupRaw) {
+  const parse = (raw) => {
+    try { const o = JSON.parse(raw); return o && typeof o === 'object' ? o : {}; } catch { return {}; }
+  };
+  const a = parse(currentRaw);
+  const b = parse(backupRaw);
+  const merged = { ...b, ...a };
+  for (const k of Object.keys(b)) if (b[k] === true) merged[k] = true;
+  return JSON.stringify(merged);
+}
 
 // True if there is any saved CozyDesk data worth backing up.
 export function hasBackupData() {
@@ -65,22 +86,43 @@ export function restoreFromFile(file) {
         return resolve({ ok: false, reason: 'invalid' });
       }
 
-      try {
-        // Clear existing cozydesk keys first (restore is a full replace).
+      // Only CozyDesk entries count. An empty backup is refused — restoring it would wipe everything.
+      const entries = Object.entries(parsed.data).filter(
+        ([key, value]) => key.startsWith(PREFIX) && typeof value === 'string'
+      );
+      if (entries.length === 0) return resolve({ ok: false, reason: 'invalid' });
+
+      // Snapshot the current data first, so nothing can be lost if writing fails halfway
+      // (e.g. browser storage full). Restore is a full replace: clear, then write.
+      const snapshot = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(PREFIX)) snapshot[key] = localStorage.getItem(key);
+      }
+
+      const clearAll = () => {
         const toRemove = [];
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (key && key.startsWith(PREFIX)) toRemove.push(key);
         }
         toRemove.forEach((k) => localStorage.removeItem(k));
+      };
 
-        // Write the backup's keys back.
-        for (const [key, value] of Object.entries(parsed.data)) {
-          if (key.startsWith(PREFIX) && typeof value === 'string') {
-            localStorage.setItem(key, value);
-          }
+      restoreDone = true; // block autosave from here on (nothing may write over the restore)
+      try {
+        clearAll();
+        for (const [key, value] of entries) localStorage.setItem(key, value);
+        if (snapshot[UNLOCK_KEY]) {
+          localStorage.setItem(UNLOCK_KEY, mergeUnlocks(snapshot[UNLOCK_KEY], localStorage.getItem(UNLOCK_KEY)));
         }
       } catch {
+        // Put everything back exactly as it was before the restore started.
+        try {
+          clearAll();
+          for (const [key, value] of Object.entries(snapshot)) localStorage.setItem(key, value);
+        } catch (_) {}
+        restoreDone = false; // restore failed and was rolled back — normal saving resumes
         return resolve({ ok: false, reason: 'write-failed' });
       }
 
