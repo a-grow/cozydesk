@@ -5,19 +5,17 @@ import {
   availableThemeNames,
   THEME_BACKGROUNDS,
   THEME_GUMROAD_URLS,
+  WORLDS,
 } from '../../themes/themeRegistry';
-import { isPaidWorld, isWorldUnlocked, verifyAndUnlock } from '../../utils/licenseManager';
+import { isPaidWorld, isWorldUnlocked, verifyAndUnlock, paidWorlds } from '../../utils/licenseManager';
 import allAccessBanner from '../../assets/backgrounds/all-access-banner.png';
 import comingSpaceBg from '../../assets/backgrounds/space-cruiser-background.png';
 import comingDynastyBg from '../../assets/backgrounds/chinese-dynasty-background.png';
 import { soundManager } from '../../utils/soundManager';
 
-const FLAVOR = {
-  cafe: "A fresh cup and a cozy table that's always waiting. It's morning here whenever you need it to be — quiet, unhurried, and entirely yours.",
-  steampunk: "Brass, lamplight, and the slow turn of gears. A workshop built for long, focused hours — where the work pulls you in and the world outside goes quiet.",
-};
-
-const PRICE = { cafe: '$2.99', steampunk: '$2.99' };
+// Flavor text and price come from each world's world.js.
+const FLAVOR = Object.fromEntries(WORLDS.filter((w) => w.flavor).map((w) => [w.key, w.flavor]));
+const PRICE = Object.fromEntries(WORLDS.filter((w) => w.price).map((w) => [w.key, w.price]));
 
 const overlay = {
   position: 'fixed', inset: 0, zIndex: 10000,
@@ -494,7 +492,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
           ))}
         </div>
 
-        {!(isWorldUnlocked('cafe') && isWorldUnlocked('steampunk')) && (
+        {!paidWorlds().every((w) => isWorldUnlocked(w)) && (
           <div
             onClick={() => {
               soundManager.play('sfx_click_button');
