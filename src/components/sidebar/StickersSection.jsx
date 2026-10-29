@@ -1,7 +1,11 @@
 import React from 'react';
 import { soundManager } from '../../utils/soundManager';
+import { useTheme } from '../../themes/ThemeContext';
 
 export default function StickersSection({ stickers, onDeskAdd, canUndo, onUndo, canRedo, onRedo }) {
+  // Interactive stickers (tap sounds / food machine, from world.js) get a little sparkle badge.
+  const { theme } = useTheme();
+  const isInteractive = (name) => !!(theme?.stickerSounds?.[name] || theme?.foodGenerators?.[name] || theme?.lightToggles?.[name]);
   return (
     <div className="stickers-section">
       {/* Undo / Redo bar — always visible */}
@@ -16,8 +20,17 @@ export default function StickersSection({ stickers, onDeskAdd, canUndo, onUndo, 
           <div
             className="sticker-thumb-cell"
             key={i}
-            title={sticker.name.replace(/\.png$/i, '').replace(/[_-]/g, ' ')}
+            title={isInteractive(sticker.name)
+              ? 'Interactive! Tap it on your desk'
+              : sticker.name.replace(/\.png$/i, '').replace(/[_-]/g, ' ')}
+            style={isInteractive(sticker.name) ? { position: 'relative' } : undefined}
           >
+            {isInteractive(sticker.name) && (
+              <span aria-hidden style={{
+                position: 'absolute', top: '3px', right: '5px', fontSize: '13px',
+                pointerEvents: 'none', filter: 'drop-shadow(0 0 3px rgba(111,243,234,0.9))',
+              }}>✨</span>
+            )}
             <img
               src={sticker.src}
               alt={sticker.name}

@@ -18,6 +18,9 @@ import { useTheme } from "./ThemeContext";
 import { useDeskState } from "../hooks/useDeskState";
 import deskImg from "../assets/backgrounds/cozycornerbg.png";
 import { soundManager } from '../utils/soundManager';
+import { mugzySay } from '../utils/mugzyBus';
+import { ambienceManager } from '../utils/ambienceManager';
+import FoodGenerator from '../components/FoodGenerator';
 import { healStickerSrc, healNoteSrc } from '../utils/assetHeal';
 import pkg from '../../package.json';
 
@@ -186,6 +189,44 @@ export default function Cozykawaii() {
 
   const playToggleSound = () => {
     soundManager.play('sfx_click_button');
+  };
+
+  // ─── World sounds & smart stickers (from world.js config) ──────────
+  // Ambience loop for the current world (none = silence). Tap sounds and the food
+  // machine are per sticker name. Food machine state is NOT saved (component only).
+  useEffect(() => { ambienceManager.setTrack(theme.ambience); }, [theme]);
+  const [genTicks, setGenTicks] = useState({});
+  const isInteractive = (name) => !!(theme.stickerSounds?.[name] || theme.foodGenerators?.[name] || theme.lightToggles?.[name]);
+  const [litIds, setLitIds] = useState({});   // sticker id → light switched on (not saved)
+  // Interactive sticker names already tapped once (they stop glowing). Saved as a small list.
+  const [tappedNames, setTappedNames] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('cozydesk_tapped_interactive') || '[]'); } catch { return []; }
+  });
+  // First time an interactive sticker is on the desk, Mugzy explains (once, ever).
+  const hasInteractiveOnDesk = desk.stickers.some((s) => isInteractive(s.name));
+  useEffect(() => {
+    if (!hasInteractiveOnDesk || localStorage.getItem('cozydesk_tip_interactive') === 'seen') return;
+    localStorage.setItem('cozydesk_tip_interactive', 'seen');
+    setTimeout(() => mugzySay("Psst… anything glowing is alive. Tap it! (Double-click one to resize it.)"), 600);
+  }, [hasInteractiveOnDesk]);
+  const onStickerTap = (sticker) => {
+    if (isInteractive(sticker.name) && !tappedNames.includes(sticker.name)) {
+      const next = [...tappedNames, sticker.name];
+      setTappedNames(next);
+      try { localStorage.setItem('cozydesk_tapped_interactive', JSON.stringify(next)); } catch { /* ignore */ }
+    }
+    const snd = theme.stickerSounds?.[sticker.name];
+    if (snd) soundManager.playUrl(snd);
+    if (theme.lightToggles?.[sticker.name]) {
+      setLitIds((l) => ({ ...l, [sticker.id]: !l[sticker.id] }));
+    }
+    if (theme.foodGenerators?.[sticker.name]) {
+      setGenTicks((t) => ({ ...t, [sticker.id]: (t[sticker.id] || 0) + 1 }));
+    }
+  };
+  const stickerOverlay = (sticker) => {
+    const g = theme.foodGenerators?.[sticker.name];
+    return g ? <FoodGenerator tick={genTicks[sticker.id] || 0} foods={g.foods} area={g.area} beam={g.beam} /> : null;
   };
 
   // ─── Keyboard shortcuts ────────────────────────────────────────────
@@ -801,6 +842,12 @@ export default function Cozykawaii() {
           layer={sticker.layer}
           isSelected={selectedId?.type === "sticker" && selectedId?.id === sticker.id}
           onSelect={() => setSelectedId({ type: "sticker", id: sticker.id })}
+          onTap={() => onStickerTap(sticker)}
+          overlay={stickerOverlay(sticker)}
+          interactive={isInteractive(sticker.name)}
+          glow={isInteractive(sticker.name) && !tappedNames.includes(sticker.name)}
+          lit={!!litIds[sticker.id]}
+          litSrc={theme.lightToggles?.[sticker.name]}
           onDragMove={data => desk.resizeAttachedStickers(
             sticker.id, data.x / dimensions.width, data.y / dimensions.height,
             sticker.wRatio, sticker.hRatio
@@ -841,6 +888,12 @@ export default function Cozykawaii() {
           layer={sticker.layer}
           isSelected={selectedId?.type === "sticker" && selectedId?.id === sticker.id}
           onSelect={() => setSelectedId({ type: "sticker", id: sticker.id })}
+          onTap={() => onStickerTap(sticker)}
+          overlay={stickerOverlay(sticker)}
+          interactive={isInteractive(sticker.name)}
+          glow={isInteractive(sticker.name) && !tappedNames.includes(sticker.name)}
+          lit={!!litIds[sticker.id]}
+          litSrc={theme.lightToggles?.[sticker.name]}
           onDragMove={data => desk.resizeAttachedStickers(
             sticker.id, data.x / dimensions.width, data.y / dimensions.height,
             sticker.wRatio, sticker.hRatio

@@ -24,6 +24,8 @@ class SoundManager {
     this._enabled = localStorage.getItem(STORAGE_KEY) !== 'false';
     this._buffers = {};
     this._ctx = null;
+    this._urlBuffers = {};   // world sounds played by url (playUrl), decoded once
+    this._listeners = [];    // told when Sound Effects is switched on/off (onChange)
     this._load();
   }
 
@@ -67,6 +69,31 @@ class SoundManager {
   setEnabled(val) {
     this._enabled = val;
     localStorage.setItem(STORAGE_KEY, String(val));
+    this._listeners.forEach((fn) => { try { fn(val); } catch { /* ignore */ } });
+  }
+
+  // Run fn(enabled) whenever Sound Effects is switched on/off (used by ambienceManager).
+  onChange(fn) { this._listeners.push(fn); }
+
+  // Play a sound file by url (a world's own sounds, from world.js). Same volume as play().
+  async playUrl(url) {
+    if (!this._enabled || !url) return;
+    try {
+      const ctx = this._getCtx();
+      let buf = this._urlBuffers[url];
+      if (!buf) {
+        const res = await fetch(url);
+        buf = await ctx.decodeAudioData(await res.arrayBuffer());
+        this._urlBuffers[url] = buf;
+      }
+      const source = ctx.createBufferSource();
+      source.buffer = buf;
+      const gain = ctx.createGain();
+      gain.gain.value = 0.4;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start();
+    } catch { /* ignore */ }
   }
 }
 

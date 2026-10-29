@@ -9,7 +9,6 @@ import {
 } from '../../themes/themeRegistry';
 import { isPaidWorld, isWorldUnlocked, verifyAndUnlock, paidWorlds } from '../../utils/licenseManager';
 import allAccessBanner from '../../assets/backgrounds/all-access-banner.png';
-import comingSpaceBg from '../../assets/backgrounds/space-cruiser-background.png';
 import comingDynastyBg from '../../assets/backgrounds/chinese-dynasty-background.png';
 import { soundManager } from '../../utils/soundManager';
 
@@ -214,7 +213,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
               Unlock Every World
             </div>
             <div style={{ fontSize: '16px', lineHeight: 1.6, maxWidth: '440px', margin: '0 auto 28px', opacity: 0.96 }}>
-              Café, Steampunk, and 2 more worlds coming soon — 6 total. Buy once, they're all yours.
+              Café, Steampunk, Space Cruiser, and 1 more world coming soon — 6 total. Buy once, they're all yours.
             </div>
             <button
               type="button"
@@ -449,7 +448,6 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
           })}
 
           {[
-            { label: 'Space Cruiser', bg: comingSpaceBg },
             { label: 'Ancient Dynasty', bg: comingDynastyBg },
           ].map((soon) => (
             <div
@@ -540,7 +538,7 @@ export default function WorldGalleryModal({ currentTheme, onPick, onClose }) {
                 Unlock Every World
               </div>
               <div style={{ fontSize: '15px', lineHeight: 1.55, opacity: 0.96 }}>
-                Café, Steampunk, and 2 more worlds coming soon — 6 total. Buy once, they're all yours.
+                Café, Steampunk, Space Cruiser, and 1 more world coming soon — 6 total. Buy once, they're all yours.
               </div>
               <div style={{
                 marginTop: '4px',

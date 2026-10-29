@@ -45,6 +45,12 @@ const Sticker = ({
   flippedY: initFlippedY = false,
   rotation: initRotation = 0,
   onTransformChange,
+  onTap,        // optional: called on a plain click (world tap sounds / food machine)
+  overlay,      // optional: drawn on top of the sticker image (food machine)
+  interactive = false, // tap = use it, no handles; double-click = select (handles) to resize/rotate
+  glow = false,        // soft teal pulse until it has been tapped once
+  lit = false,         // light switched on: show the "lights on" layer
+  litSrc,              // the sticker's "lights on" layer (only its lights, brighter, same colours)
 }) => {
   const [flippedX, setFlippedX] = useState(initFlippedX);
   const [flippedY, setFlippedY] = useState(initFlippedY);
@@ -65,6 +71,8 @@ const Sticker = ({
   // Live rotation, readable at gesture-end. The state variable is frozen inside
   // handleRotate's closure, so onUp must read the latest angle from this ref.
   const rotationRef = React.useRef(initRotation);
+  const draggedRef = React.useRef(false);   // true if the last press moved the sticker (then it's not a tap)
+  const dragStartRef = React.useRef({ x: 0, y: 0 });
 
   // Make the sticker's box match its picture's true shape so the handles hug the
   // art and overlapping stickers stop stealing each other's clicks. Display-only:
@@ -120,10 +128,19 @@ const Sticker = ({
         bottomLeft: "sticker-corner-handle nesw",
         bottomRight: "sticker-corner-handle nwse",
       }}
-      style={{ zIndex, border: "none", boxShadow: "none", borderRadius: "8px" }}
-      onClick={(e) => { e.stopPropagation(); onSelect(); }}
-      onDragStart={() => onSelect()}
-      onDrag={(e, d) => { if (onDragMove) onDragMove({ x: d.x, y: d.y }); }}
+      style={{ zIndex, border: "none", boxShadow: "none", borderRadius: "8px", ...(interactive ? { cursor: "pointer" } : {}) }}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!interactive) onSelect();
+        if (!draggedRef.current) onTap?.();
+      }}
+      onDoubleClick={interactive ? (e) => { e.stopPropagation(); onSelect(); } : undefined}
+      onDragStart={(e, d) => { draggedRef.current = false; dragStartRef.current = { x: d.x, y: d.y }; if (!interactive) onSelect(); }}
+      onDrag={(e, d) => {
+        // A real click wiggles a pixel or two — only a move of 5px+ counts as a drag (not a tap).
+        if (Math.abs(d.x - dragStartRef.current.x) + Math.abs(d.y - dragStartRef.current.y) > 5) draggedRef.current = true;
+        if (onDragMove) onDragMove({ x: d.x, y: d.y });
+      }}
       onDragStop={(e, d) => {
         onUpdate({ x: d.x, y: d.y, width, height });
       }}
@@ -149,7 +166,14 @@ const Sticker = ({
         height: "100%",
         position: "relative",
         transform: isBackdrop ? "none" : `rotate(${rotation}deg)`,
+        animation: glow && !lit ? "sticker-live-glow 1.8s ease-in-out infinite" : undefined,
       }}>
+        {glow && (
+          <style>{`@keyframes sticker-live-glow {
+            0%, 100% { filter: drop-shadow(0 0 0 rgba(111,243,234,0)); }
+            50%      { filter: drop-shadow(0 0 14px rgba(111,243,234,0.95)); }
+          }`}</style>
+        )}
         <img
           src={src}
           alt={alt}
@@ -171,6 +195,22 @@ const Sticker = ({
             border: "none",
           }}
         />
+        {litSrc && (
+          <img
+            src={litSrc}
+            alt=""
+            aria-hidden
+            style={{
+              position: "absolute", inset: 0, width: "100%", height: "100%",
+              objectFit: "contain",
+              transform: `scaleX(${flippedX ? -1 : 1}) scaleY(${flippedY ? -1 : 1})`,
+              pointerEvents: "none",
+              opacity: lit ? 1 : 0,
+              transition: "opacity 0.35s ease",
+            }}
+          />
+        )}
+        {overlay}
 
         {isSelected && (
           <>

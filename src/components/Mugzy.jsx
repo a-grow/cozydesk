@@ -4,7 +4,7 @@ import sparklePose from "../assets/mascot/mug-sparkle.png";
 import cheerPose from "../assets/mascot/mug-cheer.png";
 import focusPose from "../assets/mascot/mug-focus.png";
 import blinkPose from "../assets/mascot/mug-blink.png";
-import { onTaskComplete } from "../utils/mugzyBus";
+import { onTaskComplete, onMugzySay } from "../utils/mugzyBus";
 import { onFocusChange } from "../utils/focusBus";
 
 export default function Mugzy() {
@@ -18,6 +18,8 @@ export default function Mugzy() {
   const timerRef = useRef(null);
   const cheerTimerRef = useRef(null);
   const blinkTimeoutRef = useRef(null);
+  const [bubble, setBubble] = useState(null);        // short speech-bubble message (or null)
+  const bubbleTimerRef = useRef(null);
 
   // Live show/hide from Settings toggle
   useEffect(() => {
@@ -50,6 +52,16 @@ export default function Mugzy() {
       }
     });
     return () => { off(); clearTimeout(cheerTimerRef.current); };
+  }, []);
+
+  // Speech bubble (mugzySay): show for 7s, then hide.
+  useEffect(() => {
+    const off = onMugzySay((text) => {
+      setBubble(text);
+      clearTimeout(bubbleTimerRef.current);
+      bubbleTimerRef.current = setTimeout(() => setBubble(null), 7000);
+    });
+    return () => { off(); clearTimeout(bubbleTimerRef.current); };
   }, []);
 
   // Idle blink: flick to the closed-eye pose briefly every few seconds.
@@ -92,6 +104,25 @@ export default function Mugzy() {
         pointerEvents: "none",
       }}
     >
+      {bubble && (
+        <div style={{
+          position: "absolute", right: "8px", bottom: `${BADGE + 12}px`,
+          width: "220px", padding: "10px 14px",
+          background: "#fffaf0", color: "#4b3b2a",
+          border: "2px solid #c9a227", borderRadius: "16px",
+          fontFamily: "'Nunito', sans-serif", fontSize: "14px", fontWeight: 700, lineHeight: 1.35,
+          boxShadow: "0 6px 18px rgba(60,40,20,0.28)",
+          animation: "mugzy-bubble-in 0.35s ease-out",
+        }}>
+          {bubble}
+          <div style={{
+            position: "absolute", right: "52px", bottom: "-9px", width: "14px", height: "14px",
+            background: "#fffaf0", borderRight: "2px solid #c9a227", borderBottom: "2px solid #c9a227",
+            transform: "rotate(45deg)",
+          }} />
+        </div>
+      )}
+
       {/* Badge backdrop — gains a blue "Focus glow" during a session */}
       <div
         style={{
@@ -149,6 +180,10 @@ export default function Mugzy() {
           40%  { transform: translateX(-50%) scaleX(0.82); opacity: 0.18; }
           65%  { transform: translateX(-50%) scaleX(1.04); opacity: 0.28; }
           100% { transform: translateX(-50%) scaleX(1);    opacity: 0.30; }
+        }
+        @keyframes mugzy-bubble-in {
+          0%   { opacity: 0; transform: translateY(8px) scale(0.92); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes mugzy-focus-glow {
           0%, 100% { filter: brightness(1);    }

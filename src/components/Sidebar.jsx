@@ -178,9 +178,11 @@ import cozyDeskLogo from '../assets/cozydesk-logo.png';
 import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
 import cafeClockIcon from '../themes/cafe/widgets/cafe-clock.png';
+import spaceClockIcon from '../themes/spacecruiser/widgets/spacecruiser-clock.png';
 
 // ── Live clock overlay for the café clock sidebar icon ────────────────────────
-function LiveCafeClockIcon({ onDragStart, onDoubleClick }) {
+// Also used by Space Cruiser (own image, colour and screen area; café keeps the defaults).
+function LiveCafeClockIcon({ onDragStart, onDoubleClick, src = cafeClockIcon, color = '#f6b73c', screen = { top: '15%', left: '10%', right: '10%', bottom: '38%' } }) {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
@@ -196,8 +198,8 @@ function LiveCafeClockIcon({ onDragStart, onDoubleClick }) {
   return (
     <div style={{ position: 'relative', display: 'inline-block', width: '100%', maxWidth: '140px' }}>
       <img
-        src={cafeClockIcon}
-        alt="Café Clock"
+        src={src}
+        alt="Clock"
         className="sb-todo-icon-img"
         draggable
         onDragStart={onDragStart}
@@ -206,7 +208,7 @@ function LiveCafeClockIcon({ onDragStart, onDoubleClick }) {
       />
       <div style={{
         position: 'absolute',
-        top: '15%', left: '10%', right: '10%', bottom: '38%',
+        top: screen.top, left: screen.left, right: screen.right, bottom: screen.bottom,
         display: 'flex', flexDirection: 'column',
         justifyContent: 'center', alignItems: 'center',
         textAlign: 'center', pointerEvents: 'none', userSelect: 'none',
@@ -214,14 +216,14 @@ function LiveCafeClockIcon({ onDragStart, onDoubleClick }) {
         <div style={{
           fontSize: '19px', fontWeight: 700,
           fontFamily: "'Nunito', sans-serif",
-          color: '#f6b73c',
+          color,
           letterSpacing: '0.05em', lineHeight: 1.05,
           whiteSpace: 'nowrap',
         }}>{h}:{m} <span style={{ fontSize: '11px' }}>{ampm}</span></div>
         <div style={{
           fontSize: '12px', fontWeight: 600,
           fontFamily: "'Nunito', sans-serif",
-          color: '#f6b73c', opacity: 0.9,
+          color, opacity: 0.9,
           letterSpacing: '0.04em', lineHeight: 1.1,
           marginTop: '1px',
         }}>{dateStr}</div>
@@ -426,6 +428,23 @@ export default function Sidebar({
                       e.dataTransfer.effectAllowed = 'copy';
                       const ghost = document.createElement('img');
                       ghost.src = cafeClockIcon;
+                      ghost.style.cssText = 'position:absolute;top:-9999px;width:80px;opacity:0.5';
+                      document.body.appendChild(ghost);
+                      e.dataTransfer.setDragImage(ghost, 40, 20);
+                      setTimeout(() => document.body.removeChild(ghost), 0);
+                    }}
+                  />
+                ) : themeName === 'spacecruiser' ? (
+                  <LiveCafeClockIcon
+                    src={spaceClockIcon}
+                    color="#6ff3ea"
+                    screen={{ top: '15.5%', left: '11%', right: '11%', bottom: '22%' }}
+                    onDoubleClick={() => onDeskAdd({ name: 'spacecruiser-clock.png', src: spaceClockIcon })}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('application/json', JSON.stringify({ name: 'spacecruiser-clock.png', src: spaceClockIcon }));
+                      e.dataTransfer.effectAllowed = 'copy';
+                      const ghost = document.createElement('img');
+                      ghost.src = spaceClockIcon;
                       ghost.style.cssText = 'position:absolute;top:-9999px;width:80px;opacity:0.5';
                       document.body.appendChild(ghost);
                       e.dataTransfer.setDragImage(ghost, 40, 20);

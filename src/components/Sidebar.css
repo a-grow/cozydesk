@@ -2285,3 +2285,100 @@
 .cozy-sidebar[data-theme="cafe"] .pomo-btn:hover {
   background: var(--sb-accent-light);
 }
+
+/* ════════════════════════════════════════════════
+   Space Cruiser Sidebar
+   Deep navy hull, teal console lights
+   ════════════════════════════════════════════════ */
+
+.cozy-sidebar[data-theme="spacecruiser"] {
+  background: linear-gradient(180deg, #1c2340 0%, #151a33 55%, #0f1326 100%);
+  border-right: 2px solid #2b3566;
+  box-shadow:
+    inset 3px 0 20px rgba(0,0,0,0.45),
+    2px 0 22px rgba(0,0,0,0.55);
+  --sb-bg: #1c2340;
+  --sb-text: #eef0ff;
+  --sb-accent: #4fc9c4;
+  --sb-accent-secondary: #7fdcd7;
+  --sb-accent-light: #1f4a55;
+  --sb-border: #2b3566;
+  --sb-card: #232b4e;
+  --sb-heading: #eef0ff;
+  --sb-subtext: #9aa6d6;
+  --sb-input-bg: #232b4e;
+  --sb-input-border: #34406e;
+  --sb-btn-primary: #2f9f9a;
+  --sb-btn-primary-hover: #257f7b;
+  --sb-btn-secondary: #4fc9c4;
+  --sb-btn-secondary-text: #101830;
+  --sb-shadow: rgba(0,0,0,0.45);
+  --sb-clock-text: #eef0ff;
+  --sb-pomo-circle: #1f4a55;
+  --sb-pomo-work: #4fc9c4;
+  --sb-pomo-break: #9b8cff;
+  --btn-bg: #2f9f9a;
+  --btn-text: #f2fbff;
+  --btn-font: 'Nunito', sans-serif;
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sb-logo-subtitle {
+  color: #9aa6d6;
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sb-divider {
+  border-top-color: rgba(79,201,196,0.35);
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sb-section {
+  border-top-color: rgba(79,201,196,0.2);
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sb-section-title {
+  color: #9aa6d6;
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sb-action-btn {
+  border-radius: 8px;
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sticker-thumb-cell {
+  background: rgba(79,201,196,0.06);
+  border-color: rgba(79,201,196,0.2);
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sticker-thumb-cell:hover {
+  background: rgba(79,201,196,0.16);
+  border-color: rgba(79,201,196,0.55);
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .sb-todo-container:hover {
+  border-color: rgba(79,201,196,0.55);
+  background: rgba(79,201,196,0.12);
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .theme-dropdown {
+  background: #232b4e;
+  border-color: #4fc9c4;
+  color: #eef0ff;
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .pomo-widget {
+  background: #232b4e;
+  border-color: #2b3566;
+}
+
+.cozy-sidebar[data-theme="spacecruiser"] .pomo-widget:hover {
+  background: #2b3566;
+  box-shadow: 0 0 14px rgba(79,201,196,0.3);
+}
+
+/* Timer buttons: navy surface, light text, teal edge (same fix café needed). */
+.cozy-sidebar[data-theme="spacecruiser"] .pomo-btn {
+  background: #2b3566;
+  color: #eef0ff;
+  border-color: #4fc9c4;
+}
+.cozy-sidebar[data-theme="spacecruiser"] .pomo-btn:hover {
+  background: var(--sb-accent-light);
+}
