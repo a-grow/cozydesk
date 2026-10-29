@@ -137,9 +137,9 @@ export default {
   order: 5,                 // position in the World Gallery
   paid: true,
   price: "$2.99",
-  gumroadProductId: null,   // TODO: copy from the Gumroad dashboard once the product exists
-  gumroadUrl: null,         // TODO: Gumroad product link
-  flavor: "Your own quiet cabin among the stars. Glowing alien plants, a sleepy cat, and a window full of galaxies — a calm place to get things done, light-years from the noise.",
+  gumroadProductId: "VZLFWQDb1s-_qexpB7y8NQ==",
+  gumroadUrl: "https://doodleandy.gumroad.com/l/space-cruiser",
+  flavor: "A little cabin on a spaceship, all to yourself. There's a sleepy cat, some glowing alien plants, and stars drifting past the window. Put on some music and get your work done.",
   backgroundImage: spaceBackground,
   music: [space1, space2, space3, space4],
   config,
