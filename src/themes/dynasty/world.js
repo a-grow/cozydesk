@@ -97,8 +97,8 @@ export default {
   order: 6,                 // position in the World Gallery
   paid: true,
   price: "$2.99",
-  gumroadProductId: "",     // TODO: copy from the Gumroad dashboard once the product exists
-  gumroadUrl: "https://doodleandy.gumroad.com/l/ancient-dynasty",   // TODO: confirm after creating the product
+  gumroadProductId: "SzOx9BJbw6iQalo501alfA==",   // copied from Gumroad dashboard (product edit id wzlmi)
+  gumroadUrl: "https://doodleandy.gumroad.com/l/ancient-dynasty",
   flavor: "Step into a study from an ancient Chinese dynasty. Carved rosewood walls, glowing silk lanterns, warm tea and dumplings, and a cherry blossom garden just outside the window. Settle in and get your work done.",
   backgroundImage: dynastyBackground,
   music: [dynasty1, dynasty2, dynasty3, dynasty4, dynasty5],
