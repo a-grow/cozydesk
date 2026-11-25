@@ -6,6 +6,8 @@ export default function StickersSection({ stickers, onDeskAdd, canUndo, onUndo, 
   // Interactive stickers (tap sounds / food machine, from world.js) get a little sparkle badge.
   const { theme } = useTheme();
   const isInteractive = (name) => !!(theme?.stickerSounds?.[name] || theme?.foodGenerators?.[name] || theme?.lightToggles?.[name]);
+  // Moving stickers (animated WebP, any world) get a small ▶ badge. All animated stickers are .webp.
+  const isAnimated = (name) => /\.webp$/i.test(name);
   return (
     <div className="stickers-section">
       {/* Undo / Redo bar — always visible */}
@@ -22,14 +24,23 @@ export default function StickersSection({ stickers, onDeskAdd, canUndo, onUndo, 
             key={i}
             title={isInteractive(sticker.name)
               ? 'Interactive! Tap it on your desk'
-              : sticker.name.replace(/\.png$/i, '').replace(/[_-]/g, ' ')}
-            style={isInteractive(sticker.name) ? { position: 'relative' } : undefined}
+              : isAnimated(sticker.name)
+                ? 'Animated'
+                : sticker.name.replace(/\.png$/i, '').replace(/[_-]/g, ' ')}
+            style={(isInteractive(sticker.name) || isAnimated(sticker.name)) ? { position: 'relative' } : undefined}
           >
             {isInteractive(sticker.name) && (
               <span aria-hidden style={{
                 position: 'absolute', top: '3px', right: '5px', fontSize: '13px',
                 pointerEvents: 'none', filter: 'drop-shadow(0 0 3px rgba(111,243,234,0.9))',
               }}>✨</span>
+            )}
+            {isAnimated(sticker.name) && (
+              <span aria-hidden style={{
+                position: 'absolute', bottom: '3px', left: '5px', fontSize: '12px', lineHeight: 1,
+                color: '#5dff8f', pointerEvents: 'none',
+                filter: 'drop-shadow(0 0 2px rgba(93,255,143,1)) drop-shadow(0 0 5px rgba(93,255,143,0.8))',
+              }}>▶</span>
             )}
             <img
               src={sticker.src}
