@@ -2382,3 +2382,99 @@
 .cozy-sidebar[data-theme="spacecruiser"] .pomo-btn:hover {
   background: var(--sb-accent-light);
 }
+/* ════════════════════════════════════════════════
+   Ancient Dynasty Sidebar
+   Dark rosewood, cinnabar red, gold edges, jade
+   ════════════════════════════════════════════════ */
+
+.cozy-sidebar[data-theme="dynasty"] {
+  background: linear-gradient(180deg, #4a1f14 0%, #33150c 55%, #240e07 100%);
+  border-right: 2px solid #5c3420;
+  box-shadow:
+    inset 3px 0 20px rgba(0,0,0,0.45),
+    2px 0 22px rgba(0,0,0,0.55);
+  --sb-bg: #3a1a10;
+  --sb-text: #f5e6c8;
+  --sb-accent: #9e3a24;
+  --sb-accent-secondary: #d4a84b;
+  --sb-accent-light: #5a2416;
+  --sb-border: #5c3420;
+  --sb-card: #4a2416;
+  --sb-heading: #f5e6c8;
+  --sb-subtext: #d9b57a;
+  --sb-input-bg: #4a2416;
+  --sb-input-border: #6b3a22;
+  --sb-btn-primary: #9e3a24;
+  --sb-btn-primary-hover: #7a2c1a;
+  --sb-btn-secondary: #2e7d5a;
+  --sb-btn-secondary-text: #f5e6c8;
+  --sb-shadow: rgba(0,0,0,0.4);
+  --sb-clock-text: #f5e6c8;
+  --sb-pomo-circle: #5a2416;
+  --sb-pomo-work: #2e7d5a;
+  --sb-pomo-break: #d4a84b;
+  --btn-bg: #9e3a24;
+  --btn-text: #f5e6c8;
+  --btn-font: 'Nunito', sans-serif;
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sb-logo-subtitle {
+  color: #d9b57a;
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sb-divider {
+  border-top-color: rgba(212,168,75,0.4);
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sb-section {
+  border-top-color: rgba(212,168,75,0.25);
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sb-section-title {
+  color: #d9b57a;
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sb-action-btn {
+  border-radius: 8px;
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sticker-thumb-cell {
+  background: rgba(212,168,75,0.06);
+  border-color: rgba(212,168,75,0.2);
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sticker-thumb-cell:hover {
+  background: rgba(212,168,75,0.18);
+  border-color: rgba(212,168,75,0.55);
+}
+
+.cozy-sidebar[data-theme="dynasty"] .sb-todo-container:hover {
+  border-color: rgba(212,168,75,0.55);
+  background: rgba(212,168,75,0.15);
+}
+
+.cozy-sidebar[data-theme="dynasty"] .theme-dropdown {
+  background: #4a2416;
+  border-color: #d4a84b;
+  color: #f5e6c8;
+}
+
+.cozy-sidebar[data-theme="dynasty"] .pomo-widget {
+  background: #4a2416;
+  border-color: #5c3420;
+}
+
+.cozy-sidebar[data-theme="dynasty"] .pomo-widget:hover {
+  background: #5a2c1a;
+  box-shadow: 0 0 14px rgba(212,168,75,0.3);
+}
+
+/* Timer buttons: rosewood surface, cream text, gold edge (same fix café needed). */
+.cozy-sidebar[data-theme="dynasty"] .pomo-btn {
+  background: #5a2c1a;
+  color: #f5e6c8;
+  border-color: #d4a84b;
+}
+.cozy-sidebar[data-theme="dynasty"] .pomo-btn:hover {
+  background: var(--sb-accent-light);
+}

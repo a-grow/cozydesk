@@ -406,15 +406,32 @@ const updateNote = (id, data) => {
       return;
     }
     const isCorkboard = sticker.name.includes("corkboard");
+    // Dynasty's big window ("window-wall"): start it exactly over the front wall of the
+    // background art (1920x1080, drawn 'cover' + centred). Wall = x150 y15 w1480 h732 on that art.
+    // Only sets where a NEW sticker first appears; saved desks are untouched.
+    let wall = null;
+    if (sticker.name.includes('window-wall') && dimensions.width && dimensions.height) {
+      const s = Math.max(dimensions.width / 1920, dimensions.height / 1080);
+      const ox = (dimensions.width - 1920 * s) / 2;
+      const oy = (dimensions.height - 1080 * s) / 2;
+      wall = {
+        xRatio: (ox + 150 * s) / dimensions.width,
+        yRatio: (oy + 15 * s) / dimensions.height,
+        wRatio: (1480 * s) / dimensions.width,
+        hRatio: (732 * s) / dimensions.height,
+      };
+    }
     setStickers(prev => [...prev, {
       id: Date.now(),
-      name: sticker.name, src: sticker.src, xRatio, yRatio,
-      wRatio: isCorkboard ? 0.38 : 0.11,
-      hRatio: isCorkboard ? 0.52 : 0.14,
+      name: sticker.name, src: sticker.src,
+      xRatio: wall ? wall.xRatio : xRatio,
+      yRatio: wall ? wall.yRatio : yRatio,
+      wRatio: wall ? wall.wRatio : (isCorkboard ? 0.38 : 0.11),
+      hRatio: wall ? wall.hRatio : (isCorkboard ? 0.52 : 0.14),
       backdrop: false,
       layer: getNextLayer(),
     }]);
-  }, [pushUndo]);
+  }, [pushUndo, dimensions.width, dimensions.height]);
 
   const removeSticker = (id) => {
     soundManager.play('sfx_delete_whoosh');

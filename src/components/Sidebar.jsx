@@ -179,6 +179,7 @@ import clockIcon from '../themes/cozykawaii/stickers/cozyclock.png';
 import steampunkClockIcon from '../themes/steampunk/stickers/steampunkclock.png';
 import cafeClockIcon from '../themes/cafe/widgets/cafe-clock.png';
 import spaceClockIcon from '../themes/spacecruiser/widgets/spacecruiser-clock.png';
+import dynastyClockIcon from '../themes/dynasty/widgets/dynasty-clock.png';
 
 // ── Live clock overlay for the café clock sidebar icon ────────────────────────
 // Also used by Space Cruiser (own image, colour and screen area; café keeps the defaults).
@@ -445,6 +446,23 @@ export default function Sidebar({
                       e.dataTransfer.effectAllowed = 'copy';
                       const ghost = document.createElement('img');
                       ghost.src = spaceClockIcon;
+                      ghost.style.cssText = 'position:absolute;top:-9999px;width:80px;opacity:0.5';
+                      document.body.appendChild(ghost);
+                      e.dataTransfer.setDragImage(ghost, 40, 20);
+                      setTimeout(() => document.body.removeChild(ghost), 0);
+                    }}
+                  />
+                ) : themeName === 'dynasty' ? (
+                  <LiveCafeClockIcon
+                    src={dynastyClockIcon}
+                    color="#f6c85a"
+                    screen={{ top: '13.6%', left: '15.9%', right: '16.1%', bottom: '23.9%' }}
+                    onDoubleClick={() => onDeskAdd({ name: 'dynasty-clock.png', src: dynastyClockIcon })}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('application/json', JSON.stringify({ name: 'dynasty-clock.png', src: dynastyClockIcon }));
+                      e.dataTransfer.effectAllowed = 'copy';
+                      const ghost = document.createElement('img');
+                      ghost.src = dynastyClockIcon;
                       ghost.style.cssText = 'position:absolute;top:-9999px;width:80px;opacity:0.5';
                       document.body.appendChild(ghost);
                       e.dataTransfer.setDragImage(ghost, 40, 20);
